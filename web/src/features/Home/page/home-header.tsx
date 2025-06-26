@@ -11,13 +11,12 @@ export const HomeHeader = () => {
                     className="flex items-center gap-2 font-semibold text-lg"
                 >
                     <Image
-                        src="/"
-                        alt="logo"
-                        width={40}
-                        height={40}
-                        className="rounded-full items-center justify-center flex"
+                        src="/SMMC_Logo.png"
+                        alt="smmc-logo"
+                        width={100}
+                        height={100}
+                        className="items-center justify-center flex"
                     />
-                    X
                 </Link>
             </span>
             <div className="flex-1"></div>
