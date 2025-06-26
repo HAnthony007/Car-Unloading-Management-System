@@ -1,0 +1,48 @@
+import { cn } from "@/lib/utils";
+import { EyeIcon, EyeOffIcon } from "lucide-react";
+import { forwardRef, useState } from "react";
+import { Button } from "./button";
+
+type PasswordInputProps = Omit<
+    React.InputHTMLAttributes<HTMLInputElement>,
+    "type"
+>;
+
+const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
+    ({ className, disabled, ...props }, ref) => {
+        const [showPassword, setShowPassword] = useState(false);
+        return (
+            <div className={cn("relative rounded-md", className)}>
+                <input
+                    type={showPassword ? "text" : "password"}
+                    className={cn(
+                        "file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
+                        "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
+                        "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+                        className
+                    )}
+                    ref={ref}
+                    disabled={disabled}
+                    {...props}
+                />
+                <Button
+                    type="button"
+                    size="icon"
+                    variant="ghost"
+                    disabled={disabled}
+                    className="absolute right-1 top-1/2 h-6 w-6 -translate-y-1/2 rounded-md text-muted-foreground"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                >
+                    {showPassword ? (
+                        <EyeIcon size={18} />
+                    ) : (
+                        <EyeOffIcon size={18} />
+                    )}
+                </Button>
+            </div>
+        );
+    }
+);
+PasswordInput.displayName = "PasswordInput";
+
+export { PasswordInput };
