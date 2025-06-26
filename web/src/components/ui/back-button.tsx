@@ -13,7 +13,7 @@ export const BackButton = ({
         <Button
             onClick={() => router.back()}
             className={cn(
-                `${className} mt-6 inline-block rounded-sm px-5 text-sm font-medium focus:ring-3 focus:outline-hidden`
+                `${className} mt-6 inline-block rounded-sm px-5 text-sm font-medium focus:ring-3 focus:outline-hidden cursor-pointer`
             )}
             {...props}
         >

@@ -1,3 +1,4 @@
+import { ToggleTheme } from "@/features/theme/theme-toogle";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -23,11 +24,11 @@ export const HomeHeader = () => {
             <div className="flex gap-2 justify-center items-center">
                 {/* <Link href="/login">
                     <Button>Login</Button>
-                </Link>
-                <Link href="/signup">
+                </Link> */}
+                {/* <Link href="/signup">
                     <Button variant="outline">Signup</Button>
                 </Link> */}
-                {/* <ToggleTheme /> */}
+                <ToggleTheme />
             </div>
         </header>
     );

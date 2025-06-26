@@ -2,6 +2,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { HomeFooter } from "@/features/Home/page/home-footer";
 import { HomeHeader } from "@/features/Home/page/home-header";
 import { cn } from "@/lib/utils";
+import Providers from "@/providers/providers";
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import "./globals.css";
@@ -29,10 +30,12 @@ export default function RootLayout({
                     "antialiased, h-full flex flex-col"
                 )}
             >
-                <HomeHeader />
-                <Toaster position="bottom-right" richColors closeButton />
-                <main className="flex-1">{children}</main>
-                <HomeFooter />
+                <Providers>
+                    <HomeHeader />
+                    <Toaster position="bottom-right" richColors closeButton />
+                    <main className="flex-1">{children}</main>
+                    <HomeFooter />
+                </Providers>
             </body>
         </html>
     );
