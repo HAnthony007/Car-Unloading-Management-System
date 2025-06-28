@@ -1,5 +1,4 @@
 import { Toaster } from "@/components/ui/sonner";
-import { HomeFooter } from "@/features/Home/page/home-footer";
 import { HeaderWrapper } from "@/features/Home/page/wrapper/header-wrapper";
 import { cn } from "@/lib/utils";
 import Providers from "@/providers/providers";
@@ -34,7 +33,7 @@ export default function RootLayout({
                     <HeaderWrapper />
                     <Toaster position="bottom-right" richColors closeButton />
                     <main className="flex-1">{children}</main>
-                    <HomeFooter />
+                    {/* <HomeFooter /> */}
                 </Providers>
             </body>
         </html>

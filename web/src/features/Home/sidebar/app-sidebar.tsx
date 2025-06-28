@@ -5,17 +5,34 @@ import {
     SidebarGroup,
     SidebarGroupContent,
     SidebarGroupLabel,
+    SidebarHeader,
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
+import { ComponentProps } from "react";
 import { sidebarItems } from "./data/sidebar-data";
 
-export function AppSidebar() {
+export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
     return (
-        <Sidebar>
-            <SidebarContent>
+        <Sidebar collapsible="offcanvas" {...props}>
+            <SidebarHeader>
+                <div className="flex gap-2 text-sidebar-accent-foreground">
+                    <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+                        <Icons.overview />
+                    </div>
+                    <div className="grid flex-1 text-left text-sm leading-tight">
+                        <span className="truncate font-semibold">
+                            Scientific day
+                        </span>
+                        <span className="truncate text-xs">
+                            Monitoring&Management
+                        </span>
+                    </div>
+                </div>
+            </SidebarHeader>
+            <SidebarContent className="overflow-x-hidden">
                 <SidebarGroup>
                     <SidebarGroupLabel>Application</SidebarGroupLabel>
                     <SidebarGroupContent>
