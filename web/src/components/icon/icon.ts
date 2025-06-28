@@ -1,7 +1,21 @@
-import { AlertCircleIcon, MoonIcon, SunIcon } from "lucide-react";
+import {
+    AlertCircleIcon,
+    CalendarIcon,
+    InboxIcon,
+    LayoutDashboardIcon,
+    MoonIcon,
+    SearchIcon,
+    SettingsIcon,
+    SunIcon,
+} from "lucide-react";
 
 export const Icons = {
-    AlertCircle: AlertCircleIcon,
-    Moon: MoonIcon,
-    Sun: SunIcon,
+    alertCircle: AlertCircleIcon,
+    moon: MoonIcon,
+    sun: SunIcon,
+    overview: LayoutDashboardIcon,
+    inbox: InboxIcon,
+    calendar: CalendarIcon,
+    search: SearchIcon,
+    setting: SettingsIcon,
 };

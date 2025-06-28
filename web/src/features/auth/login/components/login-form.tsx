@@ -13,11 +13,14 @@ import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 import { ComponentProps } from "react";
 import { useForm } from "react-hook-form";
 import { loginSchema, loginSchemaType } from "../data/login-schema";
 
 export const LoginForm = ({ className }: ComponentProps<"div">) => {
+    const router = useRouter();
+
     const form = useForm<loginSchemaType>({
         resolver: zodResolver(loginSchema),
         defaultValues: {
@@ -25,12 +28,17 @@ export const LoginForm = ({ className }: ComponentProps<"div">) => {
             password: "",
         },
     });
+
     return (
         <Form {...form}>
             <form
                 id="login-form"
                 className={cn(className, "grid gap-4")}
-                onSubmit={form.handleSubmit((data) => console.log(data))}
+                onSubmit={form.handleSubmit((data) => {
+                    console.log(data);
+                    form.reset();
+                    router.push("/dashboard");
+                })}
             >
                 <FormField
                     control={form.control}
