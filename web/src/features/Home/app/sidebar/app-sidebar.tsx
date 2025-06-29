@@ -1,3 +1,4 @@
+"use client";
 import { Icons } from "@/components/icon/icon";
 import {
     Sidebar,
@@ -18,19 +19,21 @@ export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
     return (
         <Sidebar collapsible="offcanvas" {...props}>
             <SidebarHeader>
-                <div className="flex gap-2 text-sidebar-accent-foreground">
-                    <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                        <Icons.overview />
-                    </div>
-                    <div className="grid flex-1 text-left text-sm leading-tight">
-                        <span className="truncate font-semibold">
-                            Scientific day
-                        </span>
-                        <span className="truncate text-xs">
-                            Monitoring&Management
-                        </span>
-                    </div>
-                </div>
+                <SidebarMenu>
+                    <SidebarMenuItem>
+                        <SidebarMenuButton
+                            asChild
+                            className="data-[slot=sidebar-menu-button]:!p-1.5"
+                        >
+                            <a href="#">
+                                <Icons.overview className="!size-5" />
+                                <span className="text-base font-semibold">
+                                    Car Unloading Management
+                                </span>
+                            </a>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                </SidebarMenu>
             </SidebarHeader>
             <SidebarContent className="overflow-x-hidden">
                 <SidebarGroup>

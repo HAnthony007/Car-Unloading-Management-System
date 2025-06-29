@@ -6,6 +6,7 @@ import {
     MoonIcon,
     SearchIcon,
     SettingsIcon,
+    SlashIcon,
     SunIcon,
 } from "lucide-react";
 
@@ -18,4 +19,6 @@ export const Icons = {
     calendar: CalendarIcon,
     search: SearchIcon,
     setting: SettingsIcon,
+
+    slash: SlashIcon,
 };
