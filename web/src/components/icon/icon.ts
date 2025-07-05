@@ -3,6 +3,7 @@ import {
     CalendarIcon,
     InboxIcon,
     LayoutDashboardIcon,
+    Loader2Icon,
     MoonIcon,
     SearchIcon,
     SettingsIcon,
@@ -21,4 +22,6 @@ export const Icons = {
     setting: SettingsIcon,
 
     slash: SlashIcon,
+
+    spinner: Loader2Icon,
 };

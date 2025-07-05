@@ -1,5 +1,6 @@
 "use client";
 
+import { Icons } from "@/components/icon/icon";
 import { Button } from "@/components/ui/button";
 import {
     Form,
@@ -16,11 +17,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { ComponentProps } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { useLogin } from "../../hooks/useAuth";
 import { loginSchema, loginSchemaType } from "../data/login-schema";
 
 export const LoginForm = ({ className }: ComponentProps<"div">) => {
     const router = useRouter();
-
+    const { mutate, isPending, error } = useLogin();
     const form = useForm<loginSchemaType>({
         resolver: zodResolver(loginSchema),
         defaultValues: {
@@ -29,16 +32,22 @@ export const LoginForm = ({ className }: ComponentProps<"div">) => {
         },
     });
 
+    const onSubmit = (data: loginSchemaType) => {
+        mutate(data, {
+            onSuccess: () => router.push("/dashboard"),
+        });
+    };
+
+    if (error) {
+        toast.error((error as Error).message);
+    }
+
     return (
         <Form {...form}>
             <form
                 id="login-form"
                 className={cn(className, "grid gap-4")}
-                onSubmit={form.handleSubmit((data) => {
-                    console.log(data);
-                    form.reset();
-                    router.push("/dashboard");
-                })}
+                onSubmit={form.handleSubmit(onSubmit)}
             >
                 <FormField
                     control={form.control}
@@ -69,13 +78,20 @@ export const LoginForm = ({ className }: ComponentProps<"div">) => {
                         </FormItem>
                     )}
                 />
-                <Button
-                    type="submit"
-                    className="w-full gap-4 cursor-pointer"
-                    form="login-form"
-                >
-                    Submit
-                </Button>
+                {isPending ? (
+                    <Button className="w-full gap-4 cursor-wait" disabled>
+                        <Icons.spinner className="animate-spin" />
+                        Please wait
+                    </Button>
+                ) : (
+                    <Button
+                        type="submit"
+                        className="w-full gap-4 cursor-pointer"
+                        disabled={isPending}
+                    >
+                        Submit
+                    </Button>
+                )}
             </form>
         </Form>
     );
