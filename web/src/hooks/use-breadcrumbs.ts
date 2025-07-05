@@ -11,7 +11,7 @@ type BreadcrumbsItem = {
 const routeMapping: Record<string, BreadcrumbsItem[]> = {
     "/dashboard": [
         {
-            title: "Dashboardasdasd as sdaj lajs lkdajs dlkajsd klasj dlksjdlk",
+            title: "Dashboard",
             url: "/dashboard",
         },
     ],
