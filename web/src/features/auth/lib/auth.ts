@@ -46,7 +46,6 @@ export async function getUser() {
         {
             method: "GET",
             headers: {
-                "Content-Type": "application/json",
                 Accept: "application/json",
             },
             credentials: "include",
