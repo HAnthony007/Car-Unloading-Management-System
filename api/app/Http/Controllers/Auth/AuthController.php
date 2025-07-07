@@ -3,78 +3,48 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
+use App\Http\Requests\Auth\RegisterRequest;
+use App\Http\Requests\Auth\LoginRequest;
+use App\Services\AuthService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Http\JsonResponse;
 
 class AuthController extends Controller
 {
-    public function register(Request $request)
+    protected $authService;
+
+    public function __construct(AuthService $authService)
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255' ],
-            'email'=> ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password'=> ['required', 'confirmed', 'min:8'],
-            ]);
+        $this->authService = $authService;
+    }
 
-        $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => bcrypt($validated['password']),
-        ]);
-
-        if (!$user) {
-            throw ValidationException::withMessages([
-                'email' => ['The provided credentials are incorrect.'],
-            ]);
-        }
-
-        Auth::login($user);
+    public function register(RegisterRequest $request): JsonResponse
+    {
+        $user = $this->authService->register($request->validated());
         $request->session()->regenerate();
-
         return response()->json([
-            "success" => true,
-            "message" => "User registered successfully",
-            "user" => $user,
+            'success' => true,
+            'message' => 'User registered successfully',
+            'user' => $user,
         ]);
     }
 
-    public function login(Request $request)
+    public function login(LoginRequest $request): JsonResponse
     {
-        $credentials = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required'],
-        ]);
-
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
-            return response()->json([
-                "success" => true,
-                "message" => "User logged in successfully",
-                "user" => Auth::user(),
-            ]);
-        }
-        
-        throw ValidationException::withMessages([
-            'email' => ['The provided credentials are incorrect.'],
+        $user = $this->authService->login($request->validated(), $request);
+        return response()->json([
+            'success' => true,
+            'message' => 'User logged in successfully',
+            'user' => $user,
         ]);
     }
 
-    public function logout(Request $request)
+    public function logout(Request $request): JsonResponse
     {
-        if (!Auth::check()) {
-            throw ValidationException::withMessages([
-                'logout' => ['No user is currently logged in.'],
-                ]);
-        }
-        
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        $this->authService->logout($request);
         return response()->json([
-            "success" => true,
-            "message" => "User logged out successfully",
+            'success' => true,
+            'message' => 'User logged out successfully',
         ]);
     }
 }
