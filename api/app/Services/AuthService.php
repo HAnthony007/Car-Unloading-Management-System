@@ -2,21 +2,20 @@
 
 namespace App\Services;
 
-use App\Models\User;
+use App\DTOs\UserDTO;
+use App\Repositories\UserRepository;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
-use Illuminate\Http\Request;
 
 class AuthService
 {
-    public function register(array $data)
+
+    public function __construct(private UserRepository $userRepository) {}
+
+    public function register(array $data): array
     {
-        $user = User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
-        ]);
+        $user = $this->userRepository->create($data);
+        $token = $user->createToken("api-token")->plainTextToken;
 
         if (!$user) {
             throw ValidationException::withMessages([
@@ -24,30 +23,31 @@ class AuthService
             ]);
         }
 
-        Auth::login($user);
-        return $user;
+        return [
+            'user' => (new UserDTO($user))->toArrray(),
+            'token' => $token,
+        ];
     }
 
-    public function login(array $credentials, Request $request)
+    public function login(array $credentials): array
     {
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
-            return Auth::user();
-        }
-        throw ValidationException::withMessages([
-            'email' => ['The provided credentials are incorrect.'],
-        ]);
-    }
+        $user = $this->userRepository->findByEmail($credentials['email']);
 
-    public function logout(Request $request)
-    {
-        if (!Auth::check()) {
+        if (!$user || !password_verify($credentials['password'], $user->password)) {
             throw ValidationException::withMessages([
-                'logout' => ['No user is currently logged in.'],
+                'email' => ['Email or password is incorrect.'],
             ]);
         }
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+
+        $token = $user->createToken("api-token")->plainTextToken;
+        return [
+            'user' => (new UserDTO($user))->toArrray(),
+            'token' => $token,
+        ];
     }
-} 
+
+    public function logout(): void
+    {
+        Auth::user()->currentAccessToken()->delete();
+    }
+}
