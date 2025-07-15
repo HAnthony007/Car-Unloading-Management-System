@@ -29,7 +29,7 @@ export default function DashboardLayout({
                 } as CSSProperties
             }
         >
-            <AppSidebar variant="inset" />
+            <AppSidebar variant="floating" />
             <SidebarInset>
                 <AppHeader />
                 <div className="flex flex-1 flex-col">

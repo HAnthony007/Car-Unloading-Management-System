@@ -17,7 +17,7 @@ import { sidebarItems } from "./data/sidebar-data";
 
 export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
     return (
-        <Sidebar collapsible="offcanvas" {...props}>
+        <Sidebar collapsible="icon" {...props}>
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>
