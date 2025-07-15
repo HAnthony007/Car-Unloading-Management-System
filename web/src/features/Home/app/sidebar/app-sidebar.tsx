@@ -12,10 +12,12 @@ import {
     SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { ComponentProps } from "react";
 import { sidebarItems } from "./data/sidebar-data";
 
 export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
+    const pathname = usePathname();
     return (
         <Sidebar collapsible="icon" {...props}>
             <SidebarHeader>
@@ -46,7 +48,10 @@ export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
                                     : Icons.overview;
                                 return (
                                     <SidebarMenuItem key={item.title}>
-                                        <SidebarMenuButton asChild>
+                                        <SidebarMenuButton
+                                            asChild
+                                            isActive={pathname === item.url}
+                                        >
                                             <Link href={item.url}>
                                                 {item.icon && <Icon />}
                                                 <span>{item.title}</span>
