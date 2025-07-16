@@ -1,13 +1,20 @@
 "use client";
 
 import { Main } from "@/components/layout/main";
+import { useEffect, useState } from "react";
 import { UsersAddButtons } from "./components/users-add-buttons";
 import { UsersColumns } from "./components/users-columns";
 import { UsersDataTable } from "./components/users-data-table";
+import { User } from "./data/schema";
 import { FetchUsers } from "./data/users";
 
-export const Users = async () => {
-    const data = await FetchUsers();
+export default function Users() {
+    const [data, setData] = useState<User[]>([]);
+
+    useEffect(() => {
+        FetchUsers().then(setData);
+    }, []);
+
     return (
         <Main>
             <div className="mb-2 flex flex-wrap items-center justify-between space-y-2">
@@ -26,4 +33,4 @@ export const Users = async () => {
             </div>
         </Main>
     );
-};
+}
