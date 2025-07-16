@@ -1,5 +1,6 @@
 import {
     AlertCircleIcon,
+    AlertTriangleIcon,
     CalendarIcon,
     CarIcon,
     CheckIcon,
@@ -30,6 +31,7 @@ import {
 } from "lucide-react";
 
 export const Icons = {
+    alertTriangle: AlertTriangleIcon,
     alertCircle: AlertCircleIcon,
     moon: MoonIcon,
     sun: SunIcon,

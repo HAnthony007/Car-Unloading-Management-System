@@ -10,14 +10,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { User } from "@/features/users/data/schema";
 import { Row } from "@tanstack/react-table";
-import { toast } from "sonner";
+import { useUsers } from "../context/users-context";
 
 interface DataTableRowActionsProps {
     row: Row<User>;
 }
 
 export const DataTableRowActions = ({ row }: DataTableRowActionsProps) => {
-    // const { setOpen, setCurrentRow } = useUsers();
+    const { setOpen, setCurrentRow } = useUsers();
     return (
         <>
             <DropdownMenu modal={false}>
@@ -32,9 +32,10 @@ export const DataTableRowActions = ({ row }: DataTableRowActionsProps) => {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-[160px]">
                     <DropdownMenuItem
-                        onClick={() =>
-                            toast.success(`Edit user ${row.original}`)
-                        }
+                        onClick={() => {
+                            setCurrentRow(row.original);
+                            setOpen("edit");
+                        }}
                     >
                         Edit
                         <DropdownMenuShortcut>
@@ -43,9 +44,10 @@ export const DataTableRowActions = ({ row }: DataTableRowActionsProps) => {
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
-                        onClick={() =>
-                            toast.success(`Delete user ${row.original}`)
-                        }
+                        onClick={() => {
+                            setCurrentRow(row.original);
+                            setOpen("delete");
+                        }}
                         className="text-red-500!"
                     >
                         Delete
