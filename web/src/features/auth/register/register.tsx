@@ -12,11 +12,10 @@ export const Register = ({ className, ...props }: ComponentProps<"div">) => {
             <div className="grid gap-10">
                 <div className="text-center">
                     <h3 className="scroll-m-20 text-3xl font-semibold tracking-tight">
-                        <span className="text-primary-100">Join</span> X
+                        <span className="text-primary-100">Join</span> V.U.T
                     </h3>
                     <p className="text-xl text-muted-foreground">
-                        Lorem ipsum dolor sit, amet consectetur adipisicing elit
-                        Explicabo
+                        Register to Track and Manage Unloading Vehicles at port
                     </p>
                 </div>
                 <div className="grid gap-4">

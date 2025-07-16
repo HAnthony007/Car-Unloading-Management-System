@@ -30,7 +30,7 @@ export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
                             <a href="#">
                                 <Icons.overview className="!size-5" />
                                 <span className="text-base font-semibold">
-                                    Car Unloading Management
+                                    Vehicle Unloading Tracking
                                 </span>
                             </a>
                         </SidebarMenuButton>

@@ -13,11 +13,11 @@ export const Login = ({ className, ...props }: ComponentProps<"div">) => {
             <div className="grid gap-10">
                 <div className="text-center space-y-2">
                     <h3 className="scroll-m-20 text-3xl font-semibold tracking-tight">
-                        <span className="text-primary-100">Log in</span> to X
+                        <span className="text-primary-100">Log in</span> to
+                        V.U.T
                     </h3>
                     <p className="text-xl text-muted-foreground">
-                        Lorem ipsum dolor sit, amet consectetur adipisicing elit
-                        ?
+                        Log in to Track and Manage Unloading Vehicles
                     </p>
                 </div>
                 {/* 4.6K gzipped: 1.9k  */}
