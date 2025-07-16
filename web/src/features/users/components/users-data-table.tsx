@@ -24,6 +24,7 @@ import {
     VisibilityState,
 } from "@tanstack/react-table";
 import { useState } from "react";
+import { UsersDataTableToolbar } from "./users-data-table-toolbar";
 
 interface UsersDataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
@@ -68,6 +69,7 @@ export function UsersDataTable<TData, TValue>({
 
     return (
         <div className="space-y-4">
+            <UsersDataTableToolbar table={table} />
             <div className="rounded-md border">
                 <Table>
                     <TableHeader>

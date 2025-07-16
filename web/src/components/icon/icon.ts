@@ -2,6 +2,7 @@ import {
     AlertCircleIcon,
     CalendarIcon,
     CarIcon,
+    CheckIcon,
     ChevronLeftIcon,
     ChevronRightIcon,
     ChevronsUpDownIcon,
@@ -13,6 +14,7 @@ import {
     MapPinIcon,
     MoonIcon,
     MoreHorizontalIcon,
+    PlusCircleIcon,
     SearchIcon,
     SettingsIcon,
     SlashIcon,
@@ -24,6 +26,7 @@ import {
     UserCog2Icon,
     UserRoundPlus,
     UsersIcon,
+    XIcon,
 } from "lucide-react";
 
 export const Icons = {
@@ -55,6 +58,10 @@ export const Icons = {
     moreH: MoreHorizontalIcon,
     edit: EditIcon,
     trash: TrashIcon,
+
+    plusCircled: PlusCircleIcon,
+    check: CheckIcon,
+    x: XIcon,
 
     admin: UserCog2Icon,
     user: User2Icon,
