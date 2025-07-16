@@ -1,7 +1,10 @@
+import { Main } from "@/components/layout/main";
+import { Users } from "@/features/users";
+
 export default function UsersPage() {
     return (
-        <div>
-            <h1>List Users</h1>
-        </div>
+        <Main>
+            <Users />
+        </Main>
     );
 }

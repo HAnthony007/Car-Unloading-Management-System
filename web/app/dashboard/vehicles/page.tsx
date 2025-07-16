@@ -1,7 +1,9 @@
+import { Main } from "@/components/layout/main";
+
 export default function VehiclesPage() {
     return (
-        <div>
+        <Main>
             <h1>Listes Vehicules</h1>
-        </div>
+        </Main>
     );
 }

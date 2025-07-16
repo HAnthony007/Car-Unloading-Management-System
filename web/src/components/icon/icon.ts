@@ -11,6 +11,7 @@ import {
     SettingsIcon,
     SlashIcon,
     SunIcon,
+    UserRoundPlus,
     UsersIcon,
 } from "lucide-react";
 
@@ -23,6 +24,7 @@ export const Icons = {
     vehicle: CarIcon,
     area: MapPinIcon,
     users: UsersIcon,
+    addUser: UserRoundPlus,
     inbox: InboxIcon,
     calendar: CalendarIcon,
     search: SearchIcon,

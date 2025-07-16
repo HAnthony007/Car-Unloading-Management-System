@@ -14,6 +14,7 @@
         "@tanstack/react-query": "^5.81.5",
         "@tanstack/react-query-devtools": "^5.81.5",
         "@tanstack/react-query-next-experimental": "^5.81.5",
+        "@tanstack/react-table": "^8.21.3",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
         "lucide-react": "^0.525.0",
@@ -285,6 +286,10 @@
     "@tanstack/react-query-devtools": ["@tanstack/react-query-devtools@5.81.5", "", { "dependencies": { "@tanstack/query-devtools": "5.81.2" }, "peerDependencies": { "@tanstack/react-query": "^5.81.5", "react": "^18 || ^19" } }, "sha512-lCGMu4RX0uGnlrlLeSckBfnW/UV+KMlTBVqa97cwK7Z2ED5JKnZRSjNXwoma6sQBTJrcULvzgx2K6jEPvNUpDw=="],
 
     "@tanstack/react-query-next-experimental": ["@tanstack/react-query-next-experimental@5.81.5", "", { "peerDependencies": { "@tanstack/react-query": "^5.81.5", "next": "^13 || ^14 || ^15", "react": "^18 || ^19" } }, "sha512-ymWjyARF/WXvZ+1+UFSI28V5QD41Bhsc0rntHrLEtRmPkKblPljK+NthKFWNMPBRQ9pVDDtAyQWbushYtbR3kA=="],
+
+    "@tanstack/react-table": ["@tanstack/react-table@8.21.3", "", { "dependencies": { "@tanstack/table-core": "8.21.3" }, "peerDependencies": { "react": ">=16.8", "react-dom": ">=16.8" } }, "sha512-5nNMTSETP4ykGegmVkhjcS8tTLW6Vl4axfEGQN3v0zdHYbK4UfoqfPChclTrJ4EoK9QynqAu9oUf8VEmrpZ5Ww=="],
+
+    "@tanstack/table-core": ["@tanstack/table-core@8.21.3", "", {}, "sha512-ldZXEhOBb8Is7xLs01fR3YEc3DERiz5silj8tnGkFZytt1abEvl/GhUmCE0PMLaMPTa3Jk4HbKmRlHmu+gCftg=="],
 
     "@tybys/wasm-util": ["@tybys/wasm-util@0.9.0", "", { "dependencies": { "tslib": "^2.4.0" } }, "sha512-6+7nlbMVX/PVDCwaIQ8nTOPveOcFLSt8GcXdx8hD0bt39uWxYT88uXzqTd4fTvqta7oeUJqudepapKNt2DYJFw=="],
 
