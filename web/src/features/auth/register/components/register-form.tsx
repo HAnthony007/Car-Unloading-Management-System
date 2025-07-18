@@ -21,6 +21,7 @@ export const RegisterForm = ({ className }: ComponentProps<"div">) => {
     const form = useForm<registerSchemaType>({
         resolver: zodResolver(registerSchema),
         defaultValues: {
+            name: "",
             email: "",
             password: "",
             confirmPassword: "",
