@@ -55,12 +55,6 @@ This project is a full-stack web and mobile application designed to manage and m
 
 ---
 
-## 📸 Screenshots
-
-> _(Add screenshots of web and mobile UI here)_
-
----
-
 ## 📁 Project Structure (simplified)
 
 /backend (Laravel)
