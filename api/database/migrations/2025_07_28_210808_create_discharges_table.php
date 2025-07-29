@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('discharges', function (Blueprint $table) {
-            $table->id();
+            $table->id('discharge_id');
+            $table->dateTime('discharge_date');
+            $table->foreignId('port_call_id')->constrained('port_calls', 'port_call_id');
             $table->timestamps();
         });
     }

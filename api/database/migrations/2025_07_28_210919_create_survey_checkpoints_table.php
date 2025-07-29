@@ -12,7 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('survey_checkpoints', function (Blueprint $table) {
-            $table->id();
+            $table->id('checkpoint_id');
+            $table->string('title');
+            $table->string('comment')->nullable();
+            $table->foreignId('survey_id')->constrained('surveys', 'survey_id');
             $table->timestamps();
         });
     }

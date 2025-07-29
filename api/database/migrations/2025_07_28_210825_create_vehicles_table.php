@@ -12,7 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('vehicles', function (Blueprint $table) {
-            $table->id();
+            $table->id('vehicle_id');
+            $table->string('vin')->unique();
+            $table->string('plate_number')->nullable();
+            $table->string('make');
+            $table->string('model');
+            $table->string('color')->nullable();
+            $table->boolval('is_primed')->default(false);
+            $table->foreignId('discharge_id')->constrained('discharges', 'discharge_id');
             $table->timestamps();
         });
     }

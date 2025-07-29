@@ -13,15 +13,21 @@ class User extends Authenticatable
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasApiTokens, HasFactory, Notifiable;
 
+    protected $primaryKey = 'user_id';
+
     /**
      * The attributes that are mass assignable.
      *
      * @var list<string>
      */
     protected $fillable = [
-        'name',
+        'matriculation_no',
+        'full_name',
         'email',
         'password',
+        'avatar',
+        'phone',
+        'role_id',
     ];
 
     /**
@@ -33,6 +39,26 @@ class User extends Authenticatable
         'password',
         'remember_token',
     ];
+
+    public function role(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Role::class, 'role_id');
+    }
+
+    public function surveys(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Survey::class, 'user_id');
+    }
+
+    public function movements(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Movement::class, 'user_id');
+    }
+
+    public function followUpFiles(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(FollowUpFile::class, 'user_id');
+    }
 
     /**
      * Get the attributes that should be cast.

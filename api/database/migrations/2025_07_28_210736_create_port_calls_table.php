@@ -12,7 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('port_calls', function (Blueprint $table) {
-            $table->id();
+            $table->id('port_call_id');
+            $table->dateTime('arrival_date');
+            $table->dateTime('departure_date')->nullable();
+            $table->foreignId('vessel_id')->constrained('vessels', 'vessel_id');
+            $table->foreignId('dock_id')->constrained('docks', 'dock_id');
             $table->timestamps();
         });
     }

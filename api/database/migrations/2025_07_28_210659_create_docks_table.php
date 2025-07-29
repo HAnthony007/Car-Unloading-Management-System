@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('docks', function (Blueprint $table) {
-            $table->id();
+            $table->id('dock_id');
+            $table->string('dock_name');
+            $table->string('location');
             $table->timestamps();
         });
     }

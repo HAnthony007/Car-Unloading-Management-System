@@ -12,7 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('documents', function (Blueprint $table) {
-            $table->id();
+            $table->id('document_id');
+            $table->string('file_path');
+            $table->string('name');
+            $table->string('type');
+            $table->dateTime('uploaded_at');
+            $table->foreignId('follow_up_file_id')->constrained('follow_up_files', 'follow_up_file_id');
             $table->timestamps();
         });
     }
