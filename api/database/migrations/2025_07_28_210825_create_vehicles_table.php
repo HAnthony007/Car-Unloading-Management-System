@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('make');
             $table->string('model');
             $table->string('color')->nullable();
-            $table->boolval('is_primed')->default(false);
+            $table->boolean('is_primed')->default(false);
             $table->foreignId('discharge_id')->constrained('discharges', 'discharge_id');
             $table->timestamps();
         });
