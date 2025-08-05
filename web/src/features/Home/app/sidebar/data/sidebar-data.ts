@@ -7,19 +7,19 @@ export const sidebarItems: SidebarItem[] = [
         icon: "overview",
     },
     {
+        title: "Users",
+        url: "/dashboard/users",
+        icon: "users",
+    },
+    {
         title: "Vehicles",
         url: "/dashboard/vehicles",
         icon: "vehicle",
     },
     {
-        title: "Storage areas",
-        url: "/dashboard/areas",
+        title: "Parkings",
+        url: "/dashboard/parkings",
         icon: "area",
-    },
-    {
-        title: "Users",
-        url: "/dashboard/users",
-        icon: "users",
     },
     {
         title: "Settings",

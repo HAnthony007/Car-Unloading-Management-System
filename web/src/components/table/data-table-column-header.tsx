@@ -36,11 +36,11 @@ export const DataTableColumnHeader = <TData, TValue>({
                     >
                         <span>{title}</span>
                         {column.getIsSorted() === "desc" ? (
-                            <Icons.arrowDown className="ml-2 h-4 w-4" />
+                            <Icons.arrowSortDown className="ml-2 h-4 w-4" />
                         ) : column.getIsSorted() === "asc" ? (
-                            <Icons.arrowUp className="ml-2 h-4 w-4" />
+                            <Icons.arrowSortUp className="ml-2 h-4 w-4" />
                         ) : (
-                            <Icons.arrowDown className="ml-2 h-4 w-4" />
+                            <Icons.arrowSortDown className="ml-2 h-4 w-4" />
                         )}
                     </Button>
                 </DropdownMenuTrigger>
@@ -48,13 +48,13 @@ export const DataTableColumnHeader = <TData, TValue>({
                     <DropdownMenuItem
                         onClick={() => column.toggleSorting(false)}
                     >
-                        <Icons.arrowUp className="text-muted-foreground/70 mr-2 h-3.5 w-3.5" />
+                        <Icons.arrowSortUp className="text-muted-foreground/70 mr-2 h-3.5 w-3.5" />
                         Asc
                     </DropdownMenuItem>
                     <DropdownMenuItem
                         onClick={() => column.toggleSorting(true)}
                     >
-                        <Icons.arrowDown className="text-muted-foreground/70 mr-2 h-3.5 w-3.5" />
+                        <Icons.arrowSortDown className="text-muted-foreground/70 mr-2 h-3.5 w-3.5" />
                         Desc
                     </DropdownMenuItem>
                     {column.getCanHide() && (

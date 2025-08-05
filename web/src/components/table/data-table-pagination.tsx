@@ -67,7 +67,7 @@ export const DataTablePagination = <TData,>({
                         disabled={!table.getCanPreviousPage()}
                     >
                         <span className="sr-only">Go to first page</span>
-                        <Icons.doubleChevroLeft className="h-4 w-4" />
+                        <Icons.doubleArrowLeft className="h-4 w-4" />
                     </Button>
                     <Button
                         variant="outline"
@@ -96,7 +96,7 @@ export const DataTablePagination = <TData,>({
                         disabled={!table.getCanNextPage()}
                     >
                         <span className="sr-only">Go to last page</span>
-                        <Icons.doubleChevroRight className="h-4 w-4" />
+                        <Icons.doubleArrowRight className="h-4 w-4" />
                     </Button>
                 </div>
             </div>
