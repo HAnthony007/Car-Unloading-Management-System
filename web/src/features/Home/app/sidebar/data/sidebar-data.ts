@@ -22,8 +22,13 @@ export const sidebarItems: SidebarItem[] = [
         icon: "area",
     },
     {
+        title: "Docks",
+        url: "/dashboard/docks",
+        icon: "dock",
+    },
+    {
         title: "Settings",
-        url: "#",
+        url: "/dashboard/settings",
         icon: "setting",
     },
 ];

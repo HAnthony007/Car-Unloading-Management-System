@@ -1,6 +1,7 @@
 import {
     AlertCircleIcon,
     AlertTriangleIcon,
+    AnchorIcon,
     CalendarIcon,
     CarIcon,
     CheckIcon,
@@ -50,6 +51,7 @@ export const Icons = {
     inbox: InboxIcon,
     calendar: CalendarIcon,
     search: SearchIcon,
+    dock: AnchorIcon,
     setting: SettingsIcon,
 
     slash: SlashIcon,
