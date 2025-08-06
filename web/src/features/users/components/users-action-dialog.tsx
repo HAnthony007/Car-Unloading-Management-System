@@ -20,6 +20,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { SelectDropdown } from "@/components/ui/select-dropdown";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -49,6 +50,8 @@ export const UsersActionDialog = ({
     onOpenChange,
 }: UsersActionDialogProps) => {
     const isEdit = !!currentRow;
+    const [loading, setLoading] = useState(false);
+    const firstInputRef = useRef<HTMLInputElement>(null);
 
     const form = useForm<UserForm>({
         defaultValues: isEdit
@@ -62,17 +65,32 @@ export const UsersActionDialog = ({
                   isEdit,
               },
         resolver: zodResolver(formSchema),
+        mode: "onChange", // validation en temps réel
     });
 
-    const onSubmit = (data: UserForm) => {
-        form.reset();
-        if (isEdit) {
-            toast.success("User updated successfully");
-        } else {
-            toast.success("User added successfully");
+    useEffect(() => {
+        if (open && firstInputRef.current) {
+            firstInputRef.current.focus();
         }
-        console.log(data);
-        onOpenChange(false);
+    }, [open]);
+
+    const onSubmit = async (data: UserForm) => {
+        setLoading(true);
+        try {
+            console.log(data);
+            await new Promise((res) => setTimeout(res, 1000)); // Simule un appel API
+            form.reset();
+            if (isEdit) {
+                toast.success("User updated successfully");
+            } else {
+                toast.success("User added successfully");
+            }
+            onOpenChange(false);
+        } catch (e) {
+            toast.error("An error occurred. Please try again., " + e);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -107,18 +125,31 @@ export const UsersActionDialog = ({
                                 name="email"
                                 render={({ field }) => (
                                     <FormItem className="grid grid-cols-6 space-y-0 gap-x-4 gap-y-1">
-                                        <FormLabel className="text-right col-span-2">
+                                        <FormLabel
+                                            className="text-right col-span-2"
+                                            htmlFor="user-email"
+                                        >
                                             Email
                                         </FormLabel>
                                         <FormControl>
                                             <Input
                                                 {...field}
-                                                placeholder="anthonyr.perso@gmail.com"
+                                                id="user-email"
+                                                ref={firstInputRef}
+                                                placeholder="ex: jean.dupont@email.com"
                                                 className="col-span-4"
                                                 autoComplete="off"
+                                                aria-invalid={
+                                                    !!form.formState.errors
+                                                        .email
+                                                }
+                                                aria-describedby="user-email-error"
                                             />
                                         </FormControl>
-                                        <FormMessage className="col-span-4 col-start-3" />
+                                        <FormMessage
+                                            className="col-span-4 col-start-3"
+                                            id="user-email-error"
+                                        />
                                     </FormItem>
                                 )}
                             />
@@ -127,13 +158,16 @@ export const UsersActionDialog = ({
                                 name="role"
                                 render={({ field }) => (
                                     <FormItem className="grid grid-cols-6 space-y-0 gap-x-4 gap-y-1">
-                                        <FormLabel className="text-right col-span-2">
+                                        <FormLabel
+                                            className="text-right col-span-2"
+                                            htmlFor="user-role"
+                                        >
                                             Role
                                         </FormLabel>
                                         <SelectDropdown
                                             defaultValue={field.value}
                                             onValueChange={field.onChange}
-                                            placeholder="Select a role"
+                                            placeholder="Sélectionnez un rôle"
                                             className="col-span-4"
                                             items={userRoles.map(
                                                 ({ label, value }) => ({
@@ -141,8 +175,12 @@ export const UsersActionDialog = ({
                                                     value,
                                                 })
                                             )}
+                                            aria-describedby="user-role-error"
                                         />
-                                        <FormMessage className="col-span-4 col-start-3" />
+                                        <FormMessage
+                                            className="col-span-4 col-start-3"
+                                            id="user-role-error"
+                                        />
                                     </FormItem>
                                 )}
                             />
@@ -150,8 +188,13 @@ export const UsersActionDialog = ({
                     </Form>
                 </div>
                 <DialogFooter>
-                    <Button type="submit" form="user-form">
-                        Save changes
+                    <Button
+                        type="submit"
+                        form="user-form"
+                        disabled={loading || !form.formState.isValid}
+                        aria-busy={loading}
+                    >
+                        {loading ? "Enregistrement..." : "Save changes"}
                     </Button>
                 </DialogFooter>
             </DialogContent>

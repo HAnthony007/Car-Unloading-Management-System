@@ -152,22 +152,6 @@ export const ParkingsCardList = () => {
 
     return (
         <div className="space-y-6">
-            {/* Header avec titre et actions */}
-            <div className="flex items-center justify-between">
-                <div>
-                    <h2 className="text-2xl font-bold tracking-tight">
-                        Zones de parking
-                    </h2>
-                    <p className="text-muted-foreground">
-                        Gérez vos zones de parking et suivez leur occupation
-                    </p>
-                </div>
-                <Button className="flex items-center gap-2">
-                    <Icons.plusCircled className="h-4 w-4" />
-                    Ajouter un parking
-                </Button>
-            </div>
-
             {/* Grille des cartes */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
                 {parkingsData.map((parking, index) => {

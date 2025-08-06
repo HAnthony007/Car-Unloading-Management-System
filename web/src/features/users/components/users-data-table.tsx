@@ -1,5 +1,6 @@
 "use client";
 
+import { Icons } from "@/components/icon/icon";
 import { DataTablePagination } from "@/components/table/data-table-pagination";
 import {
     Table,
@@ -96,11 +97,18 @@ export function UsersDataTable<TData, TValue>({
                     </TableHeader>
                     <TableBody>
                         {table.getRowModel().rows?.length ? (
-                            table.getRowModel().rows.map((row) => (
+                            table.getRowModel().rows.map((row, idx) => (
                                 <TableRow
                                     key={row.id}
                                     data-state={
                                         row.getIsSelected() && "selected"
+                                    }
+                                    className={
+                                        "transition-colors " +
+                                        (idx % 2 === 0
+                                            ? "bg-background"
+                                            : "bg-muted/50") +
+                                        " hover:bg-primary/10 group"
                                     }
                                 >
                                     {row.getVisibleCells().map((cell) => (
@@ -117,9 +125,21 @@ export function UsersDataTable<TData, TValue>({
                             <TableRow>
                                 <TableCell
                                     colSpan={columns.length}
-                                    className="h-24 text-center"
+                                    className="h-48 text-center"
                                 >
-                                    No data
+                                    <div className="flex flex-col items-center justify-center gap-2 py-8 opacity-70">
+                                        <Icons.fileIcon
+                                            size={48}
+                                            className="mb-2 text-muted-foreground"
+                                        />
+                                        <span className="font-semibold text-lg">
+                                            Aucun utilisateur trouvé
+                                        </span>
+                                        <span className="text-sm text-muted-foreground">
+                                            Ajoutez un nouvel utilisateur pour
+                                            commencer.
+                                        </span>
+                                    </div>
                                 </TableCell>
                             </TableRow>
                         )}

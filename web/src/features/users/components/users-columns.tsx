@@ -1,7 +1,7 @@
 "use client";
 
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
-import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 import { ColumnDef } from "@tanstack/react-table";
 import { userRoles } from "../data/data";
 import { User } from "../data/schema";
@@ -9,19 +9,32 @@ import { DataTableRowActions } from "./data-table-row-actions";
 
 export const UsersColumns: ColumnDef<User>[] = [
     {
-        accessorKey: "id",
-        header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="ID" />
-        ),
-        cell: ({ row }) => <div>{row.getValue("id")}</div>,
-        meta: {
-            className: cn(
-                "drop-shadow-[0_1px_2px_rgb(0_0_0_/_0.1)] dark:drop-shadow-[0_1px_2px_rgb(255_255_255_/_0.1)] lg:drop-shadow-none",
-                "bg-background transition-colors duration-200 group-hover/row:bg-muted group-data-[state=selected]/row:bg-muted",
-                "sticky left-6 md:table-cell"
-            ),
+        id: "avatar",
+        header: () => <span className="sr-only">Avatar</span>,
+        cell: ({ row }) => {
+            const email = row.original.email;
+            const initials = email
+                .split("@")[0]
+                .split(/[.\-_]/)
+                .map((part) => part[0]?.toUpperCase() || "")
+                .join("")
+                .slice(0, 2);
+            return (
+                <div className="flex items-center justify-center">
+                    <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-primary/20 text-primary font-bold text-base">
+                        {initials}
+                    </span>
+                </div>
+            );
         },
-        enableSorting: true,
+        meta: {
+            className: "sticky left-0 z-10 bg-background",
+        },
+        enableSorting: false,
+        enableHiding: false,
+        size: 60,
+        minSize: 60,
+        maxSize: 60,
     },
     {
         accessorKey: "email",
@@ -46,12 +59,18 @@ export const UsersColumns: ColumnDef<User>[] = [
                     {userRole.icon && (
                         <userRole.icon
                             size={16}
-                            className="texm-muted-foreground"
+                            className="text-muted-foreground"
                         />
                     )}
-                    <span className="text-sm capitalize">
-                        {row.getValue("role")}
-                    </span>
+                    <Badge
+                        className={
+                            role === "admin"
+                                ? "bg-red-100 text-red-700 border-none"
+                                : "bg-blue-100 text-blue-700 border-none"
+                        }
+                    >
+                        {role}
+                    </Badge>
                 </div>
             );
         },

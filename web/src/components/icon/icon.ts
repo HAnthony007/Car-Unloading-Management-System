@@ -15,6 +15,7 @@ import {
     CircleParkingIcon,
     EditIcon,
     EyeOffIcon,
+    FileIcon,
     InboxIcon,
     LayoutDashboardIcon,
     Loader2Icon,
@@ -80,4 +81,6 @@ export const Icons = {
     user: User2Icon,
 
     spinner: Loader2Icon,
+
+    fileIcon: FileIcon,
 };
