@@ -7,6 +7,11 @@ export const sidebarItems: SidebarItem[] = [
         icon: "overview",
     },
     {
+        title: "Follow Up Files",
+        url: "/dashboard/followup",
+        icon: "folder",
+    },
+    {
         title: "Users",
         url: "/dashboard/users",
         icon: "users",

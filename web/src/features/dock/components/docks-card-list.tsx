@@ -102,8 +102,8 @@ export const DocksCardList = () => {
                     </Tooltip>
                 </div>
 
-                {/* Grille des cartes */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {/* Liste des cartes en pleine largeur */}
+                <div className="space-y-3">
                     {docksData.map((dock, index) => {
                         const status = getDockStatus(dock.name);
                         const isSelected = selectedDock === dock.name;
@@ -118,8 +118,9 @@ export const DocksCardList = () => {
                                     <Card
                                         className={cn(
                                             "group relative overflow-hidden transition-all duration-300",
-                                            "hover:shadow-xl hover:scale-[1.02] hover:border-primary/20",
+                                            "hover:shadow-xl hover:scale-[1.01] hover:border-primary/20",
                                             "cursor-pointer border-2 hover:border-primary/30",
+                                            "w-full",
                                             isSelected &&
                                                 "ring-2 ring-primary ring-offset-2",
                                             isHovered && "shadow-lg"
@@ -135,10 +136,10 @@ export const DocksCardList = () => {
                                         }
                                     >
                                         {/* Indicateur de statut */}
-                                        <div className="absolute top-3 right-3">
+                                        <div className="absolute top-2 right-2">
                                             <div
                                                 className={cn(
-                                                    "w-3 h-3 rounded-full animate-pulse",
+                                                    "w-2 h-2 rounded-full animate-pulse",
                                                     getStatusColor(status)
                                                 )}
                                             />
@@ -147,7 +148,7 @@ export const DocksCardList = () => {
                                         {/* Gradient de fond subtil */}
                                         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-                                        <CardHeader className="pb-3 relative z-10">
+                                        <CardHeader className="pb-2 relative z-10">
                                             <div className="flex items-center justify-between">
                                                 <CardTitle className="text-lg font-semibold flex items-center gap-2">
                                                     <div className="p-2 bg-primary/10 rounded-lg">
@@ -157,15 +158,15 @@ export const DocksCardList = () => {
                                                 </CardTitle>
                                                 <Badge
                                                     variant="secondary"
-                                                    className="text-xs font-medium"
+                                                    className="text-xs font-medium px-2 py-1"
                                                 >
                                                     {status}
                                                 </Badge>
                                             </div>
                                         </CardHeader>
 
-                                        <CardContent className="relative z-10">
-                                            <div className="space-y-4">
+                                        <CardContent className="relative z-10 py-3">
+                                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                                                 {/* Informations du quai */}
                                                 <div className="space-y-2">
                                                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -185,12 +186,12 @@ export const DocksCardList = () => {
                                                 </div>
 
                                                 {/* Barre de progression */}
-                                                <div className="space-y-1">
+                                                <div className="space-y-2">
                                                     <div className="flex items-center justify-between text-xs">
                                                         <span className="text-muted-foreground">
                                                             Utilisation
                                                         </span>
-                                                        <span className="font-medium">
+                                                        <span className="font-bold text-base">
                                                             75%
                                                         </span>
                                                     </div>
@@ -205,13 +206,13 @@ export const DocksCardList = () => {
                                                 </div>
 
                                                 {/* Actions */}
-                                                <div className="flex gap-2 pt-2">
+                                                <div className="flex gap-2 pt-1">
                                                     <Tooltip>
                                                         <TooltipTrigger asChild>
                                                             <Button
                                                                 size="sm"
                                                                 variant="outline"
-                                                                className="flex-1"
+                                                                className="flex-1 h-9"
                                                                 onClick={(
                                                                     e
                                                                 ) => {
@@ -249,7 +250,7 @@ export const DocksCardList = () => {
                                                             <Button
                                                                 size="sm"
                                                                 variant="outline"
-                                                                className="flex-1"
+                                                                className="flex-1 h-9"
                                                                 onClick={(
                                                                     e
                                                                 ) => {
