@@ -12,6 +12,11 @@ export const sidebarItems: SidebarItem[] = [
         icon: "folder",
     },
     {
+        title: "Import Manifest",
+        url: "/dashboard/manifest",
+        icon: "manifest",
+    },
+    {
         title: "Users",
         url: "/dashboard/users",
         icon: "users",

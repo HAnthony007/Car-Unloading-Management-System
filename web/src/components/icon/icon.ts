@@ -22,6 +22,7 @@ import {
     FolderKanbanIcon,
     GridIcon,
     ImageMinusIcon,
+    ImportIcon,
     InboxIcon,
     InfoIcon,
     InspectionPanelIcon,
@@ -42,11 +43,13 @@ import {
     SunIcon,
     TableIcon,
     TrashIcon,
+    TruckIcon,
     User2Icon,
     UserCog2Icon,
     UserRoundPlus,
     UsersIcon,
     WorkflowIcon,
+    WrenchIcon,
     XIcon,
 } from "lucide-react";
 
@@ -86,6 +89,7 @@ export const Icons = {
     car: CarIcon,
 
     moreH: MoreHorizontalIcon,
+    moreHorizontal: MoreHorizontalIcon,
     edit: EditIcon,
     trash: TrashIcon,
 
@@ -114,4 +118,12 @@ export const Icons = {
     list: ListIcon,
     table: TableIcon,
     filter: FilterIcon,
+
+    // Icônes pour les véhicules
+    wrench: WrenchIcon,
+    truck: TruckIcon,
+    trailer: TruckIcon, // Utilise TruckIcon pour trailer
+    van: CarIcon, // Utilise CarIcon pour van
+
+    manifest: ImportIcon,
 };
