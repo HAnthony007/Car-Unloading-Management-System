@@ -4,8 +4,6 @@ namespace App\Application\User\UseCases;
 
 use App\Application\User\DTOs\UserSearchCriteriaDTO;
 use App\Domain\User\Repositories\UserRepositoryInterface;
-use App\Domain\Role\ValueObjects\RoleId;
-use App\Domain\User\ValueObjects\MatriculationNumber;
 
 final class SearchUsersUseCase
 {

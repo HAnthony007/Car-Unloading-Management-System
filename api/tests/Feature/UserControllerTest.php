@@ -1,17 +1,5 @@
 <?php
 
-use App\Application\User\UseCases\CreateUserUseCase;
-use App\Application\User\UseCases\DeleteUserUseCase;
-use App\Application\User\UseCases\GetUserByMatriculationUseCase;
-use App\Application\User\UseCases\GetUserUseCase;
-use App\Application\User\UseCases\GetUsersByInstitutionUseCase;
-use App\Application\User\UseCases\SearchUsersUseCase;
-use App\Application\User\UseCases\UpdateUserProfileUseCase;
-use App\Domain\User\Entities\User;
-use App\Domain\User\ValueObjects\MatriculationNumber;
-use App\Domain\User\ValueObjects\UserId;
-use App\Domain\Auth\ValueObjects\Email;
-use App\Domain\Role\ValueObjects\RoleId;
 use App\Models\Role;
 use App\Models\User as EloquentUser;
 use Illuminate\Foundation\Testing\RefreshDatabase;

@@ -3,7 +3,6 @@
 namespace App\Application\User\UseCases;
 
 use App\Application\User\DTOs\CreateUserDTO;
-use App\Domain\Role\Entities\Role;
 use App\Domain\Role\Repositories\RoleRepositoryInterface;
 use App\Domain\Role\ValueObjects\RoleId;
 use App\Domain\User\Entities\User;

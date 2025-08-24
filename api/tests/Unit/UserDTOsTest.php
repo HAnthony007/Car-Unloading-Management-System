@@ -7,7 +7,6 @@ use App\Domain\Auth\ValueObjects\Email;
 use App\Domain\User\ValueObjects\MatriculationNumber;
 use App\Domain\User\ValueObjects\PhoneNumber;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 
 uses(RefreshDatabase::class);
 

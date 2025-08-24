@@ -8,7 +8,6 @@ use App\Domain\User\ValueObjects\MatriculationNumber;
 use App\Domain\Auth\ValueObjects\Email;
 use App\Domain\Role\ValueObjects\RoleId;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 use Mockery;
 
 uses(RefreshDatabase::class);

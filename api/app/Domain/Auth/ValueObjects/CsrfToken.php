@@ -2,8 +2,6 @@
 
 namespace App\Domain\Auth\ValueObjects;
 
-use InvalidArgumentException;
-
 final class CsrfToken
 {
     public function __construct(

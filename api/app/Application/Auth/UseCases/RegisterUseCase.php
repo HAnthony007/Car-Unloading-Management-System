@@ -8,7 +8,6 @@ use App\Domain\User\ValueObjects\MatriculationNumber;
 use App\Domain\Auth\ValueObjects\Email as EmailVo;
 use App\Domain\User\ValueObjects\PhoneNumber;
 use App\Domain\User\Entities\User as DomainUser;
-use App\Domain\User\ValueObjects\UserId;
 use App\Domain\User\Repositories\UserRepositoryInterface;
 use App\Domain\Role\Repositories\RoleRepositoryInterface;
 use Illuminate\Support\Facades\Hash;
