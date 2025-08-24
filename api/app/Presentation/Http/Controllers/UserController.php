@@ -12,9 +12,11 @@ use App\Application\User\UseCases\GetUserUseCase;
 use App\Application\User\UseCases\GetUsersByInstitutionUseCase;
 use App\Application\User\UseCases\SearchUsersUseCase;
 use App\Application\User\UseCases\UpdateUserProfileUseCase;
+use App\Application\User\UseCases\ImportUsersUseCase;
 use App\Presentation\Http\Requests\CreateUserRequest;
 use App\Presentation\Http\Requests\SearchUsersRequest;
 use App\Presentation\Http\Requests\UpdateUserRequest;
+use App\Presentation\Http\Requests\ImportUsersRequest;
 use App\Presentation\Http\Resources\UserResource;
 use Illuminate\Http\JsonResponse;
 
@@ -28,6 +30,7 @@ final class UserController extends Controller
         private readonly GetUsersByInstitutionUseCase $getUsersByInstitutionUseCase,
         private readonly SearchUsersUseCase $searchUsersUseCase,
         private readonly UpdateUserProfileUseCase $updateUserProfileUseCase,
+        private readonly ImportUsersUseCase $importUsersUseCase,
     ) {}
     
     public function index(SearchUsersRequest $request): JsonResponse
@@ -135,6 +138,28 @@ final class UserController extends Controller
             return response()->json([
                 'error' => $exception->getMessage(),
             ], $statusCode);
+        }
+    }
+
+    public function import(ImportUsersRequest $request): JsonResponse
+    {
+        try {
+            $file = $request->file('file');
+            $result = $this->importUsersUseCase->execute($file);
+
+            return response()->json([
+                'message' => 'Importation terminée avec succès.',
+                'data' => [
+                    'imported_users' => $result['imported_count'],
+                    'skipped_users' => $result['skipped_count'],
+                    'total_processed' => $result['total_processed'],
+                    'errors' => $result['errors'],
+                ],
+            ], 200);
+        } catch (\Exception $exception) {
+            return response()->json([
+                'error' => $exception->getMessage(),
+            ], 400);
         }
     }
 }

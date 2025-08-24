@@ -1,6 +1,6 @@
 <?php
 
-use App\Presentation\Http\Controllers\Auth\AuthController;
+use App\Presentation\Http\Controllers\AuthController;
 use App\Presentation\Http\Controllers\UserController;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -22,13 +22,16 @@ Route::prefix('auth')
 
 // User Management Routes
 Route::prefix('users')
-    ->middleware('auth:sanctum')
+    // ->middleware('auth:sanctum')
     ->group(function (): void {
         // Search and list users
         Route::get('/', [UserController::class, 'index'])->name('users.index');
         
         // Create new user
         Route::post('/', [UserController::class, 'store'])->name('users.store');
+        
+        // Import users from Excel file
+        Route::post('/import', [UserController::class, 'import'])->name('users.import');
         
         // Get user by ID
         Route::get('/{userId}', [UserController::class, 'show'])->name('users.show');
