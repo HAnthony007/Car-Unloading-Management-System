@@ -12,6 +12,11 @@ class Role extends Model
 
     protected $primaryKey = 'role_id';
 
+    protected $fillable = [
+        'role_name',
+        'role_description',
+    ];
+
     public function users(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(User::class, 'role_id');
