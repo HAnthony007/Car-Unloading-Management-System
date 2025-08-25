@@ -46,3 +46,14 @@ Route::prefix('users')
         // Delete user
         Route::delete('/{userId}', [UserController::class, 'destroy'])->name('users.destroy');
     });
+
+// Role Management Routes
+Route::prefix('roles')
+    ->middleware('auth:sanctum')
+    ->group(function (): void {
+        Route::get('/', [\App\Presentation\Http\Controllers\RoleController::class, 'index'])->name('roles.index');
+        Route::post('/', [\App\Presentation\Http\Controllers\RoleController::class, 'store'])->name('roles.store');
+        Route::get('/{id}', [\App\Presentation\Http\Controllers\RoleController::class, 'show'])->name('roles.show');
+        Route::put('/{id}', [\App\Presentation\Http\Controllers\RoleController::class, 'update'])->name('roles.update');
+        Route::delete('/{id}', [\App\Presentation\Http\Controllers\RoleController::class, 'destroy'])->name('roles.destroy');
+    });

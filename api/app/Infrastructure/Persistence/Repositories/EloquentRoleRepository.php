@@ -58,8 +58,18 @@ class EloquentRoleRepository implements RoleRepositoryInterface
     
     public function save(Role $role): Role
     {
-        $eloquentRole = new EloquentRole();
-        $eloquentRole->role_id = $role->getRoleId()?->getValue();
+        // If the domain Role has an id, try to update the existing Eloquent model.
+        if ($role->getRoleId()) {
+            $eloquentRole = EloquentRole::find($role->getRoleId()->getValue());
+            if (!$eloquentRole) {
+                // Fallback: create new with provided id (rare in tests)
+                $eloquentRole = new EloquentRole();
+                $eloquentRole->role_id = $role->getRoleId()->getValue();
+            }
+        } else {
+            $eloquentRole = new EloquentRole();
+        }
+
         $eloquentRole->role_name = $role->getRoleName();
         $eloquentRole->role_description = $role->getRoleDescription();
         $eloquentRole->save();
