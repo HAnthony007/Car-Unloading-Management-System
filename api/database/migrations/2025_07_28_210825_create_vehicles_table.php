@@ -14,10 +14,15 @@ return new class extends Migration
         Schema::create('vehicles', function (Blueprint $table) {
             $table->id('vehicle_id');
             $table->string('vin')->unique();
-            $table->string('plate_number')->nullable();
             $table->string('make');
             $table->string('model');
             $table->string('color')->nullable();
+            $table->string('type');
+            $table->string('weight');
+            $table->string('vehicle_condition'); // Occasion neuf etc
+            $table->string('vehicle_observation')->nullable();
+            $table->string('origin_country');
+            $table->string('ship_location')->nullable();
             $table->boolean('is_primed')->default(false);
             $table->foreignId('discharge_id')->constrained('discharges', 'discharge_id');
             $table->timestamps();

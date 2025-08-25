@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('workflow_steps', function (Blueprint $table) {
+        Schema::create('survey_checkpoint_steps', function (Blueprint $table) {
             $table->id('step_id');
             $table->string('step_name');
             $table->string('step_status');
             $table->dateTime('step_started_at');
             $table->dateTime('step_finished_at')->nullable();
-            $table->foreignId('follow_up_file_id')->constrained('follow_up_files', 'follow_up_file_id');
+            $table->foreignId('survey_checkpoint_id')->constrained('survey_checkpoints', 'checkpoint_id');
             $table->timestamps();
         });
     }
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('workflow_steps');
+        Schema::dropIfExists('survey_checkpoint_steps');
     }
 };

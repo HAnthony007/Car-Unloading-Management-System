@@ -15,10 +15,10 @@ return new class extends Migration
             $table->id('movement_id');
             $table->string('note')->nullable();
             $table->dateTime('timestamp');
+            $table->string('from')->nullable();
+            $table->string('to')->nullable();
             $table->foreignId('vehicle_id')->constrained('vehicles', 'vehicle_id');
             $table->foreignId('user_id')->constrained('users', 'user_id');
-            $table->foreignId('from_parking_id')->constrained('parkings', 'parking_id');
-            $table->foreignId('to_parking_id')->constrained('parkings', 'parking_id');
             $table->timestamps();
         });
     }

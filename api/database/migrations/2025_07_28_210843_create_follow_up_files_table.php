@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('follow_up_files', function (Blueprint $table) {
             $table->id('follow_up_file_id');
-            $table->string('reference_number')->unique();
+            $table->string('bill_of_lading')->unique();
             $table->string('status');
             $table->foreignId('vehicle_id')->constrained('vehicles', 'vehicle_id');
             $table->foreignId('port_call_id')->constrained('port_calls', 'port_call_id');

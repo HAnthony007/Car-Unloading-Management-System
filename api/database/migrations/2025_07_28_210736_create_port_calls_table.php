@@ -13,7 +13,11 @@ return new class extends Migration
     {
         Schema::create('port_calls', function (Blueprint $table) {
             $table->id('port_call_id');
+            $table->string('vessel_agent');
+            $table->string('origin_port');
+            $table->dateTime('estimated_arrival')->nullable();
             $table->dateTime('arrival_date');
+            $table->dateTime('estimated_departure')->nullable();
             $table->dateTime('departure_date')->nullable();
             $table->foreignId('vessel_id')->constrained('vessels', 'vessel_id');
             $table->foreignId('dock_id')->constrained('docks', 'dock_id');
