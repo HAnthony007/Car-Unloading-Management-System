@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Presentation\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -11,7 +11,7 @@ class UpdateParkingRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+    return true;
     }
 
     /**
@@ -22,7 +22,9 @@ class UpdateParkingRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'parking_name' => ['sometimes', 'required', 'string', 'max:255'],
+            'location' => ['sometimes', 'required', 'string', 'max:255'],
+            'capacity' => ['sometimes', 'required', 'integer', 'min:0'],
         ];
     }
 }

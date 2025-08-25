@@ -23,6 +23,11 @@ class AppServiceProvider extends ServiceProvider
             \App\Domain\Role\Repositories\RoleRepositoryInterface::class,
             \App\Infrastructure\Persistence\Repositories\EloquentRoleRepository::class
         );
+        
+        $this->app->bind(
+            \App\Domain\Parking\Repositories\ParkingRepositoryInterface::class,
+            \App\Infrastructure\Persistence\Repositories\EloquentParkingRepository::class
+        );
     }
 
     /**

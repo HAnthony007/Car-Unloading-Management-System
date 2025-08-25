@@ -57,3 +57,14 @@ Route::prefix('roles')
         Route::put('/{id}', [\App\Presentation\Http\Controllers\RoleController::class, 'update'])->name('roles.update');
         Route::delete('/{id}', [\App\Presentation\Http\Controllers\RoleController::class, 'destroy'])->name('roles.destroy');
     });
+
+// Parking Management Routes
+Route::prefix('parkings')
+    ->middleware('auth:sanctum')
+    ->group(function (): void {
+        Route::get('/', [\App\Presentation\Http\Controllers\ParkingController::class, 'index'])->name('parkings.index');
+        Route::post('/', [\App\Presentation\Http\Controllers\ParkingController::class, 'store'])->name('parkings.store');
+        Route::get('/{id}', [\App\Presentation\Http\Controllers\ParkingController::class, 'show'])->name('parkings.show');
+        Route::put('/{id}', [\App\Presentation\Http\Controllers\ParkingController::class, 'update'])->name('parkings.update');
+        Route::delete('/{id}', [\App\Presentation\Http\Controllers\ParkingController::class, 'destroy'])->name('parkings.destroy');
+    });
