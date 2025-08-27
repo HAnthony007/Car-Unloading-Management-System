@@ -11,7 +11,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 uses(RefreshDatabase::class);
 
 describe('User DTOs', function () {
-    
+
     describe('CreateUserDTO', function () {
         it('creates DTO with correct values', function () {
             $dto = new CreateUserDTO(
@@ -41,7 +41,7 @@ describe('User DTOs', function () {
                 'password' => 'password123',
                 'avatar' => '/avatars/john.jpg',
                 'phone' => '+1234567890',
-                'role_id' => 1
+                'role_id' => 1,
             ];
 
             $dto = CreateUserDTO::fromArray($data);
@@ -61,7 +61,7 @@ describe('User DTOs', function () {
                 'full_name' => 'John Doe',
                 'email' => 'john@example.com',
                 'password' => 'password123',
-                'role_id' => 1
+                'role_id' => 1,
             ];
 
             $dto = CreateUserDTO::fromArray($data);
@@ -153,7 +153,7 @@ describe('User DTOs', function () {
                 'user_id' => 1,
                 'full_name' => 'John Doe Updated',
                 'avatar' => '/avatars/updated.jpg',
-                'phone' => '+1234567890'
+                'phone' => '+1234567890',
             ];
 
             $dto = UpdateUsersProfileDTO::fromArray($data);
@@ -167,7 +167,7 @@ describe('User DTOs', function () {
         it('handles missing optional fields', function () {
             $data = [
                 'user_id' => 1,
-                'full_name' => 'John Doe Updated'
+                'full_name' => 'John Doe Updated',
             ];
 
             $dto = UpdateUsersProfileDTO::fromArray($data);
@@ -201,7 +201,7 @@ describe('User DTOs', function () {
 
     describe('UserSearchCriteriaDTO', function () {
         it('creates DTO with default values', function () {
-            $dto = new UserSearchCriteriaDTO();
+            $dto = new UserSearchCriteriaDTO;
 
             expect($dto->matriculationPrefix)->toBeNull();
             expect($dto->roleId)->toBeNull();
@@ -240,7 +240,7 @@ describe('User DTOs', function () {
                 'is_active' => true,
                 'search_term' => 'john',
                 'page' => 2,
-                'per_page' => 20
+                'per_page' => 20,
             ];
 
             $dto = UserSearchCriteriaDTO::fromArray($data);
@@ -256,7 +256,7 @@ describe('User DTOs', function () {
 
         it('handles missing optional fields with defaults', function () {
             $data = [
-                'search_term' => 'john'
+                'search_term' => 'john',
             ];
 
             $dto = UserSearchCriteriaDTO::fromArray($data);
@@ -274,7 +274,7 @@ describe('User DTOs', function () {
             $data = [
                 'role_id' => '1',
                 'page' => '2',
-                'per_page' => '25'
+                'per_page' => '25',
             ];
 
             $dto = UserSearchCriteriaDTO::fromArray($data);
@@ -287,7 +287,7 @@ describe('User DTOs', function () {
         it('casts boolean values correctly', function () {
             $data = [
                 'email_verified' => '1',
-                'is_active' => '0'
+                'is_active' => '0',
             ];
 
             $dto = UserSearchCriteriaDTO::fromArray($data);

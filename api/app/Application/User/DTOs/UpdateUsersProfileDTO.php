@@ -16,7 +16,7 @@ final class UpdateUsersProfileDTO
     public static function fromArray(array $data): self
     {
         return new self(
-            userId: (int)$data['user_id'],
+            userId: (int) $data['user_id'],
             fullName: $data['full_name'] ?? null,
             avatar: $data['avatar'] ?? null,
             phone: $data['phone'] ?? null,

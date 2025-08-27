@@ -18,7 +18,7 @@ final class GetUserByMatriculationUseCase
 
         $user = $this->userRepository->findByMatriculationNumber($matNumber);
 
-        if (!$user) {
+        if (! $user) {
             throw new \Exception('User not found.');
         }
 

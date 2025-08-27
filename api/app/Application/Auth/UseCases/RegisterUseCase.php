@@ -3,15 +3,15 @@
 namespace App\Application\Auth\UseCases;
 
 use App\Application\Auth\DTOs\RegisterDTO;
-use App\Domain\Role\ValueObjects\RoleId;
-use App\Domain\User\ValueObjects\MatriculationNumber;
 use App\Domain\Auth\ValueObjects\Email as EmailVo;
-use App\Domain\User\ValueObjects\PhoneNumber;
+use App\Domain\Role\Repositories\RoleRepositoryInterface;
+use App\Domain\Role\ValueObjects\RoleId;
 use App\Domain\User\Entities\User as DomainUser;
 use App\Domain\User\Repositories\UserRepositoryInterface;
-use App\Domain\Role\Repositories\RoleRepositoryInterface;
-use Illuminate\Support\Facades\Hash;
+use App\Domain\User\ValueObjects\MatriculationNumber;
+use App\Domain\User\ValueObjects\PhoneNumber;
 use App\Models\User as EloquentUser;
+use Illuminate\Support\Facades\Hash;
 
 final class RegisterUseCase
 {
@@ -26,7 +26,7 @@ final class RegisterUseCase
     public function execute(RegisterDTO $dto): array
     {
         $role = $this->roleRepository->findById(new RoleId($dto->roleId));
-        if (!$role) {
+        if (! $role) {
             throw \Illuminate\Validation\ValidationException::withMessages([
                 'role_id' => ['Le rôle spécifié n\'existe pas.'],
             ]);
@@ -55,7 +55,7 @@ final class RegisterUseCase
 
         // find the eloquent model to create token
         $eloquent = EloquentUser::where('email', $saved->getEmail()->getValue())->first();
-        if (!$eloquent) {
+        if (! $eloquent) {
             throw new \RuntimeException('Failed to retrieve persisted user.');
         }
 

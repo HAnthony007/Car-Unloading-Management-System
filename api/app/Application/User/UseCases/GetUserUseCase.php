@@ -16,7 +16,7 @@ final class GetUserUseCase
     {
         $user = $this->userRepository->findById(new UserId($userId));
 
-        if (!$user) {
+        if (! $user) {
             throw new \Exception('User not found.');
         }
 

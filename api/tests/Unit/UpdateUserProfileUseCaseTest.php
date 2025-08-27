@@ -2,28 +2,81 @@
 
 use App\Application\User\DTOs\UpdateUsersProfileDTO;
 use App\Application\User\UseCases\UpdateUserProfileUseCase;
-use App\Domain\User\Entities\User;
-use App\Domain\User\Repositories\UserRepositoryInterface;
-use App\Domain\User\ValueObjects\UserId;
-use App\Domain\User\ValueObjects\MatriculationNumber;
 use App\Domain\Auth\ValueObjects\Email;
 use App\Domain\Role\ValueObjects\RoleId;
+use App\Domain\User\Entities\User;
+use App\Domain\User\Repositories\UserRepositoryInterface;
+use App\Domain\User\ValueObjects\MatriculationNumber;
 use App\Domain\User\ValueObjects\PhoneNumber;
+use App\Domain\User\ValueObjects\UserId;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Mockery;
 
 uses(RefreshDatabase::class);
 
 describe('UpdateUserProfileUseCase', function () {
-    
-    beforeEach(function () {
-        $this->userRepository = Mockery::mock(UserRepositoryInterface::class);
-        $this->updateUserProfileUseCase = new UpdateUserProfileUseCase($this->userRepository);
-    });
+    class FakeUserRepository_ForUpdate implements UserRepositoryInterface
+    {
+        public ?User $found = null;
 
-    afterEach(function () {
-        Mockery::close();
-    });
+        public ?User $saved = null;
+
+        public function findById(UserId $userId): ?User
+        {
+            return $this->found;
+        }
+
+        public function findByMatriculationNumber(\App\Domain\User\ValueObjects\MatriculationNumber $matriculationNumber): ?User
+        {
+            return null;
+        }
+
+        public function findByEmail(\App\Domain\Auth\ValueObjects\Email $email): ?User
+        {
+            return null;
+        }
+
+        public function findByRole(\App\Domain\Role\ValueObjects\RoleId $roleId): array
+        {
+            return [];
+        }
+
+        public function findAll(): array
+        {
+            return [];
+        }
+
+        public function save(User $user): User
+        {
+            $this->saved = $user;
+
+            return $user;
+        }
+
+        public function delete(UserId $userId): bool
+        {
+            return true;
+        }
+
+        public function exists(\App\Domain\Auth\ValueObjects\Email $email): bool
+        {
+            return false;
+        }
+
+        public function matriculationExists(\App\Domain\User\ValueObjects\MatriculationNumber $matriculationNumber): bool
+        {
+            return false;
+        }
+
+        public function getActiveUsers(): array
+        {
+            return [];
+        }
+
+        public function getUsersWithUnverifiedEmail(): array
+        {
+            return [];
+        }
+    }
 
     it('updates user profile successfully', function () {
         // Arrange
@@ -63,18 +116,12 @@ describe('UpdateUserProfileUseCase', function () {
             createdAt: now()
         );
 
-        $this->userRepository
-            ->shouldReceive('findById')
-            ->with(Mockery::type(UserId::class))
-            ->andReturn($existingUser);
-
-        $this->userRepository
-            ->shouldReceive('save')
-            ->with(Mockery::type(User::class))
-            ->andReturn($updatedUser);
+        $repo = new FakeUserRepository_ForUpdate;
+        $repo->found = $existingUser;
+        $useCase = new UpdateUserProfileUseCase($repo);
 
         // Act
-        $result = $this->updateUserProfileUseCase->execute($dto);
+        $result = $useCase->execute($dto);
 
         // Assert
         expect($result)->toBeInstanceOf(User::class);
@@ -88,15 +135,12 @@ describe('UpdateUserProfileUseCase', function () {
             fullName: 'Updated Name'
         );
 
-        $this->userRepository
-            ->shouldReceive('findById')
-            ->with(Mockery::type(UserId::class))
-            ->andReturn(null);
+        $repo = new FakeUserRepository_ForUpdate;
+        $repo->found = null;
+        $useCase = new UpdateUserProfileUseCase($repo);
 
         // Act & Assert
-        expect(function () use ($dto) {
-            $this->updateUserProfileUseCase->execute($dto);
-        })->toThrow(Exception::class, 'User not found.');
+        expect(fn () => $useCase->execute($dto))->toThrow(Exception::class, 'User not found.');
     });
 
     it('updates only provided fields', function () {
@@ -135,18 +179,12 @@ describe('UpdateUserProfileUseCase', function () {
             createdAt: now()
         );
 
-        $this->userRepository
-            ->shouldReceive('findById')
-            ->with(Mockery::type(UserId::class))
-            ->andReturn($existingUser);
-
-        $this->userRepository
-            ->shouldReceive('save')
-            ->with(Mockery::type(User::class))
-            ->andReturn($updatedUser);
+        $repo = new FakeUserRepository_ForUpdate;
+        $repo->found = $existingUser;
+        $useCase = new UpdateUserProfileUseCase($repo);
 
         // Act
-        $result = $this->updateUserProfileUseCase->execute($dto);
+        $result = $useCase->execute($dto);
 
         // Assert
         expect($result)->toBeInstanceOf(User::class);

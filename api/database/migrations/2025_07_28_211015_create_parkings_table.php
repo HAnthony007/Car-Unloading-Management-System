@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('parking_name');
             $table->string('location');
             $table->integer('capacity');
+            $table->string('parking_number', 50)->nullable();
             $table->timestamps();
         });
     }

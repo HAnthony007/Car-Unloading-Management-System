@@ -2,12 +2,12 @@
 
 namespace Tests\Feature;
 
-use Tests\TestCase;
+use App\Models\Role;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use App\Models\User;
-use App\Models\Role;
+use Tests\TestCase;
 
 class UsersImportTest extends TestCase
 {
@@ -21,21 +21,21 @@ class UsersImportTest extends TestCase
         Role::factory()->create([
             'role_id' => 1,
             'role_name' => 'admin',
-            'role_description' => 'Administrator'
+            'role_description' => 'Administrator',
         ]);
 
         Role::factory()->create([
             'role_id' => 2,
             'role_name' => 'agent',
-            'role_description' => 'Agent'
+            'role_description' => 'Agent',
         ]);
 
         // Créer un utilisateur pour l'authentification
         $user = User::factory()->create([
             'role_id' => 1,
-            'email' => 'test@example.com'
+            'email' => 'test@example.com',
         ]);
-        
+
         $this->actingAs($user);
     }
 
@@ -52,30 +52,30 @@ class UsersImportTest extends TestCase
         $file = UploadedFile::fake()->createWithContent('test_import.csv', $csvContent);
 
         $response = $this->postJson('/api/users/import', [
-            'file' => $file
+            'file' => $file,
         ]);
 
         $response->assertStatus(200)
-                ->assertJson([
-                    'message' => 'Importation terminée avec succès.',
-                    'data' => [
-                        'imported_users' => 2,
-                        'skipped_users' => 0,
-                        'total_processed' => 2,
-                    ]
-                ]);
+            ->assertJson([
+                'message' => 'Importation terminée avec succès.',
+                'data' => [
+                    'imported_users' => 2,
+                    'skipped_users' => 0,
+                    'total_processed' => 2,
+                ],
+            ]);
 
         // Vérifier que les utilisateurs ont été créés
         $this->assertDatabaseHas('users', [
             'matriculation_no' => 'IMP001',
             'full_name' => 'John Import',
-            'email' => 'john.import@example.com'
+            'email' => 'john.import@example.com',
         ]);
 
         $this->assertDatabaseHas('users', [
             'matriculation_no' => 'IMP002',
             'full_name' => 'Jane Import',
-            'email' => 'jane.import@example.com'
+            'email' => 'jane.import@example.com',
         ]);
     }
 
@@ -86,7 +86,7 @@ class UsersImportTest extends TestCase
         User::factory()->create([
             'matriculation_no' => 'EXIST001',
             'email' => 'existing@example.com',
-            'role_id' => 1
+            'role_id' => 1,
         ]);
 
         Storage::fake('local');
@@ -98,26 +98,26 @@ class UsersImportTest extends TestCase
         $file = UploadedFile::fake()->createWithContent('test_import.csv', $csvContent);
 
         $response = $this->postJson('/api/users/import', [
-            'file' => $file
+            'file' => $file,
         ]);
 
         $response->assertStatus(200)
-                ->assertJson([
-                    'message' => 'Importation terminée avec succès.',
-                    'data' => [
-                        'imported_users' => 1,
-                        'skipped_users' => 1,
-                        'total_processed' => 2,
-                    ]
-                ]);
+            ->assertJson([
+                'message' => 'Importation terminée avec succès.',
+                'data' => [
+                    'imported_users' => 1,
+                    'skipped_users' => 1,
+                    'total_processed' => 2,
+                ],
+            ]);
 
         // Vérifier qu'il n'y a qu'un seul utilisateur avec cette matriculation
         $this->assertEquals(1, User::where('matriculation_no', 'EXIST001')->count());
-        
+
         // Vérifier que le nouvel utilisateur a été créé
         $this->assertDatabaseHas('users', [
             'matriculation_no' => 'NEW001',
-            'email' => 'new@example.com'
+            'email' => 'new@example.com',
         ]);
     }
 
@@ -129,11 +129,11 @@ class UsersImportTest extends TestCase
         $file = UploadedFile::fake()->create('test.txt', 100);
 
         $response = $this->postJson('/api/users/import', [
-            'file' => $file
+            'file' => $file,
         ]);
 
         $response->assertStatus(422)
-                ->assertJsonValidationErrors(['file']);
+            ->assertJsonValidationErrors(['file']);
     }
 
     /** @test */
@@ -146,7 +146,7 @@ class UsersImportTest extends TestCase
         $file = UploadedFile::fake()->create('test.csv', 100);
 
         $response = $this->postJson('/api/users/import', [
-            'file' => $file
+            'file' => $file,
         ]);
 
         $response->assertStatus(401);
@@ -163,22 +163,22 @@ class UsersImportTest extends TestCase
         $file = UploadedFile::fake()->createWithContent('test_import.csv', $csvContent);
 
         $response = $this->postJson('/api/users/import', [
-            'file' => $file
+            'file' => $file,
         ]);
 
         $response->assertStatus(200)
-                ->assertJson([
-                    'message' => 'Importation terminée avec succès.',
-                    'data' => [
-                        'imported_users' => 0,
-                        'skipped_users' => 1,
-                        'total_processed' => 1,
-                    ]
-                ]);
+            ->assertJson([
+                'message' => 'Importation terminée avec succès.',
+                'data' => [
+                    'imported_users' => 0,
+                    'skipped_users' => 1,
+                    'total_processed' => 1,
+                ],
+            ]);
 
         // Vérifier que l'utilisateur n'a pas été créé
         $this->assertDatabaseMissing('users', [
-            'matriculation_no' => 'INV001'
+            'matriculation_no' => 'INV001',
         ]);
     }
 }

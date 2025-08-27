@@ -6,13 +6,15 @@ use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase
 {
-    protected function setUp(): void
+    /**
+     * Creates the application.
+     */
+    public function createApplication(): \Illuminate\Foundation\Application
     {
-        parent::setUp();
-        
-        // Set application key for testing
-        config(['app.key' => 'base64:test-key-for-testing-only-not-for-production']);
-    // Ensure a stable app URL during tests to make generated asset URLs deterministic
-    config(['app.url' => 'http://localhost']);
+        $app = require __DIR__.'/../bootstrap/app.php';
+
+        $app->make(\Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+
+        return $app;
     }
 }

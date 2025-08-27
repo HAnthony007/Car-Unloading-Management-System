@@ -14,12 +14,12 @@ final class MatriculationNumberGeneratorService
     public function generateNext(string $institutionPrefix): MatriculationNumber
     {
         $year = date('Y');
-        $pattern = strtoupper($institutionPrefix) . '-' . $year . '-';
+        $pattern = strtoupper($institutionPrefix).'-'.$year.'-';
 
         $counter = 1;
         do {
             $sequence = str_pad($counter, 3, '0', STR_PAD_LEFT);
-            $candidate = $pattern . $sequence;
+            $candidate = $pattern.$sequence;
             $matriculationNumber = new MatriculationNumber($candidate);
             $counter++;
         } while ($this->userRepository->matriculationExists($matriculationNumber));
@@ -31,6 +31,7 @@ final class MatriculationNumberGeneratorService
     {
         try {
             new MatriculationNumber($matriculationNumber);
+
             return true;
         } catch (\InvalidArgumentException) {
             return false;

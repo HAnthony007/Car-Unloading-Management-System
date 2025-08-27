@@ -5,7 +5,7 @@ namespace App\Domain\Auth\ValueObjects;
 final class CsrfToken
 {
     public function __construct(
-       private readonly string $value
+        private readonly string $value
     ) {}
 
     public function getValue(): string
@@ -22,5 +22,4 @@ final class CsrfToken
     {
         return $this->value;
     }
-
 }

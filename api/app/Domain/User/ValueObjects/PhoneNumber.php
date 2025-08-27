@@ -23,23 +23,25 @@ final class PhoneNumber
 
     public function getCountryCode(): ?string
     {
-        if (!$this->hasValue()) {
+        if (! $this->hasValue()) {
             return null;
         }
+
         return preg_match('/^\+(\d{1,3})/', $this->value, $matches) ? $matches[1] : null;
     }
 
     public function getLocalNumber(): ?string
     {
-        if (!$this->hasValue()) {
+        if (! $this->hasValue()) {
             return null;
         }
-        return preg_match('/^\+\d{1,3}/', '',$this->value);
+
+        return preg_match('/^\+\d{1,3}/', '', $this->value);
     }
 
     public function hasValue(): bool
     {
-        return isset($this->value) && !empty($this->value);
+        return isset($this->value) && ! empty($this->value);
     }
 
     public function __toString(): string
@@ -66,8 +68,8 @@ final class PhoneNumber
             return $cleaned;
         }
 
-        if (!str_starts_with($cleaned, '+') && strlen($cleaned) > 10) {
-            return '+' . $cleaned;
+        if (! str_starts_with($cleaned, '+') && strlen($cleaned) > 10) {
+            return '+'.$cleaned;
         }
 
         return $cleaned;

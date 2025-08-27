@@ -18,7 +18,9 @@ return new class extends Migration
             $table->text('photo_description')->nullable();
             $table->foreignId('follow_up_file_id')->constrained('follow_up_files', 'follow_up_file_id');
             $table->foreignId('vehicle_id')->constrained('vehicles', 'vehicle_id');
-            $table->foreignId('checkpoint_id')->constrained('survey_checkpoints', 'checkpoint_id');
+            $table->foreignId('checkpoint_id')
+                ->constrained('survey_checkpoints', 'checkpoint_id')
+                ->cascadeOnDelete();
             $table->timestamps();
         });
     }

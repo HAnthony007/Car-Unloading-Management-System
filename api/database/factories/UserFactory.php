@@ -24,7 +24,7 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'matriculation_no' => 'USER' . fake()->unique()->numberBetween(1000, 9999),
+            'matriculation_no' => 'USER'.fake()->unique()->numberBetween(1000, 9999),
             'full_name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),

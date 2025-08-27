@@ -2,8 +2,8 @@
 
 namespace App\Presentation\Http\Requests\Auth;
 
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
 class RegisterRequest extends FormRequest
@@ -31,7 +31,7 @@ class RegisterRequest extends FormRequest
 
             'email.required' => "L'adresse email est requise.",
             'email.email' => "L'adresse email n'est pas valide.",
-            'email.unique' => "Cette adresse email est déjà utilisée.",
+            'email.unique' => 'Cette adresse email est déjà utilisée.',
 
             'password.required' => 'Le mot de passe est requis.',
             'password.confirmed' => 'La confirmation du mot de passe ne correspond pas.',

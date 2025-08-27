@@ -18,10 +18,30 @@ class AppServiceProvider extends ServiceProvider
             \App\Domain\User\Repositories\UserRepositoryInterface::class,
             \App\Infrastructure\Persistence\Repositories\EloquentUserRepository::class
         );
-        
+
         $this->app->bind(
             \App\Domain\Role\Repositories\RoleRepositoryInterface::class,
             \App\Infrastructure\Persistence\Repositories\EloquentRoleRepository::class
+        );
+
+        $this->app->bind(
+            \App\Domain\Parking\Repositories\ParkingRepositoryInterface::class,
+            \App\Infrastructure\Persistence\Repositories\EloquentParkingRepository::class
+        );
+
+        $this->app->bind(
+            \App\Domain\Photo\Repositories\PhotoRepositoryInterface::class,
+            \App\Infrastructure\Persistence\Repositories\EloquentPhotoRepository::class
+        );
+
+        $this->app->bind(
+            \App\Domain\Document\Repositories\DocumentRepositoryInterface::class,
+            \App\Infrastructure\Persistence\Repositories\EloquentDocumentRepository::class
+        );
+
+        $this->app->bind(
+            \App\Domain\Document\Services\DocumentStorageService::class,
+            \App\Infrastructure\Services\LaravelDocumentStorageService::class
         );
     }
 

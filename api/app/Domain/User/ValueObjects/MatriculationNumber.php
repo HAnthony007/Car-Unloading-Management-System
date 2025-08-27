@@ -27,12 +27,14 @@ final class MatriculationNumber
     public function getYear(): ?int
     {
         $parts = explode('-', $this->value);
+
         return isset($parts[1]) ? (int) $parts[1] : null;
     }
 
     public function getSequence(): ?string
     {
         $parts = explode('-', $this->value);
+
         return $parts[2] ?? null;
     }
 
@@ -60,7 +62,7 @@ final class MatriculationNumber
             throw new InvalidArgumentException('Matriculation number too long');
         }
 
-        if (!preg_match('/^[A-Z0-9-]+$/', strtoupper($matriculationNumber))) {
+        if (! preg_match('/^[A-Z0-9-]+$/', strtoupper($matriculationNumber))) {
             throw new InvalidArgumentException('Invalid matriculation number');
         }
     }

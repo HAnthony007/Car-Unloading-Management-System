@@ -37,7 +37,7 @@ final class UserResource extends JsonResource
             'created_at' => $user->getCreatedAt()?->toISOString(),
             'updated_at' => $user->getUpdatedAt()?->toISOString(),
 
-            // 'role' => new 
+            // 'role' => new
 
             // Metadata calculated fields
             'profile_completion' => $this->calculateProfileCompletion($user),
@@ -49,15 +49,15 @@ final class UserResource extends JsonResource
     {
         $fields = [
             'email' => true,
-            'full_name' => !empty($user->getFullName()),
+            'full_name' => ! empty($user->getFullName()),
             'phone' => $user->hasPhoneNumber(),
             'avatar' => $user->hasAvatar(),
             'email_verified' => $user->isEmailVerified(),
         ];
-    
+
         $completed = count(array_filter($fields));
         $total = count($fields);
-    
+
         return round(($completed / $total) * 100, 2);
     }
 }

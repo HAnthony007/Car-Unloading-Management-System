@@ -9,16 +9,16 @@ uses(RefreshDatabase::class);
 
 beforeEach(function () {
     // Créer un rôle de test
-            $this->role = Role::factory()->create([
-            'role_id' => 1,
-            'role_name' => 'User',
-            'role_description' => 'Regular user'
-        ]);
+    $this->role = Role::factory()->create([
+        'role_id' => 1,
+        'role_name' => 'User',
+        'role_description' => 'Regular user',
+    ]);
 
     // Créer un utilisateur de test pour l'authentification
     $this->user = EloquentUser::factory()->create([
         'role_id' => $this->role->role_id,
-        'email_verified_at' => now()
+        'email_verified_at' => now(),
     ]);
 
     // Authentifier l'utilisateur
@@ -26,17 +26,15 @@ beforeEach(function () {
 });
 
 describe('User API Endpoints', function () {
-    
+
     describe('GET /api/users - List Users', function () {
         it('returns paginated users list', function () {
             // Créer quelques utilisateurs de test
             EloquentUser::factory()->count(5)->create([
-                'role_id' => $this->role->role_id
+                'role_id' => $this->role->role_id,
             ]);
 
             $response = $this->getJson('/api/users');
-
-
 
             $response->assertStatus(200)
                 ->assertJsonStructure([
@@ -46,8 +44,8 @@ describe('User API Endpoints', function () {
                             'matriculation_number',
                             'full_name',
                             'email',
-                            'role_id'
-                        ]
+                            'role_id',
+                        ],
                     ],
                     'meta' => [
                         'current_page',
@@ -56,25 +54,23 @@ describe('User API Endpoints', function () {
                         'path',
                         'per_page',
                         'to',
-                        'total'
-                    ]
+                        'total',
+                    ],
                 ]);
         });
 
         it('filters users by search term', function () {
             EloquentUser::factory()->create([
                 'full_name' => 'John Doe',
-                'role_id' => $this->role->role_id
+                'role_id' => $this->role->role_id,
             ]);
 
             EloquentUser::factory()->create([
                 'full_name' => 'Jane Smith',
-                'role_id' => $this->role->role_id
+                'role_id' => $this->role->role_id,
             ]);
 
             $response = $this->getJson('/api/users?search_term=john');
-
-
 
             $response->assertStatus(200)
                 ->assertJsonCount(1, 'data')
@@ -83,14 +79,14 @@ describe('User API Endpoints', function () {
 
         it('filters users by role', function () {
             $adminRole = Role::factory()->create(['role_name' => 'Admin']);
-            
+
             // Créer un utilisateur avec le rôle admin
             EloquentUser::factory()->create([
-                'role_id' => $adminRole->role_id
+                'role_id' => $adminRole->role_id,
             ]);
 
             // Filtrer par le rôle admin (qui devrait avoir 1 utilisateur)
-            $response = $this->getJson('/api/users?role_id=' . $adminRole->role_id);
+            $response = $this->getJson('/api/users?role_id='.$adminRole->role_id);
 
             $response->assertStatus(200)
                 ->assertJsonCount(1, 'data');
@@ -99,12 +95,12 @@ describe('User API Endpoints', function () {
         it('filters users by matriculation prefix', function () {
             EloquentUser::factory()->create([
                 'matriculation_no' => 'TEST001',
-                'role_id' => $this->role->role_id
+                'role_id' => $this->role->role_id,
             ]);
 
             EloquentUser::factory()->create([
                 'matriculation_no' => 'ADMIN001',
-                'role_id' => $this->role->role_id
+                'role_id' => $this->role->role_id,
             ]);
 
             $response = $this->getJson('/api/users?matriculation_prefix=TEST');
@@ -116,7 +112,7 @@ describe('User API Endpoints', function () {
 
         it('handles pagination correctly', function () {
             EloquentUser::factory()->count(25)->create([
-                'role_id' => $this->role->role_id
+                'role_id' => $this->role->role_id,
             ]);
 
             $response = $this->getJson('/api/users?page=2&per_page=10');
@@ -136,16 +132,14 @@ describe('User API Endpoints', function () {
                 'email' => 'newuser@example.com',
                 'password' => 'password123',
                 'password_confirmation' => 'password123',
-                'role_id' => $this->role->role_id
+                'role_id' => $this->role->role_id,
             ];
 
             $response = $this->postJson('/api/users', $userData);
 
-
-
             $response->assertStatus(201)
                 ->assertJson([
-                    'message' => 'User created successfully.'
+                    'message' => 'User created successfully.',
                 ])
                 ->assertJsonStructure([
                     'data' => [
@@ -153,13 +147,13 @@ describe('User API Endpoints', function () {
                         'matriculation_number',
                         'full_name',
                         'email',
-                        'role_id'
-                    ]
+                        'role_id',
+                    ],
                 ]);
 
             $this->assertDatabaseHas('users', [
                 'matriculation_no' => 'NEW001',
-                'email' => 'newuser@example.com'
+                'email' => 'newuser@example.com',
             ]);
         });
 
@@ -172,14 +166,14 @@ describe('User API Endpoints', function () {
                     'full_name',
                     'email',
                     'password',
-                    'role_id'
+                    'role_id',
                 ]);
         });
 
         it('validates unique matriculation number', function () {
             EloquentUser::factory()->create([
                 'matriculation_no' => 'EXIST001',
-                'role_id' => $this->role->role_id
+                'role_id' => $this->role->role_id,
             ]);
 
             $userData = [
@@ -188,7 +182,7 @@ describe('User API Endpoints', function () {
                 'email' => 'another@example.com',
                 'password' => 'password123',
                 'password_confirmation' => 'password123',
-                'role_id' => $this->role->role_id
+                'role_id' => $this->role->role_id,
             ];
 
             $response = $this->postJson('/api/users', $userData);
@@ -200,7 +194,7 @@ describe('User API Endpoints', function () {
         it('validates unique email', function () {
             EloquentUser::factory()->create([
                 'email' => 'existing@example.com',
-                'role_id' => $this->role->role_id
+                'role_id' => $this->role->role_id,
             ]);
 
             $userData = [
@@ -209,7 +203,7 @@ describe('User API Endpoints', function () {
                 'email' => 'existing@example.com',
                 'password' => 'password123',
                 'password_confirmation' => 'password123',
-                'role_id' => $this->role->role_id
+                'role_id' => $this->role->role_id,
             ];
 
             $response = $this->postJson('/api/users', $userData);
@@ -225,7 +219,7 @@ describe('User API Endpoints', function () {
                 'email' => 'newuser3@example.com',
                 'password' => 'password123',
                 'password_confirmation' => 'different',
-                'role_id' => $this->role->role_id
+                'role_id' => $this->role->role_id,
             ];
 
             $response = $this->postJson('/api/users', $userData);
@@ -241,7 +235,7 @@ describe('User API Endpoints', function () {
                 'email' => 'newuser4@example.com',
                 'password' => 'password123',
                 'password_confirmation' => 'password123',
-                'role_id' => 999 // Role inexistant
+                'role_id' => 999, // Role inexistant
             ];
 
             $response = $this->postJson('/api/users', $userData);
@@ -254,7 +248,7 @@ describe('User API Endpoints', function () {
     describe('GET /api/users/{userId} - Show User', function () {
         it('returns user details by ID', function () {
             $testUser = EloquentUser::factory()->create([
-                'role_id' => $this->role->role_id
+                'role_id' => $this->role->role_id,
             ]);
 
             $response = $this->getJson("/api/users/{$testUser->user_id}");
@@ -270,10 +264,10 @@ describe('User API Endpoints', function () {
                         'avatar',
                         'phone',
                         'email_verified_at',
-                        'created_at'
-                    ]
+                        'created_at',
+                    ],
                 ])
-                ->assertJsonPath('data.user_id', (string)$testUser->user_id);
+                ->assertJsonPath('data.user_id', $testUser->user_id);
         });
 
         it('returns 404 for non-existent user', function () {
@@ -281,7 +275,7 @@ describe('User API Endpoints', function () {
 
             $response->assertStatus(404)
                 ->assertJson([
-                    'error' => 'User not found.'
+                    'error' => 'User not found.',
                 ]);
         });
     });
@@ -290,10 +284,8 @@ describe('User API Endpoints', function () {
         it('returns user details by matriculation number', function () {
             $testUser = EloquentUser::factory()->create([
                 'matriculation_no' => 'MAT001',
-                'role_id' => $this->role->role_id
+                'role_id' => $this->role->role_id,
             ]);
-
-
 
             $response = $this->getJson('/api/users/matriculation/MAT001');
 
@@ -306,7 +298,7 @@ describe('User API Endpoints', function () {
 
             $response->assertStatus(404)
                 ->assertJson([
-                    'error' => 'User not found.'
+                    'error' => 'User not found.',
                 ]);
         });
     });
@@ -314,20 +306,20 @@ describe('User API Endpoints', function () {
     describe('PUT /api/users/{userId} - Update User', function () {
         it('updates user profile successfully', function () {
             $testUser = EloquentUser::factory()->create([
-                'role_id' => $this->role->role_id
+                'role_id' => $this->role->role_id,
             ]);
 
             $updateData = [
                 'full_name' => 'Updated Name',
                 'phone' => '+1234567890',
-                'avatar' => '/avatars/updated.jpg'
+                'avatar' => '/avatars/updated.jpg',
             ];
 
             $response = $this->putJson("/api/users/{$testUser->user_id}", $updateData);
 
             $response->assertStatus(200)
                 ->assertJson([
-                    'message' => 'User updated successfully.'
+                    'message' => 'User updated successfully.',
                 ])
                 ->assertJsonPath('data.full_name', 'Updated Name')
                 ->assertJsonPath('data.phone', '+1234567890')
@@ -336,7 +328,7 @@ describe('User API Endpoints', function () {
             $this->assertDatabaseHas('users', [
                 'user_id' => $testUser->user_id,
                 'full_name' => 'Updated Name',
-                'phone' => '+1234567890'
+                'phone' => '+1234567890',
             ]);
         });
 
@@ -344,11 +336,11 @@ describe('User API Endpoints', function () {
             $testUser = EloquentUser::factory()->create([
                 'full_name' => 'Original Name',
                 'phone' => '+0987654321',
-                'role_id' => $this->role->role_id
+                'role_id' => $this->role->role_id,
             ]);
 
             $updateData = [
-                'full_name' => 'New Name Only'
+                'full_name' => 'New Name Only',
             ];
 
             $response = $this->putJson("/api/users/{$testUser->user_id}", $updateData);
@@ -360,20 +352,20 @@ describe('User API Endpoints', function () {
             $this->assertDatabaseHas('users', [
                 'user_id' => $testUser->user_id,
                 'full_name' => 'New Name Only',
-                'phone' => '+0987654321'
+                'phone' => '+0987654321',
             ]);
         });
 
         it('validates phone number format', function () {
             $testUser = EloquentUser::factory()->create([
-                'role_id' => $this->role->role_id
+                'role_id' => $this->role->role_id,
             ]);
 
             $updateData = [
-                'phone' => 'invalid-phone-format'
+                'phone' => 'invalid-phone-format',
             ];
 
-            $response = $this->putJson("/api/users/{testUser->user_id}", $updateData);
+            $response = $this->putJson('/api/users/{testUser->user_id}', $updateData);
 
             $response->assertStatus(422)
                 ->assertJsonValidationErrors(['phone']);
@@ -381,16 +373,14 @@ describe('User API Endpoints', function () {
 
         it('returns 404 for non-existent user', function () {
             $updateData = [
-                'full_name' => 'Updated Name'
+                'full_name' => 'Updated Name',
             ];
 
             $response = $this->putJson('/api/users/999', $updateData);
 
-
-
             $response->assertStatus(404)
                 ->assertJson([
-                    'error' => 'User not found.'
+                    'error' => 'User not found.',
                 ]);
         });
     });
@@ -398,18 +388,18 @@ describe('User API Endpoints', function () {
     describe('DELETE /api/users/{userId} - Delete User', function () {
         it('deletes user successfully', function () {
             $testUser = EloquentUser::factory()->create([
-                'role_id' => $this->role->role_id
+                'role_id' => $this->role->role_id,
             ]);
 
             $response = $this->deleteJson("/api/users/{$testUser->user_id}");
 
             $response->assertStatus(200)
                 ->assertJson([
-                    'message' => 'User deleted successfully.'
+                    'message' => 'User deleted successfully.',
                 ]);
 
             $this->assertDatabaseMissing('users', [
-                'user_id' => $testUser->user_id
+                'user_id' => $testUser->user_id,
             ]);
         });
 
@@ -418,7 +408,7 @@ describe('User API Endpoints', function () {
 
             $response->assertStatus(404)
                 ->assertJson([
-                    'error' => 'User not found.'
+                    'error' => 'User not found.',
                 ]);
         });
     });
@@ -427,7 +417,7 @@ describe('User API Endpoints', function () {
         it('requires authentication for all endpoints', function () {
             // Créer une nouvelle instance sans authentification
             $this->app->make('auth')->forgetGuards();
-            
+
             $response = $this->getJson('/api/users');
             $response->assertStatus(401);
 

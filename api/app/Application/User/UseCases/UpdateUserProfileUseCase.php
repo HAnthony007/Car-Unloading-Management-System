@@ -17,10 +17,10 @@ final class UpdateUserProfileUseCase
     {
         $user = $this->userRepository->findById(new UserId($dto->userId));
 
-        if (!$user) {
+        if (! $user) {
             throw new \Exception('User not found.');
         }
-    
+
         $updatedUser = new User(
             userId: $user->getUserId(),
             matriculationNumber: $user->getMatriculationNumber(),

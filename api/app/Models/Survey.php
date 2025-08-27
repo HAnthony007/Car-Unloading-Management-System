@@ -8,6 +8,10 @@ class Survey extends Model
 {
     protected $primaryKey = 'survey_id';
 
+    protected $fillable = [
+        'date', 'result', 'user_id', 'follow_up_file_id',
+    ];
+
     public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');

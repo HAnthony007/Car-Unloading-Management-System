@@ -19,7 +19,7 @@ final class CreateUserUseCase
     public function execute(CreateUserDTO $dto): User
     {
         $role = $this->roleRepository->findById(new RoleId($dto->roleId));
-        if (!$role) {
+        if (! $role) {
             // TODO Create RoleNotFoundException
             throw new \RuntimeException('Invalid role');
         }
@@ -28,7 +28,7 @@ final class CreateUserUseCase
             // TODO Create UserAlreadyExistsException
             throw new \RuntimeException("User with email {$dto->email} already exists");
         }
-    
+
         $user = new User(
             userId: null,
             matriculationNumber: $dto->getMatriculationNumberAsV0(),
@@ -44,5 +44,4 @@ final class CreateUserUseCase
 
         return $this->userRepository->save($user);
     }
-
 }

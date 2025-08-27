@@ -14,12 +14,12 @@ final class SearchUsersUseCase
     public function execute(UserSearchCriteriaDTO $criteria): array
     {
         $users = $this->userRepository->findAll();
-        
+
         // Filter by matriculation prefix
         if ($criteria->matriculationPrefix) {
-            $users = array_filter($users, function($user) use ($criteria) {
+            $users = array_filter($users, function ($user) use ($criteria) {
                 return str_starts_with(
-                    $user->getMatriculationNumber()->getValue(), 
+                    $user->getMatriculationNumber()->getValue(),
                     strtoupper($criteria->matriculationPrefix)
                 );
             });
@@ -27,15 +27,15 @@ final class SearchUsersUseCase
 
         // Filter by role
         if ($criteria->roleId) {
-            $users = array_filter($users, function($user) use ($criteria) {
+            $users = array_filter($users, function ($user) use ($criteria) {
                 return $user->getRoleId()->getValue() === $criteria->roleId;
             });
         }
 
         // Filter by email verification status
         if ($criteria->emailVerified !== null) {
-            $users = array_filter($users, function($user) use ($criteria) {
-                return $criteria->emailVerified 
+            $users = array_filter($users, function ($user) use ($criteria) {
+                return $criteria->emailVerified
                     ? $user->getEmailVerifiedAt() !== null
                     : $user->getEmailVerifiedAt() === null;
             });
@@ -43,9 +43,10 @@ final class SearchUsersUseCase
 
         // Filter by active status (email verified and recent creation)
         if ($criteria->isActive !== null) {
-            $users = array_filter($users, function($user) use ($criteria) {
-                $isActive = $user->getEmailVerifiedAt() !== null && 
+            $users = array_filter($users, function ($user) use ($criteria) {
+                $isActive = $user->getEmailVerifiedAt() !== null &&
                            $user->getCreatedAt()->isAfter(now()->subDays(90));
+
                 return $criteria->isActive === $isActive;
             });
         }
@@ -53,7 +54,7 @@ final class SearchUsersUseCase
         // Search by term (name, email, matriculation)
         if ($criteria->searchTerm) {
             $searchTerm = strtolower($criteria->searchTerm);
-            $users = array_filter($users, function($user) use ($searchTerm) {
+            $users = array_filter($users, function ($user) use ($searchTerm) {
                 return str_contains(strtolower($user->getFullName()), $searchTerm) ||
                        str_contains(strtolower($user->getEmail()->getValue()), $searchTerm) ||
                        str_contains(strtolower($user->getMatriculationNumber()->getValue()), $searchTerm);
@@ -68,7 +69,7 @@ final class SearchUsersUseCase
         $perPage = $criteria->perPage;
         $currentPage = $criteria->page;
         $lastPage = ceil($total / $perPage);
-        
+
         $offset = ($currentPage - 1) * $perPage;
         $paginatedUsers = array_slice($users, $offset, $perPage);
 

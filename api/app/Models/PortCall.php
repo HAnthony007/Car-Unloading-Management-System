@@ -8,6 +8,8 @@ class PortCall extends Model
 {
     protected $primaryKey = 'port_call_id';
 
+    protected $guarded = ['port_call_id'];
+
     public function vessel(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Vessel::class, 'vessel_id');

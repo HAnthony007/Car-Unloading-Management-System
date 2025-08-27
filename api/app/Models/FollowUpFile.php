@@ -7,7 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 class FollowUpFile extends Model
 {
     protected $primaryKey = 'follow_up_file_id';
-    public $timestamps = false;
+
+    public $timestamps = true;
+
+    protected $guarded = ['follow_up_file_id'];
 
     public function vehicle(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
@@ -32,10 +35,5 @@ class FollowUpFile extends Model
     public function surveys(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(Survey::class, 'follow_up_file_id');
-    }
-
-    public function workflowSteps(): \Illuminate\Database\Eloquent\Relations\HasMany
-    {
-        return $this->hasMany(WorkflowStep::class, 'follow_up_file_id');
     }
 }

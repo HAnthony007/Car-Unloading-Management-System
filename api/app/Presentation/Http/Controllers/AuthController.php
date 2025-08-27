@@ -2,16 +2,15 @@
 
 namespace App\Presentation\Http\Controllers;
 
-use App\Application\Auth\DTOs\RegisterDTO;
 use App\Application\Auth\DTOs\LoginDTO;
-use App\Application\Auth\UseCases\RegisterUseCase;
+use App\Application\Auth\DTOs\RegisterDTO;
 use App\Application\Auth\UseCases\LoginUseCase;
 use App\Application\Auth\UseCases\LogoutUseCase;
-use App\Presentation\Http\Controllers\Controller;
+use App\Application\Auth\UseCases\RegisterUseCase;
 use App\Presentation\Http\Requests\Auth\LoginRequest;
 use App\Presentation\Http\Requests\Auth\RegisterRequest;
-use Illuminate\Http\JsonResponse;
 use App\Presentation\Http\Resources\UserResource;
+use Illuminate\Http\JsonResponse;
 
 final class AuthController extends Controller
 {
@@ -19,8 +18,7 @@ final class AuthController extends Controller
         private readonly RegisterUseCase $registerUseCase,
         private readonly LoginUseCase $loginUseCase,
         private readonly LogoutUseCase $logoutUseCase,
-    ) {
-    }
+    ) {}
 
     public function register(RegisterRequest $request): JsonResponse
     {
