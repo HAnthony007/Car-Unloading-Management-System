@@ -7,4 +7,5 @@ return [
     App\Providers\VesselServiceProvider::class,
     App\Providers\PortCallServiceProvider::class,
     App\Providers\DischargeServiceProvider::class,
+    App\Providers\VehicleServiceProvider::class,
 ];

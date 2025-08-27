@@ -58,6 +58,17 @@ Route::prefix('roles')
         Route::delete('/{id}', [\App\Presentation\Http\Controllers\RoleController::class, 'destroy'])->name('roles.destroy');
     });
 
+// Vehicle Management Routes
+Route::prefix('vehicles')
+    ->middleware('auth:sanctum')
+    ->group(function (): void {
+        Route::get('/', [\App\Presentation\Http\Controllers\VehicleController::class, 'index'])->name('vehicles.index');
+        Route::post('/', [\App\Presentation\Http\Controllers\VehicleController::class, 'store'])->name('vehicles.store');
+        Route::get('/{id}', [\App\Presentation\Http\Controllers\VehicleController::class, 'show'])->name('vehicles.show');
+        Route::put('/{id}', [\App\Presentation\Http\Controllers\VehicleController::class, 'update'])->name('vehicles.update');
+        Route::delete('/{id}', [\App\Presentation\Http\Controllers\VehicleController::class, 'destroy'])->name('vehicles.destroy');
+    });
+
 // Parking Management Routes
 Route::prefix('parkings')
     ->middleware('auth:sanctum')
