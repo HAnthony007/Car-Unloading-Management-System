@@ -79,3 +79,14 @@ Route::prefix('docks')
         Route::put('/{id}', [\App\Presentation\Http\Controllers\DockController::class, 'update'])->name('docks.update');
         Route::delete('/{id}', [\App\Presentation\Http\Controllers\DockController::class, 'destroy'])->name('docks.destroy');
     });
+
+// Vessel Management Routes
+Route::prefix('vessels')
+    ->middleware('auth:sanctum')
+    ->group(function (): void {
+        Route::get('/', [\App\Presentation\Http\Controllers\VesselController::class, 'index'])->name('vessels.index');
+        Route::post('/', [\App\Presentation\Http\Controllers\VesselController::class, 'store'])->name('vessels.store');
+        Route::get('/{id}', [\App\Presentation\Http\Controllers\VesselController::class, 'show'])->name('vessels.show');
+        Route::put('/{id}', [\App\Presentation\Http\Controllers\VesselController::class, 'update'])->name('vessels.update');
+        Route::delete('/{id}', [\App\Presentation\Http\Controllers\VesselController::class, 'destroy'])->name('vessels.destroy');
+    });
