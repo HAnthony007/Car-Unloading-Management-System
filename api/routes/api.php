@@ -78,6 +78,9 @@ Route::prefix('vehicles')
         Route::get('/{id}', [\App\Presentation\Http\Controllers\VehicleController::class, 'show'])->name('vehicles.show');
         Route::put('/{id}', [\App\Presentation\Http\Controllers\VehicleController::class, 'update'])->name('vehicles.update');
         Route::delete('/{id}', [\App\Presentation\Http\Controllers\VehicleController::class, 'destroy'])->name('vehicles.destroy');
+
+    // Nested: list movements for a specific vehicle
+    Route::get('/{id}/movements', [\App\Presentation\Http\Controllers\MovementController::class, 'byVehicle'])->name('vehicles.movements');
     });
 
 // Parking Management Routes
@@ -180,4 +183,15 @@ Route::prefix('documents')
         Route::get('/{id}', [\App\Presentation\Http\Controllers\DocumentController::class, 'show'])->name('documents.show');
         Route::put('/{id}', [\App\Presentation\Http\Controllers\DocumentController::class, 'update'])->name('documents.update');
         Route::delete('/{id}', [\App\Presentation\Http\Controllers\DocumentController::class, 'destroy'])->name('documents.destroy');
+    });
+
+// Movements Management Routes
+Route::prefix('movements')
+    ->middleware('auth:sanctum')
+    ->group(function (): void {
+        Route::get('/', [\App\Presentation\Http\Controllers\MovementController::class, 'index'])->name('movements.index');
+        Route::post('/', [\App\Presentation\Http\Controllers\MovementController::class, 'store'])->name('movements.store');
+        Route::get('/{id}', [\App\Presentation\Http\Controllers\MovementController::class, 'show'])->name('movements.show');
+        Route::put('/{id}', [\App\Presentation\Http\Controllers\MovementController::class, 'update'])->name('movements.update');
+        Route::delete('/{id}', [\App\Presentation\Http\Controllers\MovementController::class, 'destroy'])->name('movements.destroy');
     });

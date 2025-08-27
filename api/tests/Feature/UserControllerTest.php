@@ -267,7 +267,7 @@ describe('User API Endpoints', function () {
                         'created_at',
                     ],
                 ])
-                ->assertJsonPath('data.user_id', (string) $testUser->user_id);
+                ->assertJsonPath('data.user_id', $testUser->user_id);
         });
 
         it('returns 404 for non-existent user', function () {

@@ -14,7 +14,7 @@ final class UserId
         }
     }
 
-    public function getValue(): string
+    public function getValue(): int
     {
         return $this->value;
     }

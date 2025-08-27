@@ -99,8 +99,8 @@ describe('GetUserUseCase', function () {
         $result = $getUserUseCase->execute($userId);
 
         // Assert
-        expect($result)->toBeInstanceOf(User::class);
-        expect($result->getUserId()->getValue())->toBe((string) $userId);
+    expect($result)->toBeInstanceOf(User::class);
+    expect($result->getUserId()->getValue())->toBe($userId);
     });
 
     it('throws exception when user not found', function () {
