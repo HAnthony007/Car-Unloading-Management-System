@@ -90,3 +90,14 @@ Route::prefix('vessels')
         Route::put('/{id}', [\App\Presentation\Http\Controllers\VesselController::class, 'update'])->name('vessels.update');
         Route::delete('/{id}', [\App\Presentation\Http\Controllers\VesselController::class, 'destroy'])->name('vessels.destroy');
     });
+
+// Port Call Management Routes
+Route::prefix('port-calls')
+    ->middleware('auth:sanctum')
+    ->group(function (): void {
+        Route::get('/', [\App\Presentation\Http\Controllers\PortCallController::class, 'index'])->name('portcalls.index');
+        Route::post('/', [\App\Presentation\Http\Controllers\PortCallController::class, 'store'])->name('portcalls.store');
+        Route::get('/{id}', [\App\Presentation\Http\Controllers\PortCallController::class, 'show'])->name('portcalls.show');
+        Route::put('/{id}', [\App\Presentation\Http\Controllers\PortCallController::class, 'update'])->name('portcalls.update');
+        Route::delete('/{id}', [\App\Presentation\Http\Controllers\PortCallController::class, 'destroy'])->name('portcalls.destroy');
+    });
