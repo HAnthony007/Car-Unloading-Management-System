@@ -10,4 +10,5 @@ return [
     App\Providers\VehicleServiceProvider::class,
     App\Providers\FollowUpFileServiceProvider::class,
     App\Providers\SurveyServiceProvider::class,
+    App\Providers\SurveyCheckpointServiceProvider::class,
 ];

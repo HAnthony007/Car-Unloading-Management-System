@@ -148,3 +148,14 @@ Route::prefix('follow-up-files')
         Route::put('/{id}', [\App\Presentation\Http\Controllers\FollowUpFileController::class, 'update'])->name('followupfiles.update');
         Route::delete('/{id}', [\App\Presentation\Http\Controllers\FollowUpFileController::class, 'destroy'])->name('followupfiles.destroy');
     });
+
+// Survey Checkpoints Management Routes
+Route::prefix('survey-checkpoints')
+    ->middleware('auth:sanctum')
+    ->group(function (): void {
+        Route::get('/', [\App\Presentation\Http\Controllers\SurveyCheckpointController::class, 'index'])->name('surveycheckpoints.index');
+        Route::post('/', [\App\Presentation\Http\Controllers\SurveyCheckpointController::class, 'store'])->name('surveycheckpoints.store');
+        Route::get('/{id}', [\App\Presentation\Http\Controllers\SurveyCheckpointController::class, 'show'])->name('surveycheckpoints.show');
+        Route::put('/{id}', [\App\Presentation\Http\Controllers\SurveyCheckpointController::class, 'update'])->name('surveycheckpoints.update');
+        Route::delete('/{id}', [\App\Presentation\Http\Controllers\SurveyCheckpointController::class, 'destroy'])->name('surveycheckpoints.destroy');
+    });

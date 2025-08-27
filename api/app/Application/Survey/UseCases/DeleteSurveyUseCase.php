@@ -17,7 +17,8 @@ final class DeleteSurveyUseCase
             throw new \RuntimeException('Survey not found.');
         }
 
-    $this->repository->delete(new SurveyId($id));
-    return true;
+        $this->repository->delete(new SurveyId($id));
+
+        return true;
     }
 }

@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\Dock;
 use App\Models\Discharge;
+use App\Models\Dock;
 use App\Models\FollowUpFile;
 use App\Models\PortCall;
 use App\Models\Role;
@@ -20,18 +20,18 @@ uses(RefreshDatabase::class);
  */
 function make_support_graph(): array
 {
-    $vessel = new Vessel();
+    $vessel = new Vessel;
     $vessel->imo_no = 'IMO'.random_int(10000, 99999);
     $vessel->vessel_name = 'Test Vessel';
     $vessel->flag = 'FR';
     $vessel->save();
 
-    $dock = new Dock();
+    $dock = new Dock;
     $dock->dock_name = 'Dock A';
     $dock->location = 'Zone 1';
     $dock->save();
 
-    $pc = new PortCall();
+    $pc = new PortCall;
     $pc->vessel_agent = 'Agent X';
     $pc->origin_port = 'Origin';
     $pc->arrival_date = now();
@@ -39,12 +39,12 @@ function make_support_graph(): array
     $pc->dock_id = $dock->dock_id;
     $pc->save();
 
-    $discharge = new Discharge();
+    $discharge = new Discharge;
     $discharge->discharge_date = now();
     $discharge->port_call_id = $pc->port_call_id;
     $discharge->save();
 
-    $vehicle = new Vehicle();
+    $vehicle = new Vehicle;
     $vehicle->vin = 'VIN'.random_int(10000, 99999);
     $vehicle->make = 'Make';
     $vehicle->model = 'Model';
@@ -55,7 +55,7 @@ function make_support_graph(): array
     $vehicle->discharge_id = $discharge->discharge_id;
     $vehicle->save();
 
-    $fuf = new FollowUpFile();
+    $fuf = new FollowUpFile;
     $fuf->bill_of_lading = 'BOL'.random_int(1000, 9999);
     $fuf->status = 'OPEN';
     $fuf->vehicle_id = $vehicle->vehicle_id;

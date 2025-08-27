@@ -102,6 +102,7 @@ final class SurveyController extends Controller
             return response()->json(['message' => 'Survey deleted successfully.'], 200);
         } catch (\Exception $exception) {
             $statusCode = $exception->getMessage() === 'Survey not found.' ? 404 : 400;
+
             return response()->json(['error' => $exception->getMessage()], $statusCode);
         }
     }

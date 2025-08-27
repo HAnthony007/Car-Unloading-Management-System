@@ -15,7 +15,9 @@ return new class extends Migration
             $table->id('checkpoint_id');
             $table->string('title');
             $table->string('comment')->nullable();
-            $table->foreignId('survey_id')->constrained('surveys', 'survey_id');
+            $table->foreignId('survey_id')
+                ->constrained('surveys', 'survey_id')
+                ->cascadeOnDelete();
             $table->timestamps();
         });
     }

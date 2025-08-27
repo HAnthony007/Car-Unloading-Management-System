@@ -8,6 +8,10 @@ class SurveyCheckpoint extends Model
 {
     protected $primaryKey = 'checkpoint_id';
 
+    protected $fillable = [
+        'title', 'comment', 'survey_id',
+    ];
+
     public function survey(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Survey::class, 'survey_id');

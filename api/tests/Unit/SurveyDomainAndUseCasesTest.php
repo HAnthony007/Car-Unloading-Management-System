@@ -34,7 +34,7 @@ class SurveyDomainAndUseCasesTest extends TestCase
 
         $this->assertSame('PASSED', $entity->getResult()->getValue());
         $this->assertSame('2025-08-01', $entity->getDate()->getValue()->toDateString());
-    $this->assertSame('10', $entity->getUserId()->getValue());
+        $this->assertSame('10', $entity->getUserId()->getValue());
         $this->assertSame(20, $entity->getFollowUpFileId()->getValue());
         $this->assertIsArray($entity->toArray());
     }
@@ -77,6 +77,7 @@ class SurveyDomainAndUseCasesTest extends TestCase
                     followUpFileId: new FollowUpFileId(20),
                 );
             }
+
             return null;
         });
 
