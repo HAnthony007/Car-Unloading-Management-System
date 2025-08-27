@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Dock extends Model
 {
+    use HasFactory;
     protected $primaryKey = 'dock_id';
 
     protected $guarded = ['dock_id'];

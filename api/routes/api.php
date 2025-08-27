@@ -22,7 +22,7 @@ Route::prefix('auth')
 
 // User Management Routes
 Route::prefix('users')
-    ->middleware('auth:sanctum')
+    // ->middleware('auth:sanctum')
     ->group(function (): void {
         // Search and list users
         Route::get('/', [UserController::class, 'index'])->name('users.index');

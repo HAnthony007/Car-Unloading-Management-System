@@ -12,12 +12,23 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // Order matters for FK integrity
         $this->call([
             RoleSeeder::class,
             UserSeeder::class,
             DockSeeder::class,
+            VesselSeeder::class,
+            PortCallSeeder::class,
+            DischargeSeeder::class,
+            VehicleSeeder::class,
             ParkingSeeder::class,
+            FollowUpFileSeeder::class,
+            SurveySeeder::class,
+            SurveyCheckpointSeeder::class,
+            SurveyCheckpointStepSeeder::class,
+            PhotoSeeder::class,
+            DocumentSeeder::class,
+            MovementSeeder::class,
         ]);
     }
 }

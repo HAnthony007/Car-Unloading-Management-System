@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class FollowUpFile extends Model
 {
+    use HasFactory;
     protected $primaryKey = 'follow_up_file_id';
 
     public $timestamps = true;

@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class PortCall extends Model
 {
+    use HasFactory;
     protected $primaryKey = 'port_call_id';
 
     protected $guarded = ['port_call_id'];
