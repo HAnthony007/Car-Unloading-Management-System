@@ -44,6 +44,7 @@ describe('Parking DTOs', function () {
                 'parking_name' => 'Test Parking',
                 'location' => 'Zone A',
                 'capacity' => 50,
+                'parking_number' => null,
             ]);
         });
     });

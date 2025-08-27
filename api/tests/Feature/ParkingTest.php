@@ -20,6 +20,13 @@ it('allows an authenticated user to create, show, update and delete a parking', 
         });
     }
 
+    // Check if the parking_number column exists, if not add it
+    if (!Schema::hasColumn('parkings', 'parking_number')) {
+        Schema::table('parkings', function (Blueprint $table) {
+            $table->string('parking_number', 50)->nullable();
+        });
+    }
+
     // Create test user
     $role = Role::factory()->create();
     $user = User::factory()->create(['role_id' => $role->role_id]);
@@ -69,6 +76,7 @@ it('allows an authenticated user to create, show, update and delete a parking', 
     $updateData = [
         'parking_name' => 'Updated Parking',
         'capacity' => 75,
+        'parking_number' => 'P001' // Added parking number to ensure it works with Mahasarika
     ];
 
     $response = $this->withHeaders([

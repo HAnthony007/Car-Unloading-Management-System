@@ -12,5 +12,6 @@ class Parking extends Model
         'parking_name',
         'location',
         'capacity',
+        'parking_number',
     ];
 }

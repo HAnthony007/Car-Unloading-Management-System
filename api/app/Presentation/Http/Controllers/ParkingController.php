@@ -2,13 +2,13 @@
 
 namespace App\Presentation\Http\Controllers;
 
-use App\Application\Parking\CreateParkingUseCase;
-use App\Application\Parking\GetParkingUseCase;
-use App\Application\Parking\GetParkingsUseCase;
-use App\Application\Parking\UpdateParkingUseCase;
-use App\Application\Parking\DeleteParkingUseCase;
-use App\Application\Parking\CreateParkingDTO;
-use App\Application\Parking\UpdateParkingDTO;
+use App\Application\Parking\UseCases\CreateParkingUseCase;
+use App\Application\Parking\UseCases\GetParkingUseCase;
+use App\Application\Parking\UseCases\GetParkingsUseCase;
+use App\Application\Parking\UseCases\UpdateParkingUseCase;
+use App\Application\Parking\UseCases\DeleteParkingUseCase;
+use App\Application\Parking\DTOs\CreateParkingDTO;
+use App\Application\Parking\DTOs\UpdateParkingDTO;
 use App\Presentation\Http\Requests\StoreParkingRequest;
 use App\Presentation\Http\Requests\UpdateParkingRequest;
 use App\Presentation\Http\Resources\ParkingResource;
@@ -69,8 +69,10 @@ final class ParkingController
     public function update(UpdateParkingRequest $request, int $parkingId): JsonResponse
     {
         try {
-            $dto = UpdateParkingDTO::fromArray($request->validated());
-            $parking = $this->updateParkingUseCase->execute($parkingId, $dto);
+            $validatedData = $request->validated();
+            $validatedData['parking_id'] = $parkingId;
+            $dto = UpdateParkingDTO::fromArray($validatedData);
+            $parking = $this->updateParkingUseCase->execute($dto);
             
             return response()->json([
                 'message' => 'Parking updated successfully.',

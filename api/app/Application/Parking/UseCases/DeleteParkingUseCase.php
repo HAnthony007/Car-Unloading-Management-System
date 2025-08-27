@@ -2,18 +2,20 @@
 
 namespace App\Application\Parking\UseCases;
 
-use App\Models\Parking;
+use App\Domain\Parking\Repositories\ParkingRepositoryInterface;
+use App\Domain\Parking\ValueObjects\ParkingId;
 
 final class DeleteParkingUseCase
 {
+    public function __construct(private readonly ParkingRepositoryInterface $parkingRepository) {}
+
     public function execute(int $parkingId): void
     {
-        $parking = Parking::find($parkingId);
+        $parkingIdValueObject = new ParkingId($parkingId);
+        $success = $this->parkingRepository->delete($parkingIdValueObject);
         
-        if (!$parking) {
+        if (!$success) {
             throw new \RuntimeException('Parking not found');
         }
-        
-        $parking->delete();
     }
 }

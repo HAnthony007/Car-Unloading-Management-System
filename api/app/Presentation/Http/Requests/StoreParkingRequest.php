@@ -32,6 +32,16 @@ final class StoreParkingRequest extends FormRequest
                 'min:0',
                 'max:10000',
             ],
+            'parking_number' => [
+                'nullable',
+                'string',
+                'max:50',
+                function ($attribute, $value, $fail) {
+                    if ($this->input('parking_name') === 'Mahasarika' && empty($value)) {
+                        $fail('Parking number is required for Mahasarika parking.');
+                    }
+                },
+            ],
         ];
     }
 
@@ -48,6 +58,8 @@ final class StoreParkingRequest extends FormRequest
             'capacity.integer' => 'Capacity must be a valid integer.',
             'capacity.min' => 'Capacity cannot be negative.',
             'capacity.max' => 'Capacity cannot exceed 10000.',
+            'parking_number.string' => 'Parking number must be a valid string.',
+            'parking_number.max' => 'Parking number cannot exceed 50 characters.',
         ];
     }
 

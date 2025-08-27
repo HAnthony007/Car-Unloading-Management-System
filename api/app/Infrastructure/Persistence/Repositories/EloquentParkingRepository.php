@@ -8,6 +8,7 @@ use App\Domain\Parking\ValueObjects\ParkingId;
 use App\Domain\Parking\ValueObjects\ParkingName;
 use App\Domain\Parking\ValueObjects\Location;
 use App\Domain\Parking\ValueObjects\Capacity;
+use App\Domain\Parking\ValueObjects\ParkingNumber;
 use App\Models\Parking as EloquentParking;
 
 final class EloquentParkingRepository implements ParkingRepositoryInterface
@@ -41,6 +42,7 @@ final class EloquentParkingRepository implements ParkingRepositoryInterface
         $eloquentParking->parking_name = $parking->getParkingName()->getValue();
         $eloquentParking->location = $parking->getLocation()->getValue();
         $eloquentParking->capacity = $parking->getCapacity()->getValue();
+        $eloquentParking->parking_number = $parking->getParkingNumber()?->getValue();
 
         $eloquentParking->save();
 
@@ -65,6 +67,7 @@ final class EloquentParkingRepository implements ParkingRepositoryInterface
             parkingName: new ParkingName($eloquentParking->parking_name),
             location: new Location($eloquentParking->location),
             capacity: new Capacity($eloquentParking->capacity),
+            parkingNumber: $eloquentParking->parking_number !== null ? new ParkingNumber($eloquentParking->parking_number) : null,
             createdAt: $eloquentParking->created_at,
             updatedAt: $eloquentParking->updated_at
         );

@@ -6,6 +6,7 @@ use App\Domain\Parking\ValueObjects\ParkingId;
 use App\Domain\Parking\ValueObjects\ParkingName;
 use App\Domain\Parking\ValueObjects\Location;
 use App\Domain\Parking\ValueObjects\Capacity;
+use App\Domain\Parking\ValueObjects\ParkingNumber;
 use Carbon\Carbon;
 
 final class Parking
@@ -15,9 +16,15 @@ final class Parking
         private readonly ParkingName $parkingName,
         private readonly Location $location,
         private readonly Capacity $capacity,
+        private readonly ?ParkingNumber $parkingNumber = null,
         private readonly ?Carbon $createdAt = null,
         private readonly ?Carbon $updatedAt = null
-    ) {}
+    ) {
+        // Validation for Mahasarika parking
+        if ($this->parkingId?->getValue() === 1 && $this->parkingName->getValue() === 'Mahasarika' && $this->parkingNumber === null) {
+            throw new \InvalidArgumentException('Parking number is required for Mahasarika parking.');
+        }
+    }
 
     public function getParkingId(): ?ParkingId
     {
@@ -38,6 +45,11 @@ final class Parking
     {
         return $this->capacity;
     }
+    
+    public function getParkingNumber(): ?ParkingNumber
+    {
+        return $this->parkingNumber;
+    }
 
     public function getCreatedAt(): ?Carbon
     {
@@ -56,6 +68,7 @@ final class Parking
             'parking_name' => $this->parkingName->getValue(),
             'location' => $this->location->getValue(),
             'capacity' => $this->capacity->getValue(),
+            'parking_number' => $this->parkingNumber?->getValue(),
             'created_at' => $this->createdAt?->toISOString(),
             'updated_at' => $this->updatedAt?->toISOString(),
         ];
