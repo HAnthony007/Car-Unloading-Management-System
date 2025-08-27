@@ -68,3 +68,14 @@ Route::prefix('parkings')
         Route::put('/{id}', [\App\Presentation\Http\Controllers\ParkingController::class, 'update'])->name('parkings.update');
         Route::delete('/{id}', [\App\Presentation\Http\Controllers\ParkingController::class, 'destroy'])->name('parkings.destroy');
     });
+
+// Dock Management Routes
+Route::prefix('docks')
+    ->middleware('auth:sanctum')
+    ->group(function (): void {
+        Route::get('/', [\App\Presentation\Http\Controllers\DockController::class, 'index'])->name('docks.index');
+        Route::post('/', [\App\Presentation\Http\Controllers\DockController::class, 'store'])->name('docks.store');
+        Route::get('/{id}', [\App\Presentation\Http\Controllers\DockController::class, 'show'])->name('docks.show');
+        Route::put('/{id}', [\App\Presentation\Http\Controllers\DockController::class, 'update'])->name('docks.update');
+        Route::delete('/{id}', [\App\Presentation\Http\Controllers\DockController::class, 'destroy'])->name('docks.destroy');
+    });
