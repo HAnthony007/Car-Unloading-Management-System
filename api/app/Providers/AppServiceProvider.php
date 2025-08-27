@@ -33,6 +33,16 @@ class AppServiceProvider extends ServiceProvider
             \App\Domain\Photo\Repositories\PhotoRepositoryInterface::class,
             \App\Infrastructure\Persistence\Repositories\EloquentPhotoRepository::class
         );
+
+        $this->app->bind(
+            \App\Domain\Document\Repositories\DocumentRepositoryInterface::class,
+            \App\Infrastructure\Persistence\Repositories\EloquentDocumentRepository::class
+        );
+
+        $this->app->bind(
+            \App\Domain\Document\Services\DocumentStorageService::class,
+            \App\Infrastructure\Services\LaravelDocumentStorageService::class
+        );
     }
 
     /**

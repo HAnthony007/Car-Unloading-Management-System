@@ -36,9 +36,4 @@ class FollowUpFile extends Model
     {
         return $this->hasOne(Survey::class, 'follow_up_file_id');
     }
-
-    public function workflowSteps(): \Illuminate\Database\Eloquent\Relations\HasMany
-    {
-        return $this->hasMany(WorkflowStep::class, 'follow_up_file_id');
-    }
 }

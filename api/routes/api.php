@@ -170,3 +170,14 @@ Route::prefix('photos')
         Route::put('/{id}', [\App\Presentation\Http\Controllers\PhotoController::class, 'update'])->name('photos.update');
         Route::delete('/{id}', [\App\Presentation\Http\Controllers\PhotoController::class, 'destroy'])->name('photos.destroy');
     });
+
+// Documents Management Routes
+Route::prefix('documents')
+    ->middleware('auth:sanctum')
+    ->group(function (): void {
+        Route::get('/', [\App\Presentation\Http\Controllers\DocumentController::class, 'index'])->name('documents.index');
+        Route::post('/', [\App\Presentation\Http\Controllers\DocumentController::class, 'store'])->name('documents.store');
+        Route::get('/{id}', [\App\Presentation\Http\Controllers\DocumentController::class, 'show'])->name('documents.show');
+        Route::put('/{id}', [\App\Presentation\Http\Controllers\DocumentController::class, 'update'])->name('documents.update');
+        Route::delete('/{id}', [\App\Presentation\Http\Controllers\DocumentController::class, 'destroy'])->name('documents.destroy');
+    });
