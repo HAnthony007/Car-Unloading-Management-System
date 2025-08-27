@@ -1,8 +1,8 @@
 <?php
 
+use App\Models\User;
 use App\Presentation\Http\Controllers\AuthController;
 use App\Presentation\Http\Controllers\UserController;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -26,23 +26,23 @@ Route::prefix('users')
     ->group(function (): void {
         // Search and list users
         Route::get('/', [UserController::class, 'index'])->name('users.index');
-        
+
         // Create new user
         Route::post('/', [UserController::class, 'store'])->name('users.store');
-        
+
         // Import users from Excel file
         Route::post('/import', [UserController::class, 'import'])->name('users.import');
-        
+
         // Get user by ID
         Route::get('/{userId}', [UserController::class, 'show'])->name('users.show');
-        
+
         // Get user by matriculation number
         Route::get('/matriculation/{matriculationNumber}', [UserController::class, 'showByMatriculationNumber'])
             ->name('users.show.by.matriculation');
-        
+
         // Update user profile
         Route::put('/{userId}', [UserController::class, 'update'])->name('users.update');
-        
+
         // Delete user
         Route::delete('/{userId}', [UserController::class, 'destroy'])->name('users.destroy');
     });
@@ -100,4 +100,18 @@ Route::prefix('port-calls')
         Route::get('/{id}', [\App\Presentation\Http\Controllers\PortCallController::class, 'show'])->name('portcalls.show');
         Route::put('/{id}', [\App\Presentation\Http\Controllers\PortCallController::class, 'update'])->name('portcalls.update');
         Route::delete('/{id}', [\App\Presentation\Http\Controllers\PortCallController::class, 'destroy'])->name('portcalls.destroy');
+
+        // Nested: list discharges for a specific port call
+        Route::get('/{id}/discharges', [\App\Presentation\Http\Controllers\DischargeController::class, 'byPortCall'])->name('portcalls.discharges');
+    });
+
+// Discharge Management Routes
+Route::prefix('discharges')
+    ->middleware('auth:sanctum')
+    ->group(function (): void {
+        Route::get('/', [\App\Presentation\Http\Controllers\DischargeController::class, 'index'])->name('discharges.index');
+        Route::post('/', [\App\Presentation\Http\Controllers\DischargeController::class, 'store'])->name('discharges.store');
+        Route::get('/{id}', [\App\Presentation\Http\Controllers\DischargeController::class, 'show'])->name('discharges.show');
+        Route::put('/{id}', [\App\Presentation\Http\Controllers\DischargeController::class, 'update'])->name('discharges.update');
+        Route::delete('/{id}', [\App\Presentation\Http\Controllers\DischargeController::class, 'destroy'])->name('discharges.destroy');
     });

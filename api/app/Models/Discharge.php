@@ -8,13 +8,20 @@ class Discharge extends Model
 {
     protected $primaryKey = 'discharge_id';
 
+    protected $guarded = ['discharge_id'];
+
+    protected $casts = [
+        'discharge_date' => 'datetime',
+    ];
+
     public function portCall(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(PortCall::class, 'port_call_id');
     }
 
-    public function vehicle(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function vehicles(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->belongsTo(Vehicle::class, 'vehicle_id');
+        // A discharge can have many vehicles unloaded under it
+        return $this->hasMany(Vehicle::class, 'discharge_id');
     }
 }
