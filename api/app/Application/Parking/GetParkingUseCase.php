@@ -16,7 +16,7 @@ final class GetParkingUseCase
     {
         $parking = $this->parkingRepository->findById(new ParkingId($parkingId));
 
-        if (!$parking) {
+        if (! $parking) {
             throw new \Exception("Parking not found with ID: {$parkingId}");
         }
 

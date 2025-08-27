@@ -14,9 +14,10 @@ final class GetDockUseCase
     {
         $id = new DockId($dockId);
         $dock = $this->dockRepository->findById($id);
-        if (!$dock) {
+        if (! $dock) {
             throw new \RuntimeException('Dock not found');
         }
+
         return $dock;
     }
 }

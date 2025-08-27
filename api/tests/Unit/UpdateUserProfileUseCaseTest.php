@@ -2,20 +2,20 @@
 
 use App\Application\User\DTOs\UpdateUsersProfileDTO;
 use App\Application\User\UseCases\UpdateUserProfileUseCase;
-use App\Domain\User\Entities\User;
-use App\Domain\User\Repositories\UserRepositoryInterface;
-use App\Domain\User\ValueObjects\UserId;
-use App\Domain\User\ValueObjects\MatriculationNumber;
 use App\Domain\Auth\ValueObjects\Email;
 use App\Domain\Role\ValueObjects\RoleId;
+use App\Domain\User\Entities\User;
+use App\Domain\User\Repositories\UserRepositoryInterface;
+use App\Domain\User\ValueObjects\MatriculationNumber;
 use App\Domain\User\ValueObjects\PhoneNumber;
+use App\Domain\User\ValueObjects\UserId;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery;
 
 uses(RefreshDatabase::class);
 
 describe('UpdateUserProfileUseCase', function () {
-    
+
     beforeEach(function () {
         $this->userRepository = Mockery::mock(UserRepositoryInterface::class);
         $this->updateUserProfileUseCase = new UpdateUserProfileUseCase($this->userRepository);

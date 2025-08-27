@@ -12,6 +12,7 @@ final class PortCallResource extends JsonResource
     {
         /** @var PortCall $pc */
         $pc = $this->resource;
+
         return [
             'port_call_id' => $pc->getPortCallId()?->getValue(),
             'vessel_agent' => $pc->getVesselAgent()->getValue(),

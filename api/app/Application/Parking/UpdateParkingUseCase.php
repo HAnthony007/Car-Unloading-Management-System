@@ -16,7 +16,7 @@ final class UpdateParkingUseCase
     {
         $existingParking = $this->parkingRepository->findById(new ParkingId($parkingId));
 
-        if (!$existingParking) {
+        if (! $existingParking) {
             throw new \Exception("Parking not found with ID: {$parkingId}");
         }
 

@@ -8,7 +8,10 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 
 final class UpdateVehicleRequest extends FormRequest
 {
-    public function authorize(): bool { return true; }
+    public function authorize(): bool
+    {
+        return true;
+    }
 
     public function rules(): array
     {

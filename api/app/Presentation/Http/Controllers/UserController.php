@@ -8,15 +8,15 @@ use App\Application\User\DTOs\UserSearchCriteriaDTO;
 use App\Application\User\UseCases\CreateUserUseCase;
 use App\Application\User\UseCases\DeleteUserUseCase;
 use App\Application\User\UseCases\GetUserByMatriculationUseCase;
-use App\Application\User\UseCases\GetUserUseCase;
 use App\Application\User\UseCases\GetUsersByInstitutionUseCase;
+use App\Application\User\UseCases\GetUserUseCase;
+use App\Application\User\UseCases\ImportUsersUseCase;
 use App\Application\User\UseCases\SearchUsersUseCase;
 use App\Application\User\UseCases\UpdateUserProfileUseCase;
-use App\Application\User\UseCases\ImportUsersUseCase;
 use App\Presentation\Http\Requests\CreateUserRequest;
+use App\Presentation\Http\Requests\ImportUsersRequest;
 use App\Presentation\Http\Requests\SearchUsersRequest;
 use App\Presentation\Http\Requests\UpdateUserRequest;
-use App\Presentation\Http\Requests\ImportUsersRequest;
 use App\Presentation\Http\Resources\UserResource;
 use Illuminate\Http\JsonResponse;
 
@@ -32,7 +32,7 @@ final class UserController extends Controller
         private readonly UpdateUserProfileUseCase $updateUserProfileUseCase,
         private readonly ImportUsersUseCase $importUsersUseCase,
     ) {}
-    
+
     public function index(SearchUsersRequest $request): JsonResponse
     {
         try {
@@ -119,6 +119,7 @@ final class UserController extends Controller
             ], 200);
         } catch (\Exception $exception) {
             $statusCode = $exception->getMessage() === 'User not found.' ? 404 : 400;
+
             return response()->json([
                 'error' => $exception->getMessage(),
             ], $statusCode);
@@ -135,6 +136,7 @@ final class UserController extends Controller
             ], 200);
         } catch (\Exception $exception) {
             $statusCode = $exception->getMessage() === 'User not found.' ? 404 : 400;
+
             return response()->json([
                 'error' => $exception->getMessage(),
             ], $statusCode);

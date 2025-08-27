@@ -13,9 +13,10 @@ final class GetPortCallUseCase
     public function execute(int $id): PortCall
     {
         $found = $this->repository->findById(new PortCallId($id));
-        if (!$found) {
+        if (! $found) {
             throw new \RuntimeException('Port call not found');
         }
+
         return $found;
     }
 }

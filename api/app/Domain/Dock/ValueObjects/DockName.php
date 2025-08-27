@@ -6,11 +6,11 @@ final class DockName
 {
     public function __construct(private readonly string $value)
     {
-    $trimmed = trim($this->value);
-    if ($trimmed === '') {
+        $trimmed = trim($this->value);
+        if ($trimmed === '') {
             throw new \InvalidArgumentException('Dock name cannot be empty.');
         }
-    if (strlen($trimmed) > 100) {
+        if (strlen($trimmed) > 100) {
             throw new \InvalidArgumentException('Dock name cannot exceed 100 characters.');
         }
     }

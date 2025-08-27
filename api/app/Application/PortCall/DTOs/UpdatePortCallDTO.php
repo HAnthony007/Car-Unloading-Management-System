@@ -19,15 +19,15 @@ final class UpdatePortCallDTO
     public static function fromArray(array $data): self
     {
         return new self(
-            portCallId: (int)($data['port_call_id'] ?? 0),
+            portCallId: (int) ($data['port_call_id'] ?? 0),
             vesselAgent: $data['vessel_agent'] ?? null,
             originPort: $data['origin_port'] ?? null,
             estimatedArrival: $data['estimated_arrival'] ?? null,
             arrivalDate: $data['arrival_date'] ?? null,
             estimatedDeparture: $data['estimated_departure'] ?? null,
             departureDate: $data['departure_date'] ?? null,
-            vesselId: isset($data['vessel_id']) ? (int)$data['vessel_id'] : null,
-            dockId: isset($data['dock_id']) ? (int)$data['dock_id'] : null,
+            vesselId: isset($data['vessel_id']) ? (int) $data['vessel_id'] : null,
+            dockId: isset($data['dock_id']) ? (int) $data['dock_id'] : null,
         );
     }
 }

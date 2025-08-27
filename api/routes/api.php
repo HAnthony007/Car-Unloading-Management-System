@@ -47,6 +47,17 @@ Route::prefix('users')
         Route::delete('/{userId}', [UserController::class, 'destroy'])->name('users.destroy');
     });
 
+// Surveys Management Routes
+Route::prefix('surveys')
+    ->middleware('auth:sanctum')
+    ->group(function (): void {
+        Route::get('/', [\App\Presentation\Http\Controllers\SurveyController::class, 'index'])->name('surveys.index');
+        Route::post('/', [\App\Presentation\Http\Controllers\SurveyController::class, 'store'])->name('surveys.store');
+        Route::get('/{id}', [\App\Presentation\Http\Controllers\SurveyController::class, 'show'])->name('surveys.show');
+        Route::put('/{id}', [\App\Presentation\Http\Controllers\SurveyController::class, 'update'])->name('surveys.update');
+        Route::delete('/{id}', [\App\Presentation\Http\Controllers\SurveyController::class, 'destroy'])->name('surveys.destroy');
+    });
+
 // Role Management Routes
 Route::prefix('roles')
     ->middleware('auth:sanctum')

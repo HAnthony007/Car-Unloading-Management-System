@@ -13,8 +13,8 @@ final class DeleteParkingUseCase
     {
         $parkingIdValueObject = new ParkingId($parkingId);
         $success = $this->parkingRepository->delete($parkingIdValueObject);
-        
-        if (!$success) {
+
+        if (! $success) {
             throw new \RuntimeException('Parking not found');
         }
     }

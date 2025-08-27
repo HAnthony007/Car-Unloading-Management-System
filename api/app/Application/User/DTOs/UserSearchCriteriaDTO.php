@@ -18,12 +18,12 @@ final class UserSearchCriteriaDTO
     {
         return new self(
             matriculationPrefix: $data['matriculation_prefix'] ?? null,
-            roleId: isset($data['role_id']) ? (int)$data['role_id'] : null,
-            emailVerified: isset($data['email_verified']) ? (bool)$data['email_verified'] : null,
-            isActive: isset($data['is_active']) ? (bool)$data['is_active'] : null,
+            roleId: isset($data['role_id']) ? (int) $data['role_id'] : null,
+            emailVerified: isset($data['email_verified']) ? (bool) $data['email_verified'] : null,
+            isActive: isset($data['is_active']) ? (bool) $data['is_active'] : null,
             searchTerm: $data['search_term'] ?? null,
-            page: (int)($data['page'] ?? 1),
-            perPage: (int)($data['per_page'] ?? 15),
+            page: (int) ($data['page'] ?? 1),
+            perPage: (int) ($data['per_page'] ?? 15),
         );
     }
 }

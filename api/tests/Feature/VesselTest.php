@@ -1,17 +1,22 @@
 <?php
 
-use App\Models\User;
 use App\Models\Role;
+use App\Models\User;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
-use function Pest\Laravel\{actingAs, getJson, postJson, putJson, deleteJson};
+
+use function Pest\Laravel\actingAs;
+use function Pest\Laravel\deleteJson;
+use function Pest\Laravel\getJson;
+use function Pest\Laravel\postJson;
+use function Pest\Laravel\putJson;
 
 uses(RefreshDatabase::class);
 
 it('allows an authenticated user to create, show, update and delete a vessel', function () {
     // Ensure the vessels table exists for this test
-    if (!Schema::hasTable('vessels')) {
+    if (! Schema::hasTable('vessels')) {
         Schema::create('vessels', function (Blueprint $table) {
             $table->id('vessel_id');
             $table->string('imo_no')->unique();
@@ -50,7 +55,7 @@ it('allows an authenticated user to create, show, update and delete a vessel', f
                 'flag',
                 'created_at',
                 'updated_at',
-            ]
+            ],
         ]);
 
     $vesselId = $response->json('data.vessel_id');
@@ -95,7 +100,7 @@ it('allows an authenticated user to create, show, update and delete a vessel', f
 });
 
 it('validates payload when creating a vessel and enforces unique IMO', function () {
-    if (!Schema::hasTable('vessels')) {
+    if (! Schema::hasTable('vessels')) {
         Schema::create('vessels', function (Blueprint $table) {
             $table->id('vessel_id');
             $table->string('imo_no')->unique();
@@ -139,11 +144,11 @@ it('validates payload when creating a vessel and enforces unique IMO', function 
         'vessel_name' => 'Beta',
         'flag' => 'FR',
     ])->assertStatus(422)
-      ->assertJsonStructure(['message', 'errors' => ['imo_no']]);
+        ->assertJsonStructure(['message', 'errors' => ['imo_no']]);
 });
 
 it('returns 404 for non-existing vessel on show/update/delete', function () {
-    if (!Schema::hasTable('vessels')) {
+    if (! Schema::hasTable('vessels')) {
         Schema::create('vessels', function (Blueprint $table) {
             $table->id('vessel_id');
             $table->string('imo_no')->unique();
@@ -163,7 +168,7 @@ it('returns 404 for non-existing vessel on show/update/delete', function () {
 });
 
 it('rejects unauthenticated access to vessels endpoints', function () {
-    if (!Schema::hasTable('vessels')) {
+    if (! Schema::hasTable('vessels')) {
         Schema::create('vessels', function (Blueprint $table) {
             $table->id('vessel_id');
             $table->string('imo_no')->unique();

@@ -17,7 +17,7 @@ final class UpdateVesselUseCase
     public function execute(UpdateVesselDTO $dto): Vessel
     {
         $existing = $this->repository->findById(new VesselId($dto->vesselId));
-        if (!$existing) {
+        if (! $existing) {
             throw new \RuntimeException('Vessel not found.');
         }
 

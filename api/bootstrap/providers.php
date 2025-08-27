@@ -9,4 +9,5 @@ return [
     App\Providers\DischargeServiceProvider::class,
     App\Providers\VehicleServiceProvider::class,
     App\Providers\FollowUpFileServiceProvider::class,
+    App\Providers\SurveyServiceProvider::class,
 ];

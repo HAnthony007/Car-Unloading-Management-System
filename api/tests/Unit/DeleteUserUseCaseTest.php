@@ -1,19 +1,19 @@
 <?php
 
 use App\Application\User\UseCases\DeleteUserUseCase;
-use App\Domain\User\Entities\User;
-use App\Domain\User\Repositories\UserRepositoryInterface;
-use App\Domain\User\ValueObjects\UserId;
-use App\Domain\User\ValueObjects\MatriculationNumber;
 use App\Domain\Auth\ValueObjects\Email;
 use App\Domain\Role\ValueObjects\RoleId;
+use App\Domain\User\Entities\User;
+use App\Domain\User\Repositories\UserRepositoryInterface;
+use App\Domain\User\ValueObjects\MatriculationNumber;
+use App\Domain\User\ValueObjects\UserId;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery;
 
 uses(RefreshDatabase::class);
 
 describe('DeleteUserUseCase', function () {
-    
+
     beforeEach(function () {
         $this->userRepository = Mockery::mock(UserRepositoryInterface::class);
         $this->deleteUserUseCase = new DeleteUserUseCase($this->userRepository);

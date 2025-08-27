@@ -2,13 +2,13 @@
 
 namespace App\Presentation\Http\Controllers;
 
-use App\Application\Dock\UseCases\CreateDockUseCase;
-use App\Application\Dock\UseCases\GetDockUseCase;
-use App\Application\Dock\UseCases\GetDocksUseCase;
-use App\Application\Dock\UseCases\UpdateDockUseCase;
-use App\Application\Dock\UseCases\DeleteDockUseCase;
 use App\Application\Dock\DTOs\CreateDockDTO;
 use App\Application\Dock\DTOs\UpdateDockDTO;
+use App\Application\Dock\UseCases\CreateDockUseCase;
+use App\Application\Dock\UseCases\DeleteDockUseCase;
+use App\Application\Dock\UseCases\GetDocksUseCase;
+use App\Application\Dock\UseCases\GetDockUseCase;
+use App\Application\Dock\UseCases\UpdateDockUseCase;
 use App\Presentation\Http\Requests\StoreDockRequest;
 use App\Presentation\Http\Requests\UpdateDockRequest;
 use App\Presentation\Http\Resources\DockResource;
@@ -28,6 +28,7 @@ final class DockController
     public function index(): AnonymousResourceCollection
     {
         $docks = $this->getDocksUseCase->execute();
+
         return DockResource::collection($docks);
     }
 
@@ -36,14 +37,15 @@ final class DockController
         try {
             $dto = CreateDockDTO::fromArray($request->validated());
             $dock = $this->createDockUseCase->execute($dto);
+
             return response()->json([
                 'message' => 'Dock created successfully.',
-                'data' => new DockResource($dock)
+                'data' => new DockResource($dock),
             ], 201);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Failed to create dock.',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 400);
         }
     }
@@ -52,11 +54,12 @@ final class DockController
     {
         try {
             $dock = $this->getDockUseCase->execute($id);
+
             return response()->json(['data' => new DockResource($dock)]);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Dock not found.',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 404);
         }
     }
@@ -68,14 +71,15 @@ final class DockController
             $data['dock_id'] = $id;
             $dto = UpdateDockDTO::fromArray($data);
             $dock = $this->updateDockUseCase->execute($dto);
+
             return response()->json([
                 'message' => 'Dock updated successfully.',
-                'data' => new DockResource($dock)
+                'data' => new DockResource($dock),
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Failed to update dock.',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 404);
         }
     }
@@ -84,11 +88,12 @@ final class DockController
     {
         try {
             $this->deleteDockUseCase->execute($id);
+
             return response()->json(['message' => 'Dock deleted successfully.']);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Failed to delete dock.',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 404);
         }
     }

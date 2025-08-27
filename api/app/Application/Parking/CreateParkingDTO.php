@@ -2,9 +2,9 @@
 
 namespace App\Application\Parking;
 
-use App\Domain\Parking\ValueObjects\ParkingName;
-use App\Domain\Parking\ValueObjects\Location;
 use App\Domain\Parking\ValueObjects\Capacity;
+use App\Domain\Parking\ValueObjects\Location;
+use App\Domain\Parking\ValueObjects\ParkingName;
 
 final class CreateParkingDTO
 {

@@ -13,7 +13,7 @@ final class ImoNumber
         if (str_starts_with($v, 'IMO')) {
             $v = trim(substr($v, 3));
         }
-        if (!preg_match('/^\d{7}$/', $v)) {
+        if (! preg_match('/^\d{7}$/', $v)) {
             throw new \InvalidArgumentException('IMO number must be 7 digits.');
         }
         $this->value = $v;

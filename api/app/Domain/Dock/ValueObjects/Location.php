@@ -6,12 +6,12 @@ final class Location
 {
     public function __construct(private readonly string $value)
     {
-    $trimmed = trim($this->value);
-    if ($trimmed === '') {
+        $trimmed = trim($this->value);
+        if ($trimmed === '') {
             throw new \InvalidArgumentException('Location cannot be empty.');
         }
 
-    if (strlen($trimmed) > 255) {
+        if (strlen($trimmed) > 255) {
             throw new \InvalidArgumentException('Location cannot exceed 255 characters.');
         }
     }

@@ -15,6 +15,7 @@ final class EloquentVesselRepository implements VesselRepositoryInterface
     public function findById(VesselId $vesselId): ?DomainVessel
     {
         $eloquent = EloquentVessel::find($vesselId->getValue());
+
         return $eloquent ? $this->toDomainEntity($eloquent) : null;
     }
 
@@ -25,9 +26,9 @@ final class EloquentVesselRepository implements VesselRepositoryInterface
 
     public function save(DomainVessel $vessel): DomainVessel
     {
-        $eloquent = $vessel->getVesselId() ? EloquentVessel::find($vessel->getVesselId()->getValue()) : new EloquentVessel();
-        if (!$eloquent) {
-            $eloquent = new EloquentVessel();
+        $eloquent = $vessel->getVesselId() ? EloquentVessel::find($vessel->getVesselId()->getValue()) : new EloquentVessel;
+        if (! $eloquent) {
+            $eloquent = new EloquentVessel;
         }
 
         $eloquent->imo_no = $vessel->getImoNumber()->getValue();
@@ -41,9 +42,10 @@ final class EloquentVesselRepository implements VesselRepositoryInterface
     public function delete(VesselId $vesselId): bool
     {
         $eloquent = EloquentVessel::find($vesselId->getValue());
-        if (!$eloquent) {
+        if (! $eloquent) {
             return false;
         }
+
         return (bool) $eloquent->delete();
     }
 

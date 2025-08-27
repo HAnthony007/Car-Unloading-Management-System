@@ -4,10 +4,10 @@ namespace App\Infrastructure\Persistence\Repositories;
 
 use App\Domain\Parking\Entities\Parking;
 use App\Domain\Parking\Repositories\ParkingRepositoryInterface;
+use App\Domain\Parking\ValueObjects\Capacity;
+use App\Domain\Parking\ValueObjects\Location;
 use App\Domain\Parking\ValueObjects\ParkingId;
 use App\Domain\Parking\ValueObjects\ParkingName;
-use App\Domain\Parking\ValueObjects\Location;
-use App\Domain\Parking\ValueObjects\Capacity;
 use App\Domain\Parking\ValueObjects\ParkingNumber;
 use App\Models\Parking as EloquentParking;
 
@@ -31,12 +31,12 @@ final class EloquentParkingRepository implements ParkingRepositoryInterface
 
     public function save(Parking $parking): Parking
     {
-        $eloquentParking = $parking->getParkingId() 
+        $eloquentParking = $parking->getParkingId()
             ? EloquentParking::find($parking->getParkingId()->getValue())
-            : new EloquentParking();
+            : new EloquentParking;
 
-        if (!$eloquentParking) {
-            $eloquentParking = new EloquentParking();
+        if (! $eloquentParking) {
+            $eloquentParking = new EloquentParking;
         }
 
         $eloquentParking->parking_name = $parking->getParkingName()->getValue();
@@ -53,7 +53,7 @@ final class EloquentParkingRepository implements ParkingRepositoryInterface
     {
         $eloquentParking = EloquentParking::find($parkingId->getValue());
 
-        if (!$eloquentParking) {
+        if (! $eloquentParking) {
             return false;
         }
 

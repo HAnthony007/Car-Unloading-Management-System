@@ -1,16 +1,16 @@
 <?php
 
-use App\Models\User;
 use App\Models\Role;
+use App\Models\User;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 
 uses(RefreshDatabase::class);
 
 it('allows an authenticated user to create, show, update and delete a parking', function () {
     // Create the parkings table for this test if it doesn't exist
-    if (!Schema::hasTable('parkings')) {
+    if (! Schema::hasTable('parkings')) {
         Schema::create('parkings', function (Blueprint $table) {
             $table->id('parking_id');
             $table->string('parking_name', 100);
@@ -21,7 +21,7 @@ it('allows an authenticated user to create, show, update and delete a parking', 
     }
 
     // Check if the parking_number column exists, if not add it
-    if (!Schema::hasColumn('parkings', 'parking_number')) {
+    if (! Schema::hasColumn('parkings', 'parking_number')) {
         Schema::table('parkings', function (Blueprint $table) {
             $table->string('parking_number', 50)->nullable();
         });
@@ -40,7 +40,7 @@ it('allows an authenticated user to create, show, update and delete a parking', 
     ];
 
     $response = $this->withHeaders([
-        'Authorization' => 'Bearer ' . $token,
+        'Authorization' => 'Bearer '.$token,
         'Accept' => 'application/json',
     ])->postJson('/api/parkings', $createData);
 
@@ -54,14 +54,14 @@ it('allows an authenticated user to create, show, update and delete a parking', 
                 'capacity',
                 'created_at',
                 'updated_at',
-            ]
+            ],
         ]);
 
     $parkingId = $response->json('data.parking_id');
 
     // Test showing the parking
     $response = $this->withHeaders([
-        'Authorization' => 'Bearer ' . $token,
+        'Authorization' => 'Bearer '.$token,
         'Accept' => 'application/json',
     ])->getJson("/api/parkings/{$parkingId}");
 
@@ -76,11 +76,11 @@ it('allows an authenticated user to create, show, update and delete a parking', 
     $updateData = [
         'parking_name' => 'Updated Parking',
         'capacity' => 75,
-        'parking_number' => 'P001' // Added parking number to ensure it works with Mahasarika
+        'parking_number' => 'P001', // Added parking number to ensure it works with Mahasarika
     ];
 
     $response = $this->withHeaders([
-        'Authorization' => 'Bearer ' . $token,
+        'Authorization' => 'Bearer '.$token,
         'Accept' => 'application/json',
     ])->putJson("/api/parkings/{$parkingId}", $updateData);
 
@@ -92,7 +92,7 @@ it('allows an authenticated user to create, show, update and delete a parking', 
 
     // Test deleting the parking
     $response = $this->withHeaders([
-        'Authorization' => 'Bearer ' . $token,
+        'Authorization' => 'Bearer '.$token,
         'Accept' => 'application/json',
     ])->deleteJson("/api/parkings/{$parkingId}");
 
@@ -103,7 +103,7 @@ it('allows an authenticated user to create, show, update and delete a parking', 
 
     // Test getting all parkings returns empty collection
     $response = $this->withHeaders([
-        'Authorization' => 'Bearer ' . $token,
+        'Authorization' => 'Bearer '.$token,
         'Accept' => 'application/json',
     ])->getJson('/api/parkings');
 

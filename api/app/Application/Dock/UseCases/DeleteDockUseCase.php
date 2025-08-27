@@ -13,7 +13,7 @@ final class DeleteDockUseCase
     {
         $id = new DockId($dockId);
         $success = $this->dockRepository->delete($id);
-        if (!$success) {
+        if (! $success) {
             throw new \RuntimeException('Dock not found');
         }
     }

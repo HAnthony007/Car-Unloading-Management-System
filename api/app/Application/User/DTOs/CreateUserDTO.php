@@ -27,7 +27,7 @@ final class CreateUserDTO
             password: $data['password'] ?? '',
             avatar: $data['avatar'] ?? '',
             phone: $data['phone'] ?? '',
-            roleId: (int)($data['role_id'] ?? 0)
+            roleId: (int) ($data['role_id'] ?? 0)
         );
     }
 
@@ -58,5 +58,4 @@ final class CreateUserDTO
             'role_id' => $this->roleId,
         ];
     }
-
 }

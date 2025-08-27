@@ -13,7 +13,7 @@ final class GetRoleUseCase
     {
         $role = $this->roleRepository->findById(new RoleId($id));
 
-        if (!$role) {
+        if (! $role) {
             throw new \RuntimeException('Role not found');
         }
 

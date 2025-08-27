@@ -21,7 +21,7 @@ final class UpdateVehicleDTO
     public static function fromArray(array $data): self
     {
         return new self(
-            vehicleId: (int)$data['vehicle_id'],
+            vehicleId: (int) $data['vehicle_id'],
             make: $data['make'] ?? null,
             model: $data['model'] ?? null,
             color: $data['color'] ?? null,
@@ -31,7 +31,7 @@ final class UpdateVehicleDTO
             vehicleObservation: $data['vehicle_observation'] ?? null,
             originCountry: $data['origin_country'] ?? null,
             shipLocation: $data['ship_location'] ?? null,
-            isPrimed: isset($data['is_primed']) ? (bool)$data['is_primed'] : null,
+            isPrimed: isset($data['is_primed']) ? (bool) $data['is_primed'] : null,
         );
     }
 }

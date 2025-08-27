@@ -2,8 +2,8 @@
 
 namespace App\Presentation\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
 final class UpdateParkingRequest extends FormRequest
@@ -39,7 +39,7 @@ final class UpdateParkingRequest extends FormRequest
                 function ($attribute, $value, $fail) {
                     $parkingId = $this->route('parking');
                     $parkingName = $this->input('parking_name');
-                    
+
                     // If updating Mahasarika parking (ID 1) and clearing parking number
                     if (($parkingId == 1 || $parkingName === 'Mahasarika') && $value === null) {
                         $fail('Parking number is required for Mahasarika parking.');

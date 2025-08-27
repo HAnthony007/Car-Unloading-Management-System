@@ -17,5 +17,8 @@ final class Vin
         $this->value = $v;
     }
 
-    public function getValue(): string { return $this->value; }
+    public function getValue(): string
+    {
+        return $this->value;
+    }
 }

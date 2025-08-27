@@ -17,11 +17,11 @@ final class VehicleSearchCriteriaDTO
     {
         return new self(
             vin: $data['vin'] ?? null,
-            dischargeId: isset($data['discharge_id']) ? (int)$data['discharge_id'] : null,
+            dischargeId: isset($data['discharge_id']) ? (int) $data['discharge_id'] : null,
             make: $data['make'] ?? null,
             model: $data['model'] ?? null,
-            page: (int)($data['page'] ?? 1),
-            perPage: (int)($data['per_page'] ?? 15),
+            page: (int) ($data['page'] ?? 1),
+            perPage: (int) ($data['per_page'] ?? 15),
         );
     }
 }

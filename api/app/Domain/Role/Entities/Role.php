@@ -62,6 +62,6 @@ final class Role
 
     public function hasDescription(): bool
     {
-        return !empty($this->roleDescription);
+        return ! empty($this->roleDescription);
     }
 }

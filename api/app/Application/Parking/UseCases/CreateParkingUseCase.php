@@ -5,9 +5,9 @@ namespace App\Application\Parking\UseCases;
 use App\Application\Parking\DTOs\CreateParkingDTO;
 use App\Domain\Parking\Entities\Parking;
 use App\Domain\Parking\Repositories\ParkingRepositoryInterface;
-use App\Domain\Parking\ValueObjects\ParkingName;
-use App\Domain\Parking\ValueObjects\Location;
 use App\Domain\Parking\ValueObjects\Capacity;
+use App\Domain\Parking\ValueObjects\Location;
+use App\Domain\Parking\ValueObjects\ParkingName;
 use App\Domain\Parking\ValueObjects\ParkingNumber;
 
 final class CreateParkingUseCase

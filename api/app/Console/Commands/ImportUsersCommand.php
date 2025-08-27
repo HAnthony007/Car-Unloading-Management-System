@@ -30,31 +30,33 @@ class ImportUsersCommand extends Command
         $filePath = $this->argument('file');
 
         // Vérifier que le fichier existe
-        if (!file_exists($filePath)) {
+        if (! file_exists($filePath)) {
             $this->error("Le fichier {$filePath} n'existe pas.");
+
             return Command::FAILURE;
         }
 
         // Vérifier l'extension du fichier
         $extension = pathinfo($filePath, PATHINFO_EXTENSION);
-        if (!in_array(strtolower($extension), ['xlsx', 'xls', 'csv'])) {
-            $this->error("Le fichier doit être de type Excel (.xlsx, .xls) ou CSV (.csv).");
+        if (! in_array(strtolower($extension), ['xlsx', 'xls', 'csv'])) {
+            $this->error('Le fichier doit être de type Excel (.xlsx, .xls) ou CSV (.csv).');
+
             return Command::FAILURE;
         }
 
         $this->info("Début de l'importation des utilisateurs depuis : {$filePath}");
 
         try {
-            $import = new UsersImport();
-            
+            $import = new UsersImport;
+
             Excel::import($import, $filePath);
 
-            $this->info("Importation terminée avec succès !");
+            $this->info('Importation terminée avec succès !');
             $this->line("- Utilisateurs importés: {$import->getImportedCount()}");
             $this->line("- Utilisateurs ignorés: {$import->getSkippedCount()}");
-            $this->line("- Total traité: " . ($import->getImportedCount() + $import->getSkippedCount()));
+            $this->line('- Total traité: '.($import->getImportedCount() + $import->getSkippedCount()));
 
-            if (!empty($import->getErrors())) {
+            if (! empty($import->getErrors())) {
                 $this->warn("\nErreurs rencontrées:");
                 foreach ($import->getErrors() as $error) {
                     $this->line("  - {$error}");
@@ -64,7 +66,8 @@ class ImportUsersCommand extends Command
             return Command::SUCCESS;
 
         } catch (\Exception $e) {
-            $this->error("Erreur lors de l'importation: " . $e->getMessage());
+            $this->error("Erreur lors de l'importation: ".$e->getMessage());
+
             return Command::FAILURE;
         }
     }

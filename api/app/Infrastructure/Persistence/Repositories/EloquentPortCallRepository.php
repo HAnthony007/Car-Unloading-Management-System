@@ -18,6 +18,7 @@ final class EloquentPortCallRepository implements PortCallRepositoryInterface
     public function findById(PortCallId $portCallId): ?DomainPortCall
     {
         $eloquent = EloquentPortCall::find($portCallId->getValue());
+
         return $eloquent ? $this->toDomainEntity($eloquent) : null;
     }
 
@@ -28,9 +29,9 @@ final class EloquentPortCallRepository implements PortCallRepositoryInterface
 
     public function save(DomainPortCall $portCall): DomainPortCall
     {
-        $eloquent = $portCall->getPortCallId() ? EloquentPortCall::find($portCall->getPortCallId()->getValue()) : new EloquentPortCall();
-        if (!$eloquent) {
-            $eloquent = new EloquentPortCall();
+        $eloquent = $portCall->getPortCallId() ? EloquentPortCall::find($portCall->getPortCallId()->getValue()) : new EloquentPortCall;
+        if (! $eloquent) {
+            $eloquent = new EloquentPortCall;
         }
 
         $eloquent->vessel_agent = $portCall->getVesselAgent()->getValue();
@@ -49,9 +50,10 @@ final class EloquentPortCallRepository implements PortCallRepositoryInterface
     public function delete(PortCallId $portCallId): bool
     {
         $eloquent = EloquentPortCall::find($portCallId->getValue());
-        if (!$eloquent) {
+        if (! $eloquent) {
             return false;
         }
+
         return (bool) $eloquent->delete();
     }
 

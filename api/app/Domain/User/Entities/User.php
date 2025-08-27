@@ -3,8 +3,8 @@
 namespace App\Domain\User\Entities;
 
 use App\Domain\Auth\ValueObjects\Email;
-use App\Domain\Role\ValueObjects\RoleId;
 use App\Domain\Role\Entities\Role as RoleEntity;
+use App\Domain\Role\ValueObjects\RoleId;
 use App\Domain\User\ValueObjects\MatriculationNumber;
 use App\Domain\User\ValueObjects\PhoneNumber;
 use App\Domain\User\ValueObjects\UserId;
@@ -13,7 +13,7 @@ use Carbon\Carbon;
 final class User
 {
     public function __construct(
-        private readonly ?UserId $userId, 
+        private readonly ?UserId $userId,
         private readonly MatriculationNumber $matriculationNumber,
         private readonly string $fullName,
         private readonly Email $email,
@@ -52,6 +52,7 @@ final class User
     public function getLastName(): string
     {
         $parts = explode(' ', $this->fullName);
+
         return count($parts) > 1 ? end($parts) : '';
     }
 
@@ -122,7 +123,7 @@ final class User
 
     public function hasAvatar(): bool
     {
-        return !empty($this->avatar);
+        return ! empty($this->avatar);
     }
 
     public function hasPhoneNumber(): bool
@@ -133,6 +134,7 @@ final class User
     public function updateLastLoginAt(Carbon $loginTime): self
     {
         $this->lastLoginAt = $loginTime;
+
         return $this;
     }
 
@@ -153,7 +155,7 @@ final class User
 
     public function getAvatarUrl(): ?string
     {
-        if (!$this->hasAvatar()) {
+        if (! $this->hasAvatar()) {
             return null;
         }
 
@@ -161,10 +163,10 @@ final class User
             return $this->avatar;
         }
 
-    // Use configured app URL to build a stable absolute URL during tests
-    $baseUrl = rtrim(config('app.url', 'http://localhost'), '/');
-    $avatarPath = ltrim('storage/avatars/' . $this->avatar, '/');
+        // Use configured app URL to build a stable absolute URL during tests
+        $baseUrl = rtrim(config('app.url', 'http://localhost'), '/');
+        $avatarPath = ltrim('storage/avatars/'.$this->avatar, '/');
 
-    return $baseUrl . '/' . $avatarPath;
+        return $baseUrl.'/'.$avatarPath;
     }
 }

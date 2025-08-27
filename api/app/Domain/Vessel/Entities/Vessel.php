@@ -19,12 +19,35 @@ final class Vessel
         private readonly ?Carbon $updatedAt = null,
     ) {}
 
-    public function getVesselId(): ?VesselId { return $this->vesselId; }
-    public function getImoNumber(): ImoNumber { return $this->imoNumber; }
-    public function getVesselName(): VesselName { return $this->vesselName; }
-    public function getFlag(): Flag { return $this->flag; }
-    public function getCreatedAt(): ?Carbon { return $this->createdAt; }
-    public function getUpdatedAt(): ?Carbon { return $this->updatedAt; }
+    public function getVesselId(): ?VesselId
+    {
+        return $this->vesselId;
+    }
+
+    public function getImoNumber(): ImoNumber
+    {
+        return $this->imoNumber;
+    }
+
+    public function getVesselName(): VesselName
+    {
+        return $this->vesselName;
+    }
+
+    public function getFlag(): Flag
+    {
+        return $this->flag;
+    }
+
+    public function getCreatedAt(): ?Carbon
+    {
+        return $this->createdAt;
+    }
+
+    public function getUpdatedAt(): ?Carbon
+    {
+        return $this->updatedAt;
+    }
 
     public function toArray(): array
     {

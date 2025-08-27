@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
 final class LaravelAvatarManagementService implements AvatarManagementService
 {
     private const AVATAR_DISK = 'public';
+
     private const AVATAR_DIRECTORY = 'avatars';
 
     public function uploadAvatar(UserId $userId, string $imageData): string
@@ -19,8 +20,8 @@ final class LaravelAvatarManagementService implements AvatarManagementService
             $imageData = base64_decode($imageData);
         }
 
-        $filename = $userId->getValue() . '_' . Str::random(10) . '.jpg';
-        $path = self::AVATAR_DIRECTORY . '/' . $filename;
+        $filename = $userId->getValue().'_'.Str::random(10).'.jpg';
+        $path = self::AVATAR_DIRECTORY.'/'.$filename;
 
         $this->deleteExistingAvatar($userId);
 
@@ -40,7 +41,7 @@ final class LaravelAvatarManagementService implements AvatarManagementService
             return $avatarFilename;
         }
 
-        return Storage::disk(self::AVATAR_DISK)->url(self::AVATAR_DIRECTORY . '/' . $avatarFilename);
+        return Storage::disk(self::AVATAR_DISK)->url(self::AVATAR_DIRECTORY.'/'.$avatarFilename);
     }
 
     public function getDefaultAvatar(): string
@@ -51,7 +52,7 @@ final class LaravelAvatarManagementService implements AvatarManagementService
     private function deleteExistingAvatar(UserId $userId): bool
     {
         $files = Storage::disk(self::AVATAR_DISK)->files(self::AVATAR_DIRECTORY);
-        $pattern = '/^' . preg_quote(self::AVATAR_DIRECTORY . '/' . $userId->getValue(), '/') . '_/';
+        $pattern = '/^'.preg_quote(self::AVATAR_DIRECTORY.'/'.$userId->getValue(), '/').'_/';
 
         $deleted = false;
 

@@ -13,7 +13,7 @@ final class UpdateDockDTO
     public static function fromArray(array $data): self
     {
         return new self(
-            dockId: (int)($data['dock_id'] ?? 0),
+            dockId: (int) ($data['dock_id'] ?? 0),
             dockName: $data['dock_name'] ?? null,
             location: $data['location'] ?? null,
         );
@@ -22,8 +22,13 @@ final class UpdateDockDTO
     public function toArray(): array
     {
         $data = [];
-        if ($this->dockName !== null) $data['dock_name'] = $this->dockName;
-        if ($this->location !== null) $data['location'] = $this->location;
+        if ($this->dockName !== null) {
+            $data['dock_name'] = $this->dockName;
+        }
+        if ($this->location !== null) {
+            $data['location'] = $this->location;
+        }
+
         return $data;
     }
 }

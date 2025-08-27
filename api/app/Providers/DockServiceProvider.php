@@ -2,13 +2,13 @@
 
 namespace App\Providers;
 
+use App\Application\Dock\UseCases\CreateDockUseCase;
+use App\Application\Dock\UseCases\DeleteDockUseCase;
+use App\Application\Dock\UseCases\GetDocksUseCase;
+use App\Application\Dock\UseCases\GetDockUseCase;
+use App\Application\Dock\UseCases\UpdateDockUseCase;
 use App\Domain\Dock\Repositories\DockRepositoryInterface;
 use App\Infrastructure\Persistence\Repositories\EloquentDockRepository;
-use App\Application\Dock\UseCases\CreateDockUseCase;
-use App\Application\Dock\UseCases\UpdateDockUseCase;
-use App\Application\Dock\UseCases\GetDockUseCase;
-use App\Application\Dock\UseCases\GetDocksUseCase;
-use App\Application\Dock\UseCases\DeleteDockUseCase;
 use Illuminate\Support\ServiceProvider;
 
 class DockServiceProvider extends ServiceProvider

@@ -17,10 +17,11 @@ class UpdateVesselRequest extends FormRequest
     public function rules(): array
     {
         $vesselId = (int) $this->route('id');
+
         return [
             'imo_no' => [
                 'sometimes', 'string', 'regex:/^([Ii][Mm][Oo])?\s?\d{7}$/', 'max:20',
-                Rule::unique('vessels', 'imo_no')->ignore($vesselId, 'vessel_id')
+                Rule::unique('vessels', 'imo_no')->ignore($vesselId, 'vessel_id'),
             ],
             'vessel_name' => ['sometimes', 'string', 'max:150'],
             'flag' => ['sometimes', 'string', 'max:100'],

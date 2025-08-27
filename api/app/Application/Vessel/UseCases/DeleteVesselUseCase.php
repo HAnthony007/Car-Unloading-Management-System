@@ -12,7 +12,7 @@ final class DeleteVesselUseCase
     public function execute(int $id): void
     {
         $deleted = $this->repository->delete(new VesselId($id));
-        if (!$deleted) {
+        if (! $deleted) {
             throw new \RuntimeException('Vessel not found.');
         }
     }

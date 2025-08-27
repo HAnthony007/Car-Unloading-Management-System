@@ -27,7 +27,6 @@ final class RoleResource extends JsonResource
             'created_at' => $role->getCreatedAt()?->toISOString(),
             'updated_at' => $role->getUpdatedAt()?->toISOString(),
 
-
         ];
     }
 }

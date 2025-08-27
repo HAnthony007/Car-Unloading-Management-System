@@ -4,14 +4,20 @@ use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
-use function Pest\Laravel\{actingAs, getJson, postJson, putJson, deleteJson};
+use Illuminate\Support\Facades\Schema;
+
+use function Pest\Laravel\actingAs;
+use function Pest\Laravel\deleteJson;
+use function Pest\Laravel\getJson;
+use function Pest\Laravel\postJson;
+use function Pest\Laravel\putJson;
 
 uses(RefreshDatabase::class);
 
-function ensure_vehicle_schema(): void {
-    if (!Schema::hasTable('discharges')) {
+function ensure_vehicle_schema(): void
+{
+    if (! Schema::hasTable('discharges')) {
         Schema::create('discharges', function (Blueprint $table) {
             $table->id('discharge_id');
             $table->timestamp('discharge_date')->nullable();
@@ -19,7 +25,7 @@ function ensure_vehicle_schema(): void {
             $table->timestamps();
         });
     }
-    if (!Schema::hasTable('vehicles')) {
+    if (! Schema::hasTable('vehicles')) {
         Schema::create('vehicles', function (Blueprint $table) {
             $table->id('vehicle_id');
             $table->string('vin')->unique();
@@ -100,14 +106,16 @@ it('creates, shows, updates, deletes and searches vehicles (auth required)', fun
     ];
 
     $resp = postJson('/api/vehicles', $payload);
-    if ($resp->status() !== 201) { $resp->dump(); }
+    if ($resp->status() !== 201) {
+        $resp->dump();
+    }
     $resp->assertCreated()->assertJsonStructure([
         'message',
         'data' => [
             'vehicle_id', 'vin', 'make', 'model', 'color', 'type', 'weight',
             'vehicle_condition', 'vehicle_observation', 'origin_country', 'ship_location',
-            'is_primed', 'discharge_id', 'created_at', 'updated_at'
-        ]
+            'is_primed', 'discharge_id', 'created_at', 'updated_at',
+        ],
     ]);
 
     $vehicleId = $resp->json('data.vehicle_id');
@@ -145,8 +153,8 @@ it('validates payload and unique vin, and rejects invalid discharge', function (
 
     // Invalid discharge should be rejected by domain check (controller returns 400)
     postJson('/api/vehicles', [
-    'vin' => 'X12345',
-        'make' => 'A','model' => 'B','type' => 'C','weight' => '10kg','vehicle_condition' => 'Neuf','origin_country' => 'FR',
+        'vin' => 'X12345',
+        'make' => 'A', 'model' => 'B', 'type' => 'C', 'weight' => '10kg', 'vehicle_condition' => 'Neuf', 'origin_country' => 'FR',
         'discharge_id' => 99999,
     ])->assertStatus(400);
 
@@ -186,21 +194,21 @@ it('validates payload and unique vin, and rejects invalid discharge', function (
     // Create valid
     postJson('/api/vehicles', [
         'vin' => 'uniqVIN',
-        'make' => 'M','model' => 'N','type' => 'T','weight' => '100','vehicle_condition' => 'Occasion','origin_country' => 'DE',
+        'make' => 'M', 'model' => 'N', 'type' => 'T', 'weight' => '100', 'vehicle_condition' => 'Occasion', 'origin_country' => 'DE',
         'discharge_id' => $dischargeId,
     ])->assertCreated();
 
     // Duplicate vin
     postJson('/api/vehicles', [
         'vin' => 'uniqVIN',
-        'make' => 'M','model' => 'N','type' => 'T','weight' => '100','vehicle_condition' => 'Occasion','origin_country' => 'DE',
+        'make' => 'M', 'model' => 'N', 'type' => 'T', 'weight' => '100', 'vehicle_condition' => 'Occasion', 'origin_country' => 'DE',
         'discharge_id' => $dischargeId,
     ])->assertStatus(422)->assertJsonStructure(['errors' => ['vin']]);
 });
 
 it('rejects unauthenticated access to vehicles endpoints', function () {
     ensure_vehicle_schema();
-    postJson('/api/vehicles', ['vin' => 'A','make' => 'B','model' => 'C','type' => 'D','weight' => '1','vehicle_condition' => 'X','origin_country' => 'Y','discharge_id' => 1])
+    postJson('/api/vehicles', ['vin' => 'A', 'make' => 'B', 'model' => 'C', 'type' => 'D', 'weight' => '1', 'vehicle_condition' => 'X', 'origin_country' => 'Y', 'discharge_id' => 1])
         ->assertUnauthorized();
     getJson('/api/vehicles')->assertUnauthorized();
 });

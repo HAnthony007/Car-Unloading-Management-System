@@ -27,7 +27,7 @@ final class ParkingNumber
         if ($other === null) {
             return $this->value === null;
         }
-        
+
         return $this->value === $other->value;
     }
 

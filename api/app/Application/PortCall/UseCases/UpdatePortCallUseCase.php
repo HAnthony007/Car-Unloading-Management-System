@@ -20,7 +20,7 @@ final class UpdatePortCallUseCase
     public function execute(UpdatePortCallDTO $dto): PortCall
     {
         $existing = $this->repository->findById(new PortCallId($dto->portCallId));
-        if (!$existing) {
+        if (! $existing) {
             throw new \RuntimeException('Port call not found');
         }
 

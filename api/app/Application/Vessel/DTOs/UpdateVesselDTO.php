@@ -14,7 +14,7 @@ final class UpdateVesselDTO
     public static function fromArray(array $data): self
     {
         return new self(
-            vesselId: (int)($data['vessel_id'] ?? 0),
+            vesselId: (int) ($data['vessel_id'] ?? 0),
             imoNo: $data['imo_no'] ?? null,
             vesselName: $data['vessel_name'] ?? null,
             flag: $data['flag'] ?? null,
@@ -24,9 +24,16 @@ final class UpdateVesselDTO
     public function toArray(): array
     {
         $data = [];
-        if ($this->imoNo !== null) $data['imo_no'] = $this->imoNo;
-        if ($this->vesselName !== null) $data['vessel_name'] = $this->vesselName;
-        if ($this->flag !== null) $data['flag'] = $this->flag;
+        if ($this->imoNo !== null) {
+            $data['imo_no'] = $this->imoNo;
+        }
+        if ($this->vesselName !== null) {
+            $data['vessel_name'] = $this->vesselName;
+        }
+        if ($this->flag !== null) {
+            $data['flag'] = $this->flag;
+        }
+
         return $data;
     }
 }

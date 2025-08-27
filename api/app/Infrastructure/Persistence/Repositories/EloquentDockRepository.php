@@ -14,6 +14,7 @@ final class EloquentDockRepository implements DockRepositoryInterface
     public function findById(DockId $dockId): ?DomainDock
     {
         $eloquent = EloquentDock::find($dockId->getValue());
+
         return $eloquent ? $this->toDomainEntity($eloquent) : null;
     }
 
@@ -24,9 +25,9 @@ final class EloquentDockRepository implements DockRepositoryInterface
 
     public function save(DomainDock $dock): DomainDock
     {
-        $eloquent = $dock->getDockId() ? EloquentDock::find($dock->getDockId()->getValue()) : new EloquentDock();
-        if (!$eloquent) {
-            $eloquent = new EloquentDock();
+        $eloquent = $dock->getDockId() ? EloquentDock::find($dock->getDockId()->getValue()) : new EloquentDock;
+        if (! $eloquent) {
+            $eloquent = new EloquentDock;
         }
 
         $eloquent->dock_name = $dock->getDockName()->getValue();
@@ -39,9 +40,10 @@ final class EloquentDockRepository implements DockRepositoryInterface
     public function delete(DockId $dockId): bool
     {
         $eloquent = EloquentDock::find($dockId->getValue());
-        if (!$eloquent) {
+        if (! $eloquent) {
             return false;
         }
+
         return (bool) $eloquent->delete();
     }
 

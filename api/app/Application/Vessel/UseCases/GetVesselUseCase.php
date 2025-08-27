@@ -13,9 +13,10 @@ final class GetVesselUseCase
     public function execute(int $id): Vessel
     {
         $vessel = $this->repository->findById(new VesselId($id));
-        if (!$vessel) {
+        if (! $vessel) {
             throw new \RuntimeException('Vessel not found.');
         }
+
         return $vessel;
     }
 }

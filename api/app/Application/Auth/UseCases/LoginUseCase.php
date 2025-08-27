@@ -17,20 +17,20 @@ final class LoginUseCase
     {
         $user = $this->userRepository->findByEmail(new \App\Domain\Auth\ValueObjects\Email($dto->email));
 
-        if (!$user) {
+        if (! $user) {
             throw \Illuminate\Validation\ValidationException::withMessages([
                 'email' => ["Cette adresse email n\'est pas enregistrée."],
             ]);
         }
 
-        if (!password_verify($dto->password, $user->getHashedPassword())) {
+        if (! password_verify($dto->password, $user->getHashedPassword())) {
             throw \Illuminate\Validation\ValidationException::withMessages([
                 'password' => ['Mot de passe incorrect.'],
             ]);
         }
 
         $eloquent = EloquentUser::where('user_id', $user->getUserId()?->getValue())->first();
-        if (!$eloquent) {
+        if (! $eloquent) {
             throw new \RuntimeException('Failed to retrieve user model for token creation.');
         }
 

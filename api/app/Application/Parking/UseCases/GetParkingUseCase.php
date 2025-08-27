@@ -14,11 +14,11 @@ final class GetParkingUseCase
     {
         $parkingIdValueObject = new ParkingId($parkingId);
         $parking = $this->parkingRepository->findById($parkingIdValueObject);
-        
-        if (!$parking) {
+
+        if (! $parking) {
             throw new \RuntimeException('Parking not found');
         }
-        
+
         return $parking;
     }
 }

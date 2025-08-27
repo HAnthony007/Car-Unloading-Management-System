@@ -4,8 +4,8 @@ namespace App\Providers;
 
 use App\Application\Vessel\UseCases\CreateVesselUseCase;
 use App\Application\Vessel\UseCases\DeleteVesselUseCase;
-use App\Application\Vessel\UseCases\GetVesselUseCase;
 use App\Application\Vessel\UseCases\GetVesselsUseCase;
+use App\Application\Vessel\UseCases\GetVesselUseCase;
 use App\Application\Vessel\UseCases\UpdateVesselUseCase;
 use App\Domain\Vessel\Repositories\VesselRepositoryInterface;
 use App\Infrastructure\Persistence\Repositories\EloquentVesselRepository;

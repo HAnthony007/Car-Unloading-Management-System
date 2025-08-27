@@ -39,12 +39,12 @@ it('lists all roles', function () {
                     'permissions' => [
                         'is_administrator',
                         'can_manage_users',
-                        'can_vew_reports'
+                        'can_vew_reports',
                     ],
                     'created_at',
-                    'updated_at'
-                ]
-            ]
+                    'updated_at',
+                ],
+            ],
         ]);
 
     expect(count($response->json('data')))->toBeGreaterThanOrEqual(3);
@@ -77,7 +77,7 @@ it('validates required fields when creating', function () {
 it('shows a role by id', function () {
     $role = EloquentRole::factory()->create(['role_name' => 'Viewer']);
 
-    $response = $this->getJson('/api/roles/' . $role->role_id);
+    $response = $this->getJson('/api/roles/'.$role->role_id);
 
     $response->assertStatus(200)
         ->assertJsonPath('data.role_name', 'Viewer');
@@ -91,7 +91,7 @@ it('updates a role', function () {
         'role_description' => 'Updated desc',
     ];
 
-    $response = $this->putJson('/api/roles/' . $role->role_id, $payload);
+    $response = $this->putJson('/api/roles/'.$role->role_id, $payload);
 
     $response->assertStatus(200)
         ->assertJsonPath('data.role_name', 'UpdatedRole');
@@ -104,7 +104,7 @@ it('updates a role', function () {
 it('deletes a role', function () {
     $role = EloquentRole::factory()->create(['role_name' => 'ToDelete']);
 
-    $response = $this->deleteJson('/api/roles/' . $role->role_id);
+    $response = $this->deleteJson('/api/roles/'.$role->role_id);
 
     $response->assertStatus(204);
 

@@ -13,20 +13,20 @@ test('should create a parking number with null value', function () {
 });
 
 test('should throw exception when parking number is empty', function () {
-    expect(fn() => new ParkingNumber(''))->toThrow(InvalidArgumentException::class, 'Parking number cannot be empty when provided.');
+    expect(fn () => new ParkingNumber(''))->toThrow(InvalidArgumentException::class, 'Parking number cannot be empty when provided.');
 });
 
 test('should throw exception when parking number exceeds 50 characters', function () {
     $longParkingNumber = str_repeat('A', 51);
-    expect(fn() => new ParkingNumber($longParkingNumber))->toThrow(InvalidArgumentException::class, 'Parking number cannot exceed 50 characters.');
+    expect(fn () => new ParkingNumber($longParkingNumber))->toThrow(InvalidArgumentException::class, 'Parking number cannot exceed 50 characters.');
 });
 
 test('should convert to string correctly', function () {
     $parkingNumber = new ParkingNumber('P-123');
-    expect((string)$parkingNumber)->toBe('P-123');
-    
+    expect((string) $parkingNumber)->toBe('P-123');
+
     $nullParkingNumber = new ParkingNumber(null);
-    expect((string)$nullParkingNumber)->toBe('');
+    expect((string) $nullParkingNumber)->toBe('');
 });
 
 test('should compare parking numbers correctly', function () {
@@ -34,7 +34,7 @@ test('should compare parking numbers correctly', function () {
     $parkingNumber2 = new ParkingNumber('P-123');
     $parkingNumber3 = new ParkingNumber('P-456');
     $nullParkingNumber = new ParkingNumber(null);
-    
+
     expect($parkingNumber1->equals($parkingNumber2))->toBeTrue();
     expect($parkingNumber1->equals($parkingNumber3))->toBeFalse();
     expect($parkingNumber1->equals($nullParkingNumber))->toBeFalse();

@@ -14,12 +14,14 @@ final class EloquentVehicleRepository implements VehicleRepositoryInterface
     public function findById(VehicleId $vehicleId): ?DomainVehicle
     {
         $e = EloquentVehicle::find($vehicleId->getValue());
+
         return $e ? $this->toDomainEntity($e) : null;
     }
 
     public function findByVin(Vin $vin): ?DomainVehicle
     {
         $e = EloquentVehicle::where('vin', $vin->getValue())->first();
+
         return $e ? $this->toDomainEntity($e) : null;
     }
 
@@ -30,9 +32,9 @@ final class EloquentVehicleRepository implements VehicleRepositoryInterface
 
     public function save(DomainVehicle $vehicle): DomainVehicle
     {
-        $e = $vehicle->getVehicleId() ? EloquentVehicle::find($vehicle->getVehicleId()->getValue()) : new EloquentVehicle();
-        if (!$e) {
-            $e = new EloquentVehicle();
+        $e = $vehicle->getVehicleId() ? EloquentVehicle::find($vehicle->getVehicleId()->getValue()) : new EloquentVehicle;
+        if (! $e) {
+            $e = new EloquentVehicle;
         }
 
         $e->vin = $vehicle->getVin()->getValue();
@@ -55,10 +57,11 @@ final class EloquentVehicleRepository implements VehicleRepositoryInterface
     public function delete(VehicleId $vehicleId): bool
     {
         $e = EloquentVehicle::find($vehicleId->getValue());
-        if (!$e) {
+        if (! $e) {
             return false;
         }
-        return (bool)$e->delete();
+
+        return (bool) $e->delete();
     }
 
     private function toDomainEntity(EloquentVehicle $e): DomainVehicle
@@ -75,7 +78,7 @@ final class EloquentVehicleRepository implements VehicleRepositoryInterface
             vehicleObservation: $e->vehicle_observation,
             originCountry: $e->origin_country,
             shipLocation: $e->ship_location,
-            isPrimed: (bool)$e->is_primed,
+            isPrimed: (bool) $e->is_primed,
             dischargeId: new DischargeId($e->discharge_id),
             createdAt: $e->created_at,
             updatedAt: $e->updated_at,
@@ -87,21 +90,21 @@ final class EloquentVehicleRepository implements VehicleRepositoryInterface
         $query = EloquentVehicle::query();
 
         if ($vin) {
-            $query->where('vin', 'like', '%' . strtoupper($vin) . '%');
+            $query->where('vin', 'like', '%'.strtoupper($vin).'%');
         }
         if ($dischargeId) {
             $query->where('discharge_id', $dischargeId);
         }
         if ($make) {
-            $query->where('make', 'like', '%' . $make . '%');
+            $query->where('make', 'like', '%'.$make.'%');
         }
         if ($model) {
-            $query->where('model', 'like', '%' . $model . '%');
+            $query->where('model', 'like', '%'.$model.'%');
         }
 
         $paginator = $query->orderByDesc('created_at')->paginate($perPage, ['*'], 'page', $page);
 
-        $data = collect($paginator->items())->map(fn($e) => $this->toDomainEntity($e))->toArray();
+        $data = collect($paginator->items())->map(fn ($e) => $this->toDomainEntity($e))->toArray();
 
         return [
             'data' => $data,

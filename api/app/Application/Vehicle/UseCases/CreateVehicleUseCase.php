@@ -3,11 +3,11 @@
 namespace App\Application\Vehicle\UseCases;
 
 use App\Application\Vehicle\DTOs\CreateVehicleDTO;
+use App\Domain\Discharge\Repositories\DischargeRepositoryInterface;
 use App\Domain\Discharge\ValueObjects\DischargeId;
 use App\Domain\Vehicle\Entities\Vehicle;
 use App\Domain\Vehicle\Repositories\VehicleRepositoryInterface;
 use App\Domain\Vehicle\ValueObjects\Vin;
-use App\Domain\Discharge\Repositories\DischargeRepositoryInterface;
 
 final class CreateVehicleUseCase
 {
@@ -24,7 +24,7 @@ final class CreateVehicleUseCase
 
         // Ensure discharge exists
         $discharge = $this->dischargeRepository->findById(new DischargeId($dto->dischargeId));
-        if (!$discharge) {
+        if (! $discharge) {
             throw new \RuntimeException('Invalid discharge');
         }
 

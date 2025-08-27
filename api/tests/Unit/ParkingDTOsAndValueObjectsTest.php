@@ -18,7 +18,7 @@ describe('Parking DTOs', function () {
             $data = [
                 'parking_name' => 'Test Parking',
                 'location' => 'Zone A',
-                'capacity' => 100
+                'capacity' => 100,
             ];
 
             $dto = \App\Application\Parking\CreateParkingDTO::fromArray($data);
@@ -62,7 +62,7 @@ describe('Parking DTOs', function () {
             $data = [
                 'parking_name' => 'Updated Parking',
                 'location' => 'Zone B',
-                'capacity' => 150
+                'capacity' => 150,
             ];
 
             $dto = \App\Application\Parking\UpdateParkingDTO::fromArray($data);
@@ -74,7 +74,7 @@ describe('Parking DTOs', function () {
 
         it('handles partial updates', function () {
             $data = [
-                'parking_name' => 'Updated Parking'
+                'parking_name' => 'Updated Parking',
             ];
 
             $dto = \App\Application\Parking\UpdateParkingDTO::fromArray($data);
@@ -108,13 +108,13 @@ describe('Parking ValueObjects', function () {
         });
 
         it('throws exception for empty name', function () {
-            expect(fn() => new \App\Domain\Parking\ValueObjects\ParkingName(''))
+            expect(fn () => new \App\Domain\Parking\ValueObjects\ParkingName(''))
                 ->toThrow(\InvalidArgumentException::class);
         });
 
         it('throws exception for too long name', function () {
             $longName = str_repeat('a', 101);
-            expect(fn() => new \App\Domain\Parking\ValueObjects\ParkingName($longName))
+            expect(fn () => new \App\Domain\Parking\ValueObjects\ParkingName($longName))
                 ->toThrow(\InvalidArgumentException::class);
         });
     });
@@ -126,7 +126,7 @@ describe('Parking ValueObjects', function () {
         });
 
         it('throws exception for empty location', function () {
-            expect(fn() => new \App\Domain\Parking\ValueObjects\Location(''))
+            expect(fn () => new \App\Domain\Parking\ValueObjects\Location(''))
                 ->toThrow(\InvalidArgumentException::class);
         });
     });
@@ -138,12 +138,12 @@ describe('Parking ValueObjects', function () {
         });
 
         it('throws exception for negative capacity', function () {
-            expect(fn() => new \App\Domain\Parking\ValueObjects\Capacity(-1))
+            expect(fn () => new \App\Domain\Parking\ValueObjects\Capacity(-1))
                 ->toThrow(\InvalidArgumentException::class);
         });
 
         it('throws exception for too large capacity', function () {
-            expect(fn() => new \App\Domain\Parking\ValueObjects\Capacity(10001))
+            expect(fn () => new \App\Domain\Parking\ValueObjects\Capacity(10001))
                 ->toThrow(\InvalidArgumentException::class);
         });
     });

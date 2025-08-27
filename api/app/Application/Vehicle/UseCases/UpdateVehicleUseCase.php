@@ -3,7 +3,6 @@
 namespace App\Application\Vehicle\UseCases;
 
 use App\Application\Vehicle\DTOs\UpdateVehicleDTO;
-use App\Domain\Discharge\ValueObjects\DischargeId;
 use App\Domain\Vehicle\Entities\Vehicle as DomainVehicle;
 use App\Domain\Vehicle\Repositories\VehicleRepositoryInterface;
 use App\Domain\Vehicle\ValueObjects\VehicleId;
@@ -16,7 +15,7 @@ final class UpdateVehicleUseCase
     public function execute(UpdateVehicleDTO $dto): DomainVehicle
     {
         $existing = $this->repository->findById(new VehicleId($dto->vehicleId));
-        if (!$existing) {
+        if (! $existing) {
             throw new \RuntimeException('Vehicle not found.');
         }
 

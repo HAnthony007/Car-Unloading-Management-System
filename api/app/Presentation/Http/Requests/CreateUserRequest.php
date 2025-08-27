@@ -2,8 +2,8 @@
 
 namespace App\Presentation\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
 final class CreateUserRequest extends FormRequest
@@ -56,7 +56,7 @@ final class CreateUserRequest extends FormRequest
                 'required',
                 'integer',
                 'exists:roles,role_id',
-            ]
+            ],
         ];
     }
 

@@ -23,7 +23,7 @@ final class RegisterDTO
             $data['password'] ?? '',
             $data['avatar'] ?? null,
             $data['phone'] ?? null,
-            (int)($data['role_id'] ?? 0)
+            (int) ($data['role_id'] ?? 0)
         );
     }
 }

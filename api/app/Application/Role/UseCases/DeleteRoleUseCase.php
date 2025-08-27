@@ -12,7 +12,7 @@ final class DeleteRoleUseCase
     public function execute(int $id): void
     {
         $role = $this->roleRepository->findById(new RoleId($id));
-        if (!$role) {
+        if (! $role) {
             throw new \RuntimeException('Role not found');
         }
 

@@ -12,7 +12,7 @@ final class DeletePortCallUseCase
     public function execute(int $id): void
     {
         $deleted = $this->repository->delete(new PortCallId($id));
-        if (!$deleted) {
+        if (! $deleted) {
             throw new \RuntimeException('Port call not found');
         }
     }

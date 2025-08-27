@@ -14,7 +14,7 @@ final class UpdateRoleUseCase
     public function execute(int $id, CreateRoleDTO $dto): DomainRole
     {
         $existing = $this->roleRepository->findById(new RoleId($id));
-        if (!$existing) {
+        if (! $existing) {
             throw new \RuntimeException('Role not found');
         }
 

@@ -6,16 +6,15 @@ use App\Application\Vehicle\DTOs\CreateVehicleDTO;
 use App\Application\Vehicle\DTOs\UpdateVehicleDTO;
 use App\Application\Vehicle\UseCases\CreateVehicleUseCase;
 use App\Application\Vehicle\UseCases\DeleteVehicleUseCase;
-use App\Application\Vehicle\UseCases\GetVehicleUseCase;
 use App\Application\Vehicle\UseCases\GetVehiclesUseCase;
-use App\Application\Vehicle\UseCases\UpdateVehicleUseCase;
+use App\Application\Vehicle\UseCases\GetVehicleUseCase;
 use App\Application\Vehicle\UseCases\SearchVehiclesUseCase;
+use App\Application\Vehicle\UseCases\UpdateVehicleUseCase;
+use App\Presentation\Http\Requests\SearchVehiclesRequest;
 use App\Presentation\Http\Requests\StoreVehicleRequest;
 use App\Presentation\Http\Requests\UpdateVehicleRequest;
-use App\Presentation\Http\Requests\SearchVehiclesRequest;
 use App\Presentation\Http\Resources\VehicleResource;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 final class VehicleController
 {
@@ -32,6 +31,7 @@ final class VehicleController
     {
         $criteria = \App\Application\Vehicle\DTOs\VehicleSearchCriteriaDTO::fromArray($request->validated());
         $result = $this->searchUseCase->execute($criteria);
+
         return response()->json([
             'data' => VehicleResource::collection($result['data']),
             'meta' => [
@@ -51,9 +51,10 @@ final class VehicleController
         try {
             $dto = CreateVehicleDTO::fromArray($request->validated());
             $vehicle = $this->createUseCase->execute($dto);
+
             return response()->json([
                 'message' => 'Vehicle created successfully.',
-                'data' => new VehicleResource($vehicle)
+                'data' => new VehicleResource($vehicle),
             ], 201);
         } catch (\Throwable $e) {
             return response()->json([
@@ -67,6 +68,7 @@ final class VehicleController
     {
         try {
             $vehicle = $this->getUseCase->execute($id);
+
             return response()->json(['data' => new VehicleResource($vehicle)]);
         } catch (\Throwable $e) {
             return response()->json([
@@ -83,6 +85,7 @@ final class VehicleController
             $data['vehicle_id'] = $id;
             $dto = UpdateVehicleDTO::fromArray($data);
             $vehicle = $this->updateUseCase->execute($dto);
+
             return response()->json([
                 'message' => 'Vehicle updated successfully.',
                 'data' => new VehicleResource($vehicle),
@@ -99,6 +102,7 @@ final class VehicleController
     {
         try {
             $this->deleteUseCase->execute($id);
+
             return response()->json(['message' => 'Vehicle deleted successfully.']);
         } catch (\Throwable $e) {
             return response()->json([

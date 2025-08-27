@@ -1,10 +1,10 @@
 <?php
 
 use App\Domain\Parking\Entities\Parking;
+use App\Domain\Parking\ValueObjects\Capacity;
+use App\Domain\Parking\ValueObjects\Location;
 use App\Domain\Parking\ValueObjects\ParkingId;
 use App\Domain\Parking\ValueObjects\ParkingName;
-use App\Domain\Parking\ValueObjects\Location;
-use App\Domain\Parking\ValueObjects\Capacity;
 use App\Domain\Parking\ValueObjects\ParkingNumber;
 use Carbon\Carbon;
 
@@ -18,7 +18,7 @@ test('should create a parking entity with all properties', function () {
         createdAt: Carbon::now(),
         updatedAt: Carbon::now()
     );
-    
+
     expect($parking->getParkingId()->getValue())->toBe(1);
     expect($parking->getParkingName()->getValue())->toBe('Test Parking');
     expect($parking->getLocation()->getValue())->toBe('Test Location');
@@ -35,7 +35,7 @@ test('should create a parking entity without optional properties', function () {
         location: new Location('Test Location'),
         capacity: new Capacity(100)
     );
-    
+
     expect($parking->getParkingId())->toBeNull();
     expect($parking->getParkingName()->getValue())->toBe('Test Parking');
     expect($parking->getLocation()->getValue())->toBe('Test Location');
@@ -56,9 +56,9 @@ test('should convert to array correctly', function () {
         createdAt: $now,
         updatedAt: $now
     );
-    
+
     $array = $parking->toArray();
-    
+
     expect($array)->toBeArray();
     expect($array['parking_id'])->toBe(1);
     expect($array['parking_name'])->toBe('Test Parking');
@@ -70,7 +70,7 @@ test('should convert to array correctly', function () {
 });
 
 test('should throw exception for Mahasarika parking without parking number', function () {
-    expect(fn() => new Parking(
+    expect(fn () => new Parking(
         parkingId: new ParkingId(1),
         parkingName: new ParkingName('Mahasarika'),
         location: new Location('Location'),
@@ -87,6 +87,6 @@ test('should not throw exception for non-Mahasarika parking without parking numb
         capacity: new Capacity(100),
         parkingNumber: null
     );
-    
+
     expect($parking)->toBeInstanceOf(Parking::class);
 });

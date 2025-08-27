@@ -13,7 +13,7 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-         User::insert([
+        User::insert([
             [
                 'matriculation_no' => 'ADM001',
                 'full_name' => 'RAKOTO Harifetra',
@@ -21,7 +21,7 @@ class UserSeeder extends Seeder
                 'password' => Hash::make('admin123'),
                 'avatar' => '',
                 'phone' => '0345511784',
-                'role_id' => 1
+                'role_id' => 1,
             ],
             [
                 'matriculation_no' => 'AGT001',
@@ -30,7 +30,7 @@ class UserSeeder extends Seeder
                 'password' => Hash::make('agent123'),
                 'avatar' => '',
                 'phone' => '0320228232',
-                'role_id' => 2
+                'role_id' => 2,
             ],
         ]);
     }

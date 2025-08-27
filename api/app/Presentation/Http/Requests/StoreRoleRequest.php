@@ -30,7 +30,6 @@ class StoreRoleRequest extends FormRequest
         ];
     }
 
-
     protected function failedValidation(Validator $validator): void
     {
         $errors = $validator->errors()->messages();

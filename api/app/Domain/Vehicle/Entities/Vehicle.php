@@ -27,21 +27,80 @@ final class Vehicle
         private readonly ?Carbon $updatedAt = null,
     ) {}
 
-    public function getVehicleId(): ?VehicleId { return $this->vehicleId; }
-    public function getVin(): Vin { return $this->vin; }
-    public function getMake(): string { return $this->make; }
-    public function getModel(): string { return $this->model; }
-    public function getColor(): ?string { return $this->color; }
-    public function getType(): string { return $this->type; }
-    public function getWeight(): string { return $this->weight; }
-    public function getVehicleCondition(): string { return $this->vehicleCondition; }
-    public function getVehicleObservation(): ?string { return $this->vehicleObservation; }
-    public function getOriginCountry(): string { return $this->originCountry; }
-    public function getShipLocation(): ?string { return $this->shipLocation; }
-    public function isPrimed(): bool { return $this->isPrimed; }
-    public function getDischargeId(): DischargeId { return $this->dischargeId; }
-    public function getCreatedAt(): ?Carbon { return $this->createdAt; }
-    public function getUpdatedAt(): ?Carbon { return $this->updatedAt; }
+    public function getVehicleId(): ?VehicleId
+    {
+        return $this->vehicleId;
+    }
+
+    public function getVin(): Vin
+    {
+        return $this->vin;
+    }
+
+    public function getMake(): string
+    {
+        return $this->make;
+    }
+
+    public function getModel(): string
+    {
+        return $this->model;
+    }
+
+    public function getColor(): ?string
+    {
+        return $this->color;
+    }
+
+    public function getType(): string
+    {
+        return $this->type;
+    }
+
+    public function getWeight(): string
+    {
+        return $this->weight;
+    }
+
+    public function getVehicleCondition(): string
+    {
+        return $this->vehicleCondition;
+    }
+
+    public function getVehicleObservation(): ?string
+    {
+        return $this->vehicleObservation;
+    }
+
+    public function getOriginCountry(): string
+    {
+        return $this->originCountry;
+    }
+
+    public function getShipLocation(): ?string
+    {
+        return $this->shipLocation;
+    }
+
+    public function isPrimed(): bool
+    {
+        return $this->isPrimed;
+    }
+
+    public function getDischargeId(): DischargeId
+    {
+        return $this->dischargeId;
+    }
+
+    public function getCreatedAt(): ?Carbon
+    {
+        return $this->createdAt;
+    }
+
+    public function getUpdatedAt(): ?Carbon
+    {
+        return $this->updatedAt;
+    }
 
     public function toArray(): array
     {

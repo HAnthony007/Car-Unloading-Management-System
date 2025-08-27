@@ -18,12 +18,12 @@ class AppServiceProvider extends ServiceProvider
             \App\Domain\User\Repositories\UserRepositoryInterface::class,
             \App\Infrastructure\Persistence\Repositories\EloquentUserRepository::class
         );
-        
+
         $this->app->bind(
             \App\Domain\Role\Repositories\RoleRepositoryInterface::class,
             \App\Infrastructure\Persistence\Repositories\EloquentRoleRepository::class
         );
-        
+
         $this->app->bind(
             \App\Domain\Parking\Repositories\ParkingRepositoryInterface::class,
             \App\Infrastructure\Persistence\Repositories\EloquentParkingRepository::class

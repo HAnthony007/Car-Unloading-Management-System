@@ -45,7 +45,7 @@ final class EloquentUserRepository implements UserRepositoryInterface
         return EloquentUser::with('role')
             ->where('role_id', $roleId->getValue())
             ->get()
-            ->map(fn($user) => $this->toDomainEntity($user))
+            ->map(fn ($user) => $this->toDomainEntity($user))
             ->toArray();
     }
 
@@ -53,7 +53,7 @@ final class EloquentUserRepository implements UserRepositoryInterface
     {
         return EloquentUser::with('role')
             ->get()
-            ->map(fn($user) => $this->toDomainEntity($user))
+            ->map(fn ($user) => $this->toDomainEntity($user))
             ->toArray();
     }
 
@@ -102,7 +102,7 @@ final class EloquentUserRepository implements UserRepositoryInterface
             ->whereNotNull('email_verified_at')
             ->where('created_at', '>', now()->subDays(90))
             ->get()
-            ->map(fn($user) => $this->toDomainEntity($user))
+            ->map(fn ($user) => $this->toDomainEntity($user))
             ->toArray();
     }
 
@@ -111,7 +111,7 @@ final class EloquentUserRepository implements UserRepositoryInterface
         return EloquentUser::with('role')
             ->whereNull('email_verified_at')
             ->get()
-            ->map(fn($user) => $this->toDomainEntity($user))
+            ->map(fn ($user) => $this->toDomainEntity($user))
             ->toArray();
     }
 

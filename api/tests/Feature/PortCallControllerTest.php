@@ -2,16 +2,22 @@
 
 use App\Models\Role;
 use App\Models\User;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
-use function Pest\Laravel\{actingAs, getJson, postJson, putJson, deleteJson};
+
+use function Pest\Laravel\actingAs;
+use function Pest\Laravel\deleteJson;
+use function Pest\Laravel\getJson;
+use function Pest\Laravel\postJson;
+use function Pest\Laravel\putJson;
 
 uses(RefreshDatabase::class);
 
-function ensurePortCallRelatedTables(): void {
-    if (!Schema::hasTable('vessels')) {
+function ensurePortCallRelatedTables(): void
+{
+    if (! Schema::hasTable('vessels')) {
         Schema::create('vessels', function (Blueprint $table) {
             $table->id('vessel_id');
             $table->string('imo_no')->unique();
@@ -21,7 +27,7 @@ function ensurePortCallRelatedTables(): void {
         });
     }
 
-    if (!Schema::hasTable('docks')) {
+    if (! Schema::hasTable('docks')) {
         Schema::create('docks', function (Blueprint $table) {
             $table->id('dock_id');
             $table->string('dock_name');
@@ -30,7 +36,7 @@ function ensurePortCallRelatedTables(): void {
         });
     }
 
-    if (!Schema::hasTable('port_calls')) {
+    if (! Schema::hasTable('port_calls')) {
         Schema::create('port_calls', function (Blueprint $table) {
             $table->id('port_call_id');
             $table->string('vessel_agent');
@@ -79,15 +85,17 @@ it('allows an authenticated user to create, show, update and delete a port call'
     ];
 
     $response = postJson('/api/port-calls', $createData);
-    if ($response->status() !== 201) { $response->dump(); }
+    if ($response->status() !== 201) {
+        $response->dump();
+    }
     $response->assertCreated()
         ->assertJsonStructure([
             'message',
             'data' => [
                 'port_call_id', 'vessel_agent', 'origin_port',
                 'estimated_arrival', 'arrival_date', 'estimated_departure', 'departure_date',
-                'vessel_id', 'dock_id', 'created_at', 'updated_at'
-            ]
+                'vessel_id', 'dock_id', 'created_at', 'updated_at',
+            ],
         ]);
 
     $id = $response->json('data.port_call_id');

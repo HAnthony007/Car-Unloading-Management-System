@@ -16,7 +16,7 @@ final class CreateParkingDTO
         return new self(
             parkingName: $data['parking_name'] ?? '',
             location: $data['location'] ?? '',
-            capacity: (int)($data['capacity'] ?? 0),
+            capacity: (int) ($data['capacity'] ?? 0),
             parkingNumber: $data['parking_number'] ?? null
         );
     }

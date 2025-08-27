@@ -1,19 +1,19 @@
 <?php
 
 use App\Application\User\UseCases\GetUserUseCase;
-use App\Domain\User\Entities\User;
-use App\Domain\User\Repositories\UserRepositoryInterface;
-use App\Domain\User\ValueObjects\UserId;
-use App\Domain\User\ValueObjects\MatriculationNumber;
 use App\Domain\Auth\ValueObjects\Email;
 use App\Domain\Role\ValueObjects\RoleId;
+use App\Domain\User\Entities\User;
+use App\Domain\User\Repositories\UserRepositoryInterface;
+use App\Domain\User\ValueObjects\MatriculationNumber;
+use App\Domain\User\ValueObjects\UserId;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery;
 
 uses(RefreshDatabase::class);
 
 describe('GetUserUseCase', function () {
-    
+
     beforeEach(function () {
         $this->userRepository = Mockery::mock(UserRepositoryInterface::class);
         $this->getUserUseCase = new GetUserUseCase($this->userRepository);
@@ -50,7 +50,7 @@ describe('GetUserUseCase', function () {
 
         // Assert
         expect($result)->toBeInstanceOf(User::class);
-        expect($result->getUserId()->getValue())->toBe((string)$userId);
+        expect($result->getUserId()->getValue())->toBe((string) $userId);
     });
 
     it('throws exception when user not found', function () {

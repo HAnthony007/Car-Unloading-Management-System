@@ -11,7 +11,7 @@ final class RoleId
             throw new \InvalidArgumentException('Role ID must be greater than 0');
         }
     }
-    
+
     public function getValue(): int
     {
         return $this->value;

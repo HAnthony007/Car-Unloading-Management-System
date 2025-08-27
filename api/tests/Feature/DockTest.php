@@ -1,16 +1,16 @@
 <?php
 
-use App\Models\User;
 use App\Models\Role;
+use App\Models\User;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 
 uses(RefreshDatabase::class);
 
 it('allows an authenticated user to create, show, update and delete a dock', function () {
     // Ensure the docks table exists for this test
-    if (!Schema::hasTable('docks')) {
+    if (! Schema::hasTable('docks')) {
         Schema::create('docks', function (Blueprint $table) {
             $table->id('dock_id');
             $table->string('dock_name', 100);
@@ -42,7 +42,7 @@ it('allows an authenticated user to create, show, update and delete a dock', fun
                 'location',
                 'created_at',
                 'updated_at',
-            ]
+            ],
         ]);
 
     $dockId = $response->json('data.dock_id');
@@ -86,7 +86,7 @@ it('allows an authenticated user to create, show, update and delete a dock', fun
 });
 
 it('validates payload when creating a dock', function () {
-    if (!Schema::hasTable('docks')) {
+    if (! Schema::hasTable('docks')) {
         Schema::create('docks', function (Blueprint $table) {
             $table->id('dock_id');
             $table->string('dock_name', 100);
@@ -109,7 +109,7 @@ it('validates payload when creating a dock', function () {
 });
 
 it('returns 404 for non-existing dock on show/update/delete', function () {
-    if (!Schema::hasTable('docks')) {
+    if (! Schema::hasTable('docks')) {
         Schema::create('docks', function (Blueprint $table) {
             $table->id('dock_id');
             $table->string('dock_name', 100);
@@ -128,7 +128,7 @@ it('returns 404 for non-existing dock on show/update/delete', function () {
 });
 
 it('rejects unauthenticated access', function () {
-    if (!Schema::hasTable('docks')) {
+    if (! Schema::hasTable('docks')) {
         Schema::create('docks', function (Blueprint $table) {
             $table->id('dock_id');
             $table->string('dock_name', 100);

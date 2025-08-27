@@ -4,13 +4,13 @@ namespace App\Presentation\Http\Controllers;
 
 use App\Application\Role\DTOs\CreateRoleDTO;
 use App\Application\Role\UseCases\CreateRoleUseCase;
-use App\Application\Role\UseCases\GetRoleUseCase;
-use App\Application\Role\UseCases\GetRolesUseCase;
-use App\Application\Role\UseCases\UpdateRoleUseCase;
 use App\Application\Role\UseCases\DeleteRoleUseCase;
-use App\Presentation\Http\Resources\RoleResource;
+use App\Application\Role\UseCases\GetRolesUseCase;
+use App\Application\Role\UseCases\GetRoleUseCase;
+use App\Application\Role\UseCases\UpdateRoleUseCase;
 use App\Presentation\Http\Requests\StoreRoleRequest;
 use App\Presentation\Http\Requests\UpdateRoleRequest;
+use App\Presentation\Http\Resources\RoleResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
@@ -25,6 +25,7 @@ class RoleController extends Controller
         private readonly UpdateRoleUseCase $updateRoleUseCase,
         private readonly DeleteRoleUseCase $deleteRoleUseCase,
     ) {}
+
     /**
      * Display a listing of the roles.
      */
@@ -93,6 +94,7 @@ class RoleController extends Controller
             ], 200);
         } catch (\RuntimeException $e) {
             $status = $e->getMessage() === 'Role not found' ? SymfonyResponse::HTTP_NOT_FOUND : SymfonyResponse::HTTP_UNPROCESSABLE_ENTITY;
+
             return response()->json(['error' => $e->getMessage()], $status);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 400);

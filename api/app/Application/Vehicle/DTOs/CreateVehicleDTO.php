@@ -34,10 +34,13 @@ final class CreateVehicleDTO
             vehicleObservation: $data['vehicle_observation'] ?? null,
             originCountry: $data['origin_country'] ?? '',
             shipLocation: $data['ship_location'] ?? null,
-            isPrimed: (bool)($data['is_primed'] ?? false),
-            dischargeId: (int)($data['discharge_id'] ?? 0),
+            isPrimed: (bool) ($data['is_primed'] ?? false),
+            dischargeId: (int) ($data['discharge_id'] ?? 0),
         );
     }
 
-    public function getVinVO(): Vin { return new Vin($this->vin); }
+    public function getVinVO(): Vin
+    {
+        return new Vin($this->vin);
+    }
 }

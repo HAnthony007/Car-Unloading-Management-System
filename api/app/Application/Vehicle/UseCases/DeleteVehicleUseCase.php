@@ -12,7 +12,7 @@ final class DeleteVehicleUseCase
     public function execute(int $id): void
     {
         $deleted = $this->repository->delete(new VehicleId($id));
-        if (!$deleted) {
+        if (! $deleted) {
             throw new \RuntimeException('Vehicle not found.');
         }
     }

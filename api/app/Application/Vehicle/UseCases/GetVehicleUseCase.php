@@ -13,9 +13,10 @@ final class GetVehicleUseCase
     public function execute(int $id): Vehicle
     {
         $vehicle = $this->repository->findById(new VehicleId($id));
-        if (!$vehicle) {
+        if (! $vehicle) {
             throw new \RuntimeException('Vehicle not found.');
         }
+
         return $vehicle;
     }
 }

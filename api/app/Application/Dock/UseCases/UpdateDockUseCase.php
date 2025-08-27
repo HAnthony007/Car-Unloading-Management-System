@@ -17,7 +17,7 @@ final class UpdateDockUseCase
     {
         $dockId = new DockId($dto->dockId);
         $existing = $this->dockRepository->findById($dockId);
-        if (!$existing) {
+        if (! $existing) {
             throw new \RuntimeException('Dock not found');
         }
 

@@ -2,10 +2,10 @@
 
 namespace App\Domain\Parking\Entities;
 
+use App\Domain\Parking\ValueObjects\Capacity;
+use App\Domain\Parking\ValueObjects\Location;
 use App\Domain\Parking\ValueObjects\ParkingId;
 use App\Domain\Parking\ValueObjects\ParkingName;
-use App\Domain\Parking\ValueObjects\Location;
-use App\Domain\Parking\ValueObjects\Capacity;
 use App\Domain\Parking\ValueObjects\ParkingNumber;
 use Carbon\Carbon;
 
@@ -45,7 +45,7 @@ final class Parking
     {
         return $this->capacity;
     }
-    
+
     public function getParkingNumber(): ?ParkingNumber
     {
         return $this->parkingNumber;

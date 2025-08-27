@@ -10,6 +10,7 @@ final class VehicleResource extends JsonResource
     public function toArray(Request $request): array
     {
         $v = $this->resource;
+
         return [
             'vehicle_id' => $v->getVehicleId()?->getValue(),
             'vin' => $v->getVin()->getValue(),

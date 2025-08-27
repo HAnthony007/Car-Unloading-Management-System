@@ -6,8 +6,8 @@ use App\Application\PortCall\DTOs\CreatePortCallDTO;
 use App\Application\PortCall\DTOs\UpdatePortCallDTO;
 use App\Application\PortCall\UseCases\CreatePortCallUseCase;
 use App\Application\PortCall\UseCases\DeletePortCallUseCase;
-use App\Application\PortCall\UseCases\GetPortCallUseCase;
 use App\Application\PortCall\UseCases\GetPortCallsUseCase;
+use App\Application\PortCall\UseCases\GetPortCallUseCase;
 use App\Application\PortCall\UseCases\UpdatePortCallUseCase;
 use App\Presentation\Http\Requests\StorePortCallRequest;
 use App\Presentation\Http\Requests\UpdatePortCallRequest;
@@ -35,6 +35,7 @@ final class PortCallController
         try {
             $dto = CreatePortCallDTO::fromArray($request->validated());
             $pc = $this->createUseCase->execute($dto);
+
             return response()->json([
                 'message' => 'Port call created successfully.',
                 'data' => new PortCallResource($pc),
@@ -51,6 +52,7 @@ final class PortCallController
     {
         try {
             $pc = $this->getUseCase->execute($id);
+
             return response()->json(['data' => new PortCallResource($pc)]);
         } catch (\Throwable $e) {
             return response()->json([
@@ -67,9 +69,10 @@ final class PortCallController
             $data['port_call_id'] = $id;
             $dto = UpdatePortCallDTO::fromArray($data);
             $pc = $this->updateUseCase->execute($dto);
+
             return response()->json([
                 'message' => 'Port call updated successfully.',
-                'data' => new PortCallResource($pc)
+                'data' => new PortCallResource($pc),
             ]);
         } catch (\Throwable $e) {
             return response()->json([
@@ -83,6 +86,7 @@ final class PortCallController
     {
         try {
             $this->deleteUseCase->execute($id);
+
             return response()->json(['message' => 'Port call deleted successfully.']);
         } catch (\Throwable $e) {
             return response()->json([

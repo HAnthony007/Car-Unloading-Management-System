@@ -6,8 +6,8 @@ use App\Application\Vessel\DTOs\CreateVesselDTO;
 use App\Application\Vessel\DTOs\UpdateVesselDTO;
 use App\Application\Vessel\UseCases\CreateVesselUseCase;
 use App\Application\Vessel\UseCases\DeleteVesselUseCase;
-use App\Application\Vessel\UseCases\GetVesselUseCase;
 use App\Application\Vessel\UseCases\GetVesselsUseCase;
+use App\Application\Vessel\UseCases\GetVesselUseCase;
 use App\Application\Vessel\UseCases\UpdateVesselUseCase;
 use App\Presentation\Http\Requests\StoreVesselRequest;
 use App\Presentation\Http\Requests\UpdateVesselRequest;
@@ -28,6 +28,7 @@ final class VesselController
     public function index(): AnonymousResourceCollection
     {
         $vessels = $this->listUseCase->execute();
+
         return VesselResource::collection($vessels);
     }
 
@@ -36,9 +37,10 @@ final class VesselController
         try {
             $dto = CreateVesselDTO::fromArray($request->validated());
             $vessel = $this->createUseCase->execute($dto);
+
             return response()->json([
                 'message' => 'Vessel created successfully.',
-                'data' => new VesselResource($vessel)
+                'data' => new VesselResource($vessel),
             ], 201);
         } catch (\Throwable $e) {
             return response()->json([
@@ -52,6 +54,7 @@ final class VesselController
     {
         try {
             $vessel = $this->getUseCase->execute($id);
+
             return response()->json(['data' => new VesselResource($vessel)]);
         } catch (\Throwable $e) {
             return response()->json([
@@ -68,6 +71,7 @@ final class VesselController
             $data['vessel_id'] = $id;
             $dto = UpdateVesselDTO::fromArray($data);
             $vessel = $this->updateUseCase->execute($dto);
+
             return response()->json([
                 'message' => 'Vessel updated successfully.',
                 'data' => new VesselResource($vessel),
@@ -84,6 +88,7 @@ final class VesselController
     {
         try {
             $this->deleteUseCase->execute($id);
+
             return response()->json(['message' => 'Vessel deleted successfully.']);
         } catch (\Throwable $e) {
             return response()->json([

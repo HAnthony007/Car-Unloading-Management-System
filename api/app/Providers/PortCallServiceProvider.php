@@ -4,8 +4,8 @@ namespace App\Providers;
 
 use App\Application\PortCall\UseCases\CreatePortCallUseCase;
 use App\Application\PortCall\UseCases\DeletePortCallUseCase;
-use App\Application\PortCall\UseCases\GetPortCallUseCase;
 use App\Application\PortCall\UseCases\GetPortCallsUseCase;
+use App\Application\PortCall\UseCases\GetPortCallUseCase;
 use App\Application\PortCall\UseCases\UpdatePortCallUseCase;
 use App\Domain\PortCall\Repositories\PortCallRepositoryInterface;
 use App\Infrastructure\Persistence\Repositories\EloquentPortCallRepository;
