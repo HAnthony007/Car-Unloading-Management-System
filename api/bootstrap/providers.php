@@ -8,4 +8,5 @@ return [
     App\Providers\PortCallServiceProvider::class,
     App\Providers\DischargeServiceProvider::class,
     App\Providers\VehicleServiceProvider::class,
+    App\Providers\FollowUpFileServiceProvider::class,
 ];

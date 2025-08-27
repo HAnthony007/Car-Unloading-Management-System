@@ -126,3 +126,14 @@ Route::prefix('discharges')
         Route::put('/{id}', [\App\Presentation\Http\Controllers\DischargeController::class, 'update'])->name('discharges.update');
         Route::delete('/{id}', [\App\Presentation\Http\Controllers\DischargeController::class, 'destroy'])->name('discharges.destroy');
     });
+
+// Follow Up Files Management Routes
+Route::prefix('follow-up-files')
+    ->middleware('auth:sanctum')
+    ->group(function (): void {
+        Route::get('/', [\App\Presentation\Http\Controllers\FollowUpFileController::class, 'index'])->name('followupfiles.index');
+        Route::post('/', [\App\Presentation\Http\Controllers\FollowUpFileController::class, 'store'])->name('followupfiles.store');
+        Route::get('/{id}', [\App\Presentation\Http\Controllers\FollowUpFileController::class, 'show'])->name('followupfiles.show');
+        Route::put('/{id}', [\App\Presentation\Http\Controllers\FollowUpFileController::class, 'update'])->name('followupfiles.update');
+        Route::delete('/{id}', [\App\Presentation\Http\Controllers\FollowUpFileController::class, 'destroy'])->name('followupfiles.destroy');
+    });

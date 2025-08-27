@@ -7,7 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class FollowUpFile extends Model
 {
     protected $primaryKey = 'follow_up_file_id';
-    public $timestamps = false;
+
+    public $timestamps = true;
 
     public function vehicle(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
