@@ -159,3 +159,14 @@ Route::prefix('survey-checkpoints')
         Route::put('/{id}', [\App\Presentation\Http\Controllers\SurveyCheckpointController::class, 'update'])->name('surveycheckpoints.update');
         Route::delete('/{id}', [\App\Presentation\Http\Controllers\SurveyCheckpointController::class, 'destroy'])->name('surveycheckpoints.destroy');
     });
+
+// Photos Management Routes
+Route::prefix('photos')
+    ->middleware('auth:sanctum')
+    ->group(function (): void {
+        Route::get('/', [\App\Presentation\Http\Controllers\PhotoController::class, 'index'])->name('photos.index');
+        Route::post('/', [\App\Presentation\Http\Controllers\PhotoController::class, 'store'])->name('photos.store');
+        Route::get('/{id}', [\App\Presentation\Http\Controllers\PhotoController::class, 'show'])->name('photos.show');
+        Route::put('/{id}', [\App\Presentation\Http\Controllers\PhotoController::class, 'update'])->name('photos.update');
+        Route::delete('/{id}', [\App\Presentation\Http\Controllers\PhotoController::class, 'destroy'])->name('photos.destroy');
+    });

@@ -8,20 +8,73 @@ use App\Domain\User\Repositories\UserRepositoryInterface;
 use App\Domain\User\ValueObjects\MatriculationNumber;
 use App\Domain\User\ValueObjects\UserId;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Mockery;
 
 uses(RefreshDatabase::class);
 
 describe('DeleteUserUseCase', function () {
+    class FakeUserRepository_ForDelete implements UserRepositoryInterface
+    {
+        public ?User $found = null;
 
-    beforeEach(function () {
-        $this->userRepository = Mockery::mock(UserRepositoryInterface::class);
-        $this->deleteUserUseCase = new DeleteUserUseCase($this->userRepository);
-    });
+        public bool $deleted = false;
 
-    afterEach(function () {
-        Mockery::close();
-    });
+        public function findById(UserId $userId): ?User
+        {
+            return $this->found;
+        }
+
+        public function findByMatriculationNumber(\App\Domain\User\ValueObjects\MatriculationNumber $matriculationNumber): ?User
+        {
+            return null;
+        }
+
+        public function findByEmail(\App\Domain\Auth\ValueObjects\Email $email): ?User
+        {
+            return null;
+        }
+
+        public function findByRole(\App\Domain\Role\ValueObjects\RoleId $roleId): array
+        {
+            return [];
+        }
+
+        public function findAll(): array
+        {
+            return [];
+        }
+
+        public function save(User $user): User
+        {
+            return $user;
+        }
+
+        public function delete(UserId $userId): bool
+        {
+            $this->deleted = true;
+
+            return true;
+        }
+
+        public function exists(\App\Domain\Auth\ValueObjects\Email $email): bool
+        {
+            return false;
+        }
+
+        public function matriculationExists(\App\Domain\User\ValueObjects\MatriculationNumber $matriculationNumber): bool
+        {
+            return false;
+        }
+
+        public function getActiveUsers(): array
+        {
+            return [];
+        }
+
+        public function getUsersWithUnverifiedEmail(): array
+        {
+            return [];
+        }
+    }
 
     it('deletes user successfully when user exists', function () {
         // Arrange
@@ -40,18 +93,12 @@ describe('DeleteUserUseCase', function () {
             createdAt: now()
         );
 
-        $this->userRepository
-            ->shouldReceive('findById')
-            ->with(Mockery::type(UserId::class))
-            ->andReturn($user);
-
-        $this->userRepository
-            ->shouldReceive('delete')
-            ->with(Mockery::type(UserId::class))
-            ->andReturn(true);
+        $userRepository = new FakeUserRepository_ForDelete;
+        $userRepository->found = $user;
+        $deleteUserUseCase = new DeleteUserUseCase($userRepository);
 
         // Act
-        $result = $this->deleteUserUseCase->execute($userId);
+        $result = $deleteUserUseCase->execute($userId);
 
         // Assert
         expect($result)->toBe(true);
@@ -61,14 +108,13 @@ describe('DeleteUserUseCase', function () {
         // Arrange
         $userId = 999;
 
-        $this->userRepository
-            ->shouldReceive('findById')
-            ->with(Mockery::type(UserId::class))
-            ->andReturn(null);
+        $userRepository = new FakeUserRepository_ForDelete;
+        $userRepository->found = null;
+        $deleteUserUseCase = new DeleteUserUseCase($userRepository);
 
         // Act & Assert
-        expect(function () use ($userId) {
-            $this->deleteUserUseCase->execute($userId);
+        expect(function () use ($deleteUserUseCase, $userId) {
+            $deleteUserUseCase->execute($userId);
         })->toThrow(Exception::class, 'User not found.');
     });
 });

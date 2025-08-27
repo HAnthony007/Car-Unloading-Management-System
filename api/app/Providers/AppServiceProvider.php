@@ -28,6 +28,11 @@ class AppServiceProvider extends ServiceProvider
             \App\Domain\Parking\Repositories\ParkingRepositoryInterface::class,
             \App\Infrastructure\Persistence\Repositories\EloquentParkingRepository::class
         );
+
+        $this->app->bind(
+            \App\Domain\Photo\Repositories\PhotoRepositoryInterface::class,
+            \App\Infrastructure\Persistence\Repositories\EloquentPhotoRepository::class
+        );
     }
 
     /**

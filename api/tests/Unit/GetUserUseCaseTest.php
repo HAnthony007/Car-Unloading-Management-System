@@ -8,20 +8,71 @@ use App\Domain\User\Repositories\UserRepositoryInterface;
 use App\Domain\User\ValueObjects\MatriculationNumber;
 use App\Domain\User\ValueObjects\UserId;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Mockery;
+
+// Simple fake repository (no external mocking)
+class FakeUserRepository_ForGet implements UserRepositoryInterface
+{
+    public ?User $found = null;
+
+    public function findById(UserId $userId): ?User
+    {
+        return $this->found;
+    }
+
+    public function findByMatriculationNumber(\App\Domain\User\ValueObjects\MatriculationNumber $matriculationNumber): ?User
+    {
+        return null;
+    }
+
+    public function findByEmail(\App\Domain\Auth\ValueObjects\Email $email): ?User
+    {
+        return null;
+    }
+
+    public function findByRole(\App\Domain\Role\ValueObjects\RoleId $roleId): array
+    {
+        return [];
+    }
+
+    public function findAll(): array
+    {
+        return [];
+    }
+
+    public function save(User $user): User
+    {
+        return $user;
+    }
+
+    public function delete(UserId $userId): bool
+    {
+        return true;
+    }
+
+    public function exists(\App\Domain\Auth\ValueObjects\Email $email): bool
+    {
+        return false;
+    }
+
+    public function matriculationExists(\App\Domain\User\ValueObjects\MatriculationNumber $matriculationNumber): bool
+    {
+        return false;
+    }
+
+    public function getActiveUsers(): array
+    {
+        return [];
+    }
+
+    public function getUsersWithUnverifiedEmail(): array
+    {
+        return [];
+    }
+}
 
 uses(RefreshDatabase::class);
 
 describe('GetUserUseCase', function () {
-
-    beforeEach(function () {
-        $this->userRepository = Mockery::mock(UserRepositoryInterface::class);
-        $this->getUserUseCase = new GetUserUseCase($this->userRepository);
-    });
-
-    afterEach(function () {
-        Mockery::close();
-    });
 
     it('returns user when found', function () {
         // Arrange
@@ -40,13 +91,12 @@ describe('GetUserUseCase', function () {
             createdAt: now()
         );
 
-        $this->userRepository
-            ->shouldReceive('findById')
-            ->with(Mockery::type(UserId::class))
-            ->andReturn($user);
+        $userRepository = new FakeUserRepository_ForGet;
+        $userRepository->found = $user;
+        $getUserUseCase = new GetUserUseCase($userRepository);
 
         // Act
-        $result = $this->getUserUseCase->execute($userId);
+        $result = $getUserUseCase->execute($userId);
 
         // Assert
         expect($result)->toBeInstanceOf(User::class);
@@ -57,14 +107,13 @@ describe('GetUserUseCase', function () {
         // Arrange
         $userId = 999;
 
-        $this->userRepository
-            ->shouldReceive('findById')
-            ->with(Mockery::type(UserId::class))
-            ->andReturn(null);
+        $userRepository = new FakeUserRepository_ForGet;
+        $getUserUseCase = new GetUserUseCase($userRepository);
+        $userRepository->found = null;
 
         // Act & Assert
-        expect(function () use ($userId) {
-            $this->getUserUseCase->execute($userId);
+        expect(function () use ($getUserUseCase, $userId) {
+            $getUserUseCase->execute($userId);
         })->toThrow(Exception::class, 'User not found.');
     });
 

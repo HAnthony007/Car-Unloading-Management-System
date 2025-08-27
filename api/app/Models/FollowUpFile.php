@@ -10,6 +10,8 @@ class FollowUpFile extends Model
 
     public $timestamps = true;
 
+    protected $guarded = ['follow_up_file_id'];
+
     public function vehicle(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Vehicle::class, 'vehicle_id');
