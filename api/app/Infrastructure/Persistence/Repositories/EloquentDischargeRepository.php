@@ -15,16 +15,12 @@ final class EloquentDischargeRepository implements DischargeRepositoryInterface
     public function findById(DischargeId $id): ?DomainDischarge
     {
         $eloquent = EloquentDischarge::find($id->getValue());
-
         return $eloquent ? $this->toDomainEntity($eloquent) : null;
     }
 
     public function findAll(): array
     {
-        return EloquentDischarge::orderByDesc('discharge_date')
-            ->get()
-            ->map(fn ($e) => $this->toDomainEntity($e))
-            ->toArray();
+        return EloquentDischarge::orderByDesc('discharge_date')->get()->map(fn ($e) => $this->toDomainEntity($e))->toArray();
     }
 
     public function findByPortCallId(PortCallId $portCallId): array
@@ -38,11 +34,9 @@ final class EloquentDischargeRepository implements DischargeRepositoryInterface
 
     public function save(DomainDischarge $discharge): DomainDischarge
     {
-        $eloquent = $discharge->getDischargeId()
-            ? EloquentDischarge::find($discharge->getDischargeId()->getValue())
-            : new EloquentDischarge;
-        if (! $eloquent) {
-            $eloquent = new EloquentDischarge;
+        $eloquent = $discharge->getDischargeId() ? EloquentDischarge::find($discharge->getDischargeId()->getValue()) : new EloquentDischarge();
+        if (!$eloquent) {
+            $eloquent = new EloquentDischarge();
         }
 
         $eloquent->discharge_date = $discharge->getDischargeDate()->getValue();
@@ -55,10 +49,9 @@ final class EloquentDischargeRepository implements DischargeRepositoryInterface
     public function delete(DischargeId $id): bool
     {
         $eloquent = EloquentDischarge::find($id->getValue());
-        if (! $eloquent) {
+        if (!$eloquent) {
             return false;
         }
-
         return (bool) $eloquent->delete();
     }
 
