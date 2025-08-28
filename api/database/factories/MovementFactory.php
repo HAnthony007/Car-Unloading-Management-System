@@ -18,6 +18,7 @@ class MovementFactory extends Factory
     {
         $from = fake()->optional()->word();
         $to = fake()->optional()->word();
+
         return [
             'note' => fake()->optional()->sentence(),
             'timestamp' => fake()->dateTimeBetween('-10 days', 'now'),

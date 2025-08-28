@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class FollowUpFile extends Model
 {
     use HasFactory;
+
     protected $primaryKey = 'follow_up_file_id';
 
     public $timestamps = true;

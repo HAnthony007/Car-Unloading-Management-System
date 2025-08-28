@@ -4,8 +4,8 @@ use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\deleteJson;
@@ -134,7 +134,9 @@ it('creates, shows, updates, deletes and lists movements (auth required)', funct
         'user_id' => $user->user_id,
     ];
     $resp = postJson('/api/movements', $payload);
-    if ($resp->status() !== 201) { $resp->dump(); }
+    if ($resp->status() !== 201) {
+        $resp->dump();
+    }
     $resp->assertCreated()->assertJsonStructure(['message', 'data' => ['movement_id', 'timestamp', 'vehicle_id', 'user_id']]);
     $movementId = $resp->json('data.movement_id');
 

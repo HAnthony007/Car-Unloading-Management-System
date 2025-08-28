@@ -16,6 +16,7 @@ class SurveyCheckpointStepFactory extends Factory
     public function definition(): array
     {
         $start = fake()->dateTimeBetween('-2 days', 'now');
+
         return [
             'step_name' => fake()->word(),
             'step_status' => fake()->randomElement(['pending', 'running', 'done', 'failed']),

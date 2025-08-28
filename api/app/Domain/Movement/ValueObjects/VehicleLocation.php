@@ -10,6 +10,7 @@ final class VehicleLocation
     {
         if ($value === null) {
             $this->value = null;
+
             return;
         }
 

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class SurveyCheckpoint extends Model
 {
     use HasFactory;
+
     protected $primaryKey = 'checkpoint_id';
 
     protected $fillable = [

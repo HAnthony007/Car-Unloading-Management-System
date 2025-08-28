@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\Discharge;
 use App\Models\Dock;
 use App\Models\Document;
@@ -16,6 +15,7 @@ use App\Models\SurveyCheckpointStep;
 use App\Models\User;
 use App\Models\Vehicle;
 use App\Models\Vessel;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 

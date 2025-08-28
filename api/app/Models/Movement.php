@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Movement extends Model
 {
     use HasFactory;
+
     protected $primaryKey = 'movement_id';
 
     protected $guarded = ['movement_id'];

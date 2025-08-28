@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Discharge extends Model
 {
     use HasFactory;
+
     protected $primaryKey = 'discharge_id';
 
     protected $guarded = ['discharge_id'];

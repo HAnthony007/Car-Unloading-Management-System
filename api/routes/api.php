@@ -16,13 +16,14 @@ Route::prefix('auth')
         Route::post('/login', [AuthController::class, 'login'])->name('login');
 
         Route::middleware('auth:sanctum')->group(function () {
+            Route::get('/me', [AuthController::class, 'me'])->name('me');
             Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
         });
     });
 
 // User Management Routes
 Route::prefix('users')
-    // ->middleware('auth:sanctum')
+    ->middleware('auth:sanctum')
     ->group(function (): void {
         // Search and list users
         Route::get('/', [UserController::class, 'index'])->name('users.index');
@@ -79,8 +80,8 @@ Route::prefix('vehicles')
         Route::put('/{id}', [\App\Presentation\Http\Controllers\VehicleController::class, 'update'])->name('vehicles.update');
         Route::delete('/{id}', [\App\Presentation\Http\Controllers\VehicleController::class, 'destroy'])->name('vehicles.destroy');
 
-    // Nested: list movements for a specific vehicle
-    Route::get('/{id}/movements', [\App\Presentation\Http\Controllers\MovementController::class, 'byVehicle'])->name('vehicles.movements');
+        // Nested: list movements for a specific vehicle
+        Route::get('/{id}/movements', [\App\Presentation\Http\Controllers\MovementController::class, 'byVehicle'])->name('vehicles.movements');
     });
 
 // Parking Management Routes
