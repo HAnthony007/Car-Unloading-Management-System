@@ -18,6 +18,7 @@ final class ParkingResource extends JsonResource
             'parking_name' => $parking->getParkingName()->getValue(),
             'location' => $parking->getLocation()->getValue(),
             'capacity' => $parking->getCapacity()->getValue(),
+            'parking_number' => $parking->getParkingNumber()?->getValue(),
             'created_at' => $parking->getCreatedAt()?->toISOString(),
             'updated_at' => $parking->getUpdatedAt()?->toISOString(),
         ];

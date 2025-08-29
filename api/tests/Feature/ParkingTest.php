@@ -52,6 +52,7 @@ it('allows an authenticated user to create, show, update and delete a parking', 
                 'parking_name',
                 'location',
                 'capacity',
+                'parking_number',
                 'created_at',
                 'updated_at',
             ],
@@ -88,6 +89,7 @@ it('allows an authenticated user to create, show, update and delete a parking', 
         ->assertJsonFragment([
             'parking_name' => 'Updated Parking',
             'capacity' => 75,
+            'parking_number' => 'P001',
         ]);
 
     // Test deleting the parking

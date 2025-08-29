@@ -37,7 +37,8 @@ final class UpdateParkingRequest extends FormRequest
                 'string',
                 'max:50',
                 function ($attribute, $value, $fail) {
-                    $parkingId = $this->route('parking');
+                    // Route param is defined as /parkings/{id}
+                    $parkingId = $this->route('id');
                     $parkingName = $this->input('parking_name');
 
                     // If updating Mahasarika parking (ID 1) and clearing parking number
