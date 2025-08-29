@@ -18,7 +18,7 @@ class FollowUpFileFactory extends Factory
     {
         return [
             'bill_of_lading' => 'BOL'.fake()->bothify('########??'),
-            'status' => fake()->randomElement(['initiated', 'in_progress', 'completed', 'on_hold']),
+            'status' => fake()->randomElement(['OPEN', 'IN_PROGRESS', 'CLOSED']),
             'vehicle_id' => Vehicle::factory(),
             'port_call_id' => PortCall::factory(),
         ];

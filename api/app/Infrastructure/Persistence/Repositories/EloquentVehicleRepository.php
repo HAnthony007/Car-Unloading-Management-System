@@ -40,6 +40,8 @@ final class EloquentVehicleRepository implements VehicleRepositoryInterface
         $e->vin = $vehicle->getVin()->getValue();
         $e->make = $vehicle->getMake();
         $e->model = $vehicle->getModel();
+        $e->year = $vehicle->getYear();
+        $e->owner_name = $vehicle->getOwnerName();
         $e->color = $vehicle->getColor();
         $e->type = $vehicle->getType();
         $e->weight = $vehicle->getWeight();
@@ -48,7 +50,7 @@ final class EloquentVehicleRepository implements VehicleRepositoryInterface
         $e->origin_country = $vehicle->getOriginCountry();
         $e->ship_location = $vehicle->getShipLocation();
         $e->is_primed = $vehicle->isPrimed();
-        $e->discharge_id = $vehicle->getDischargeId()->getValue();
+        $e->discharge_id = $vehicle->getDischargeId()?->getValue();
         $e->save();
 
         return $this->toDomainEntity($e);
@@ -71,6 +73,8 @@ final class EloquentVehicleRepository implements VehicleRepositoryInterface
             vin: new Vin($e->vin),
             make: $e->make,
             model: $e->model,
+            year: $e->year,
+            ownerName: $e->owner_name,
             color: $e->color,
             type: $e->type,
             weight: $e->weight,
@@ -79,7 +83,7 @@ final class EloquentVehicleRepository implements VehicleRepositoryInterface
             originCountry: $e->origin_country,
             shipLocation: $e->ship_location,
             isPrimed: (bool) $e->is_primed,
-            dischargeId: new DischargeId($e->discharge_id),
+            dischargeId: $e->discharge_id !== null ? new DischargeId($e->discharge_id) : null,
             createdAt: $e->created_at,
             updatedAt: $e->updated_at,
         );

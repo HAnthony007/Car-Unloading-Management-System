@@ -14,6 +14,8 @@ final class Vehicle
         private readonly Vin $vin,
         private readonly string $make,
         private readonly string $model,
+        private readonly ?int $year,
+        private readonly ?string $ownerName,
         private readonly ?string $color,
         private readonly string $type,
         private readonly string $weight,
@@ -22,7 +24,7 @@ final class Vehicle
         private readonly string $originCountry,
         private readonly ?string $shipLocation,
         private readonly bool $isPrimed,
-        private readonly DischargeId $dischargeId,
+        private readonly ?DischargeId $dischargeId,
         private readonly ?Carbon $createdAt = null,
         private readonly ?Carbon $updatedAt = null,
     ) {}
@@ -45,6 +47,16 @@ final class Vehicle
     public function getModel(): string
     {
         return $this->model;
+    }
+
+    public function getYear(): ?int
+    {
+        return $this->year;
+    }
+
+    public function getOwnerName(): ?string
+    {
+        return $this->ownerName;
     }
 
     public function getColor(): ?string
@@ -87,7 +99,7 @@ final class Vehicle
         return $this->isPrimed;
     }
 
-    public function getDischargeId(): DischargeId
+    public function getDischargeId(): ?DischargeId
     {
         return $this->dischargeId;
     }
@@ -109,6 +121,8 @@ final class Vehicle
             'vin' => $this->vin->getValue(),
             'make' => $this->make,
             'model' => $this->model,
+            'year' => $this->year,
+            'owner_name' => $this->ownerName,
             'color' => $this->color,
             'type' => $this->type,
             'weight' => $this->weight,
@@ -117,7 +131,7 @@ final class Vehicle
             'origin_country' => $this->originCountry,
             'ship_location' => $this->shipLocation,
             'is_primed' => $this->isPrimed,
-            'discharge_id' => $this->dischargeId->getValue(),
+            'discharge_id' => $this->dischargeId?->getValue(),
             'created_at' => $this->createdAt?->toISOString(),
             'updated_at' => $this->updatedAt?->toISOString(),
         ];

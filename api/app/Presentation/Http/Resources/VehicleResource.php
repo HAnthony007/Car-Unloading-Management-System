@@ -16,6 +16,8 @@ final class VehicleResource extends JsonResource
             'vin' => $v->getVin()->getValue(),
             'make' => $v->getMake(),
             'model' => $v->getModel(),
+            'year' => $v->getYear(),
+            'owner_name' => $v->getOwnerName(),
             'color' => $v->getColor(),
             'type' => $v->getType(),
             'weight' => $v->getWeight(),
@@ -24,7 +26,7 @@ final class VehicleResource extends JsonResource
             'origin_country' => $v->getOriginCountry(),
             'ship_location' => $v->getShipLocation(),
             'is_primed' => $v->isPrimed(),
-            'discharge_id' => $v->getDischargeId()->getValue(),
+            'discharge_id' => $v->getDischargeId()?->getValue(),
             'created_at' => $v->getCreatedAt()?->toISOString(),
             'updated_at' => $v->getUpdatedAt()?->toISOString(),
         ];

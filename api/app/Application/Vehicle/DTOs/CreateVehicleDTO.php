@@ -10,6 +10,8 @@ final class CreateVehicleDTO
         public readonly string $vin,
         public readonly string $make,
         public readonly string $model,
+        public readonly ?int $year,
+        public readonly ?string $ownerName,
         public readonly ?string $color,
         public readonly string $type,
         public readonly string $weight,
@@ -18,7 +20,7 @@ final class CreateVehicleDTO
         public readonly string $originCountry,
         public readonly ?string $shipLocation,
         public readonly bool $isPrimed,
-        public readonly int $dischargeId,
+        public readonly ?int $dischargeId,
     ) {}
 
     public static function fromArray(array $data): self
@@ -27,6 +29,8 @@ final class CreateVehicleDTO
             vin: $data['vin'] ?? '',
             make: $data['make'] ?? '',
             model: $data['model'] ?? '',
+            year: isset($data['year']) ? (int) $data['year'] : null,
+            ownerName: $data['owner_name'] ?? null,
             color: $data['color'] ?? null,
             type: $data['type'] ?? '',
             weight: $data['weight'] ?? '',
@@ -35,7 +39,7 @@ final class CreateVehicleDTO
             originCountry: $data['origin_country'] ?? '',
             shipLocation: $data['ship_location'] ?? null,
             isPrimed: (bool) ($data['is_primed'] ?? false),
-            dischargeId: (int) ($data['discharge_id'] ?? 0),
+            dischargeId: isset($data['discharge_id']) ? (int) $data['discharge_id'] : null,
         );
     }
 

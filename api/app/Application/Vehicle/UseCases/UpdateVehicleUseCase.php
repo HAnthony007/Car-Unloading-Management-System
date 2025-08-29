@@ -25,6 +25,8 @@ final class UpdateVehicleUseCase
             vin: $existing->getVin(),
             make: $dto->make ?? $existing->getMake(),
             model: $dto->model ?? $existing->getModel(),
+            year: $dto->year ?? $existing->getYear(),
+            ownerName: $dto->ownerName ?? $existing->getOwnerName(),
             color: $dto->color ?? $existing->getColor(),
             type: $dto->type ?? $existing->getType(),
             weight: $dto->weight ?? $existing->getWeight(),

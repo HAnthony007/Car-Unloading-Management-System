@@ -31,6 +31,8 @@ function ensure_vehicle_schema(): void
             $table->string('vin')->unique();
             $table->string('make');
             $table->string('model');
+            $table->unsignedSmallInteger('year')->nullable();
+            $table->string('owner_name')->nullable();
             $table->string('color')->nullable();
             $table->string('type');
             $table->string('weight');
@@ -39,7 +41,7 @@ function ensure_vehicle_schema(): void
             $table->string('origin_country');
             $table->string('ship_location')->nullable();
             $table->boolean('is_primed')->default(false);
-            $table->unsignedBigInteger('discharge_id');
+            $table->unsignedBigInteger('discharge_id')->nullable();
             $table->timestamps();
         });
     }
@@ -112,7 +114,7 @@ it('creates, shows, updates, deletes and searches vehicles (auth required)', fun
     $resp->assertCreated()->assertJsonStructure([
         'message',
         'data' => [
-            'vehicle_id', 'vin', 'make', 'model', 'color', 'type', 'weight',
+            'vehicle_id', 'vin', 'make', 'model', 'year', 'owner_name', 'color', 'type', 'weight',
             'vehicle_condition', 'vehicle_observation', 'origin_country', 'ship_location',
             'is_primed', 'discharge_id', 'created_at', 'updated_at',
         ],

@@ -17,7 +17,6 @@ return new class extends Migration
             $table->dateTime('taken_at');
             $table->text('photo_description')->nullable();
             $table->foreignId('follow_up_file_id')->nullable()->constrained('follow_up_files', 'follow_up_file_id');
-            $table->foreignId('vehicle_id')->nullable()->constrained('vehicles', 'vehicle_id');
             $table->foreignId('checkpoint_id')
                 ->nullable()
                 ->constrained('survey_checkpoints', 'checkpoint_id')

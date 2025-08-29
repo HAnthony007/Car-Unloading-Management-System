@@ -16,6 +16,8 @@ return new class extends Migration
             $table->string('vin')->unique();
             $table->string('make');
             $table->string('model');
+            $table->unsignedSmallInteger('year')->nullable();
+            $table->string('owner_name')->nullable();
             $table->string('color')->nullable();
             $table->string('type');
             $table->string('weight');
@@ -24,7 +26,7 @@ return new class extends Migration
             $table->string('origin_country');
             $table->string('ship_location')->nullable();
             $table->boolean('is_primed')->default(false);
-            $table->foreignId('discharge_id')->constrained('discharges', 'discharge_id');
+            $table->foreignId('discharge_id')->nullable()->constrained('discharges', 'discharge_id');
             $table->timestamps();
         });
     }

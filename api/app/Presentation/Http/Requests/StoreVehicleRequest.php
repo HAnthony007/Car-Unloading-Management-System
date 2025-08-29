@@ -19,6 +19,8 @@ final class StoreVehicleRequest extends FormRequest
             'vin' => ['required', 'string', 'max:255', 'unique:vehicles,vin'],
             'make' => ['required', 'string', 'max:255'],
             'model' => ['required', 'string', 'max:255'],
+            'year' => ['nullable', 'integer', 'digits:4', 'min:1900', 'max:'.((int) date('Y') + 1)],
+            'owner_name' => ['nullable', 'string', 'max:255'],
             'color' => ['nullable', 'string', 'max:255'],
             'type' => ['required', 'string', 'max:255'],
             'weight' => ['required', 'string', 'max:255'],
@@ -27,7 +29,7 @@ final class StoreVehicleRequest extends FormRequest
             'origin_country' => ['required', 'string', 'max:255'],
             'ship_location' => ['nullable', 'string', 'max:255'],
             'is_primed' => ['boolean'],
-            'discharge_id' => ['required', 'integer'],
+            'discharge_id' => ['nullable', 'integer'],
         ];
     }
 

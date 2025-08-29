@@ -19,6 +19,8 @@ class VehicleFactory extends Factory
             'vin' => strtoupper(fake()->bothify('??##############')),
             'make' => fake()->company(),
             'model' => fake()->bothify('Model-##'),
+            'year' => fake()->optional()->numberBetween(1980, (int) date('Y') + 1),
+            'owner_name' => fake()->optional()->name(),
             'color' => fake()->optional()->safeColorName(),
             'type' => fake()->randomElement(['SUV', 'Sedan', 'Truck', 'Van', 'Coupe']),
             'weight' => (string) fake()->numberBetween(900, 3500).'kg',

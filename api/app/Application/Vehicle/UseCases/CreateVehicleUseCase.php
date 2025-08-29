@@ -22,10 +22,14 @@ final class CreateVehicleUseCase
             throw new \RuntimeException('Vehicle with this VIN already exists');
         }
 
-        // Ensure discharge exists
-        $discharge = $this->dischargeRepository->findById(new DischargeId($dto->dischargeId));
-        if (! $discharge) {
-            throw new \RuntimeException('Invalid discharge');
+        // Ensure discharge exists when provided
+        $dischargeIdVo = null;
+        if ($dto->dischargeId !== null) {
+            $discharge = $this->dischargeRepository->findById(new DischargeId($dto->dischargeId));
+            if (! $discharge) {
+                throw new \RuntimeException('Invalid discharge');
+            }
+            $dischargeIdVo = new DischargeId($dto->dischargeId);
         }
 
         $vehicle = new Vehicle(
@@ -33,6 +37,8 @@ final class CreateVehicleUseCase
             vin: $dto->getVinVO(),
             make: $dto->make,
             model: $dto->model,
+            year: $dto->year,
+            ownerName: $dto->ownerName,
             color: $dto->color,
             type: $dto->type,
             weight: $dto->weight,
@@ -41,7 +47,7 @@ final class CreateVehicleUseCase
             originCountry: $dto->originCountry,
             shipLocation: $dto->shipLocation,
             isPrimed: $dto->isPrimed,
-            dischargeId: new DischargeId($dto->dischargeId),
+            dischargeId: $dischargeIdVo,
         );
 
         return $this->repository->save($vehicle);
