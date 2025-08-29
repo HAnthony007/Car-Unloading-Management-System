@@ -7,7 +7,6 @@ use App\Domain\Photo\Entities\Photo as DomainPhoto;
 use App\Domain\Photo\Repositories\PhotoRepositoryInterface;
 use App\Domain\Photo\ValueObjects\PhotoId;
 use App\Domain\SurveyCheckpoint\ValueObjects\SurveyCheckpointId;
-use App\Domain\Vehicle\ValueObjects\VehicleId;
 use App\Models\Photo as EloquentPhoto;
 use Carbon\Carbon;
 
@@ -38,9 +37,8 @@ final class EloquentPhotoRepository implements PhotoRepositoryInterface
         $e->photo_path = $p->getPhotoPath();
         $e->taken_at = $p->getTakenAt();
         $e->photo_description = $p->getPhotoDescription();
-        $e->follow_up_file_id = $p->getFollowUpFileId()->getValue();
-        $e->vehicle_id = $p->getVehicleId()->getValue();
-        $e->checkpoint_id = $p->getCheckpointId()->getValue();
+        $e->follow_up_file_id = $p->getFollowUpFileId()?->getValue();
+        $e->checkpoint_id = $p->getCheckpointId()?->getValue();
         $e->save();
 
         return $this->toDomain($e);
@@ -56,15 +54,12 @@ final class EloquentPhotoRepository implements PhotoRepositoryInterface
         return (bool) $e->delete();
     }
 
-    public function search(?int $followUpFileId, ?int $vehicleId, ?int $checkpointId, ?string $fromDate, ?string $toDate, int $page, int $perPage): array
+    public function search(?int $followUpFileId, ?int $checkpointId, ?string $fromDate, ?string $toDate, int $page, int $perPage): array
     {
         $query = EloquentPhoto::query();
 
         if ($followUpFileId) {
             $query->where('follow_up_file_id', $followUpFileId);
-        }
-        if ($vehicleId) {
-            $query->where('vehicle_id', $vehicleId);
         }
         if ($checkpointId) {
             $query->where('checkpoint_id', $checkpointId);
@@ -97,9 +92,8 @@ final class EloquentPhotoRepository implements PhotoRepositoryInterface
             photoPath: $e->photo_path,
             takenAt: new Carbon($e->taken_at),
             photoDescription: $e->photo_description,
-            followUpFileId: new FollowUpFileId($e->follow_up_file_id),
-            vehicleId: new VehicleId($e->vehicle_id),
-            checkpointId: new SurveyCheckpointId($e->checkpoint_id),
+            followUpFileId: $e->follow_up_file_id ? new FollowUpFileId($e->follow_up_file_id) : null,
+            checkpointId: $e->checkpoint_id ? new SurveyCheckpointId($e->checkpoint_id) : null,
             createdAt: $e->created_at,
             updatedAt: $e->updated_at,
         );

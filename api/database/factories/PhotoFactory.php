@@ -5,7 +5,6 @@ namespace Database\Factories;
 use App\Models\FollowUpFile;
 use App\Models\Photo;
 use App\Models\SurveyCheckpoint;
-use App\Models\Vehicle;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -22,7 +21,6 @@ class PhotoFactory extends Factory
             'taken_at' => fake()->dateTimeBetween('-10 days', 'now'),
             'photo_description' => fake()->optional()->sentence(),
             'follow_up_file_id' => FollowUpFile::factory(),
-            'vehicle_id' => Vehicle::factory(),
             'checkpoint_id' => SurveyCheckpoint::factory(),
         ];
     }

@@ -10,11 +10,14 @@ use App\Application\Photo\UseCases\DeletePhotoUseCase;
 use App\Application\Photo\UseCases\GetPhotoUseCase;
 use App\Application\Photo\UseCases\SearchPhotosUseCase;
 use App\Application\Photo\UseCases\UpdatePhotoUseCase;
+use App\Models\Photo as EloquentPhoto;
 use App\Presentation\Http\Requests\SearchPhotosRequest;
 use App\Presentation\Http\Requests\StorePhotoRequest;
 use App\Presentation\Http\Requests\UpdatePhotoRequest;
+use App\Presentation\Http\Requests\UploadPhotoRequest;
 use App\Presentation\Http\Resources\DomainPhotoResource;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 final class PhotoController extends Controller
 {
@@ -98,5 +101,55 @@ final class PhotoController extends Controller
         } catch (\Throwable $e) {
             return response()->json(['error' => $e->getMessage()], 404);
         }
+    }
+
+    /**
+     * Upload/replace the underlying photo file to Cloudflare R2 and update photo_path.
+     */
+    public function upload(UploadPhotoRequest $request, int $id): JsonResponse
+    {
+        $photo = EloquentPhoto::find($id);
+        if (! $photo) {
+            return response()->json(['error' => 'Photo not found.'], 404);
+        }
+
+        $file = $request->file('file');
+        $directory = $request->string('directory')->toString() ?: null;
+        $visibility = $request->string('visibility')->toString() ?: 'public';
+
+        // If an old file exists, best-effort delete handled by model event on delete; here we overwrite by uploading new
+        $photo->storeUploadedPhoto($file, $directory, $visibility);
+        $photo->save();
+
+        return response()->json([
+            'message' => 'Photo uploaded successfully.',
+            'data' => [
+                'photo_path' => $photo->photo_path,
+                'url' => $photo->photoUrl(),
+            ],
+        ], 201);
+    }
+
+    /**
+     * Get a (temporary) URL to access the photo file (use temporary=1 for signed).
+     */
+    public function getUrl(Request $request, int $id): JsonResponse
+    {
+        $photo = EloquentPhoto::find($id);
+        if (! $photo) {
+            return response()->json(['error' => 'Photo not found.'], 404);
+        }
+
+        $temporary = (bool) $request->boolean('temporary', false);
+        $expires = (int) $request->integer('expires', 3600);
+
+        $url = $temporary ? $photo->temporaryPhotoUrl($expires) : $photo->photoUrl();
+
+        return response()->json([
+            'data' => [
+                'url' => $url,
+                'expires_in' => $temporary ? $expires : null,
+            ],
+        ]);
     }
 }

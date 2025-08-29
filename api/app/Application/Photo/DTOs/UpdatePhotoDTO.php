@@ -10,7 +10,6 @@ final class UpdatePhotoDTO
         public readonly ?string $takenAt,
         public readonly ?string $photoDescription,
         public readonly ?int $followUpFileId,
-        public readonly ?int $vehicleId,
         public readonly ?int $checkpointId,
     ) {}
 
@@ -22,7 +21,6 @@ final class UpdatePhotoDTO
             takenAt: $data['taken_at'] ?? null,
             photoDescription: $data['photo_description'] ?? null,
             followUpFileId: isset($data['follow_up_file_id']) ? (int) $data['follow_up_file_id'] : null,
-            vehicleId: isset($data['vehicle_id']) ? (int) $data['vehicle_id'] : null,
             checkpointId: isset($data['checkpoint_id']) ? (int) $data['checkpoint_id'] : null,
         );
     }

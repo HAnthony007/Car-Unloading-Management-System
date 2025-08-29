@@ -13,7 +13,6 @@ final class SearchPhotosUseCase
     {
         return $this->repo->search(
             followUpFileId: $criteria->followUpFileId,
-            vehicleId: $criteria->vehicleId,
             checkpointId: $criteria->checkpointId,
             fromDate: $criteria->fromDate,
             toDate: $criteria->toDate,

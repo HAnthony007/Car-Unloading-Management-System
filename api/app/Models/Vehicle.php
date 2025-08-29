@@ -27,8 +27,5 @@ class Vehicle extends Model
         return $this->hasMany(Movement::class, 'vehicle_id');
     }
 
-    public function photos(): \Illuminate\Database\Eloquent\Relations\HasMany
-    {
-        return $this->hasMany(Photo::class, 'vehicle_id');
-    }
+    // photos() relation removed (Photo no longer references vehicle_id)
 }

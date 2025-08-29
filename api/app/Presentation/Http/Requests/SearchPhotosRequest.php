@@ -15,7 +15,6 @@ class SearchPhotosRequest extends FormRequest
     {
         return [
             'follow_up_file_id' => ['nullable', 'integer'],
-            'vehicle_id' => ['nullable', 'integer'],
             'checkpoint_id' => ['nullable', 'integer'],
             'from_date' => ['nullable', 'date'],
             'to_date' => ['nullable', 'date'],

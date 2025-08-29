@@ -11,8 +11,6 @@ use App\Domain\FollowUpFile\ValueObjects\FollowUpFileId;
 use App\Domain\Photo\Entities\Photo;
 use App\Domain\Photo\Repositories\PhotoRepositoryInterface;
 use App\Domain\Photo\ValueObjects\PhotoId;
-use App\Domain\SurveyCheckpoint\ValueObjects\SurveyCheckpointId;
-use App\Domain\Vehicle\ValueObjects\VehicleId;
 use Carbon\Carbon;
 
 // No mocking framework required; we'll use a simple in-file fake repository.
@@ -24,7 +22,6 @@ describe('Photo DTOs', function () {
             'taken_at' => '2025-08-01 10:00:00',
             'photo_description' => 'desc',
             'follow_up_file_id' => 1,
-            'vehicle_id' => 2,
             'checkpoint_id' => 3,
         ];
         $dto = CreatePhotoDTO::fromArray($data);
@@ -32,18 +29,15 @@ describe('Photo DTOs', function () {
             ->and($dto->takenAt)->toBe('2025-08-01 10:00:00')
             ->and($dto->photoDescription)->toBe('desc')
             ->and($dto->followUpFileId)->toBe(1)
-            ->and($dto->vehicleId)->toBe(2)
             ->and($dto->checkpointId)->toBe(3);
     });
 
     it('PhotoSearchCriteriaDTO from array', function () {
         $dto = PhotoSearchCriteriaDTO::fromArray([
-            'vehicle_id' => 4,
             'page' => 2,
             'per_page' => 5,
         ]);
-        expect($dto->vehicleId)->toBe(4)
-            ->and($dto->page)->toBe(2)
+        expect($dto->page)->toBe(2)
             ->and($dto->perPage)->toBe(5);
     });
 });
@@ -79,7 +73,7 @@ class FakePhotoRepository implements PhotoRepositoryInterface
         return $this->deleted;
     }
 
-    public function search(?int $followUpFileId, ?int $vehicleId, ?int $checkpointId, ?string $fromDate, ?string $toDate, int $page, int $perPage): array
+    public function search(?int $followUpFileId, ?int $checkpointId, ?string $fromDate, ?string $toDate, int $page, int $perPage): array
     {
         return ['data' => [], 'current_page' => 1, 'from' => 0, 'last_page' => 1, 'path' => '/', 'per_page' => $perPage, 'to' => 0, 'total' => 0];
     }
@@ -89,7 +83,8 @@ describe('Photo UseCases', function () {
     it('CreatePhotoUseCase saves photo', function () {
         $repo = new FakePhotoRepository;
         $useCase = new CreatePhotoUseCase($repo);
-        $dto = new CreatePhotoDTO('img/p.jpg', '2025-08-01 10:00:00', 'desc', 1, 2, 3);
+        // Provide only one of follow_up_file_id or checkpoint_id (XOR)
+        $dto = new CreatePhotoDTO('img/p.jpg', '2025-08-01 10:00:00', 'desc', 1, null);
 
         $result = $useCase->execute($dto);
         expect($result)->toBeInstanceOf(Photo::class)
@@ -105,8 +100,7 @@ describe('Photo UseCases', function () {
             takenAt: Carbon::parse('2025-08-01 10:00:00'),
             photoDescription: 'desc',
             followUpFileId: new FollowUpFileId(1),
-            vehicleId: new VehicleId(2),
-            checkpointId: new SurveyCheckpointId(3),
+            checkpointId: null,
         );
         $repo->found = $entity;
         $result = $useCase->execute(10);
@@ -129,14 +123,13 @@ describe('Photo UseCases', function () {
             takenAt: Carbon::parse('2025-08-01 10:00:00'),
             photoDescription: null,
             followUpFileId: new FollowUpFileId(1),
-            vehicleId: new VehicleId(2),
-            checkpointId: new SurveyCheckpointId(3),
+            checkpointId: null,
             createdAt: now(),
             updatedAt: now(),
         );
         $repo->found = $existing;
 
-        $dto = new UpdatePhotoDTO(10, 'new.jpg', null, 'desc', null, null, null);
+        $dto = new UpdatePhotoDTO(10, 'new.jpg', null, 'desc', null, null);
         $updated = $useCase->execute($dto);
         expect($updated->getPhotoPath())->toBe('new.jpg')
             ->and($updated->getPhotoDescription())->toBe('desc');

@@ -288,7 +288,6 @@ Réponse (201):
 {
     "message": "Vehicle created successfully.",
     "data": {
-        "vehicle_id": 100,
         "vin": "WVWZZZ1JZXW000001",
         "make": "Toyota",
         "model": "Corolla",
@@ -491,7 +490,6 @@ Création:
 {
     "bill_of_lading": "BL-2025-0001",
     "status": "OPEN", // OPEN | IN_PROGRESS | CLOSED
-    "vehicle_id": 100,
     "port_call_id": 30
 }
 ```
@@ -505,7 +503,6 @@ Réponse (201):
         "follow_up_file_id": 10,
         "bill_of_lading": "BL-2025-0001",
         "status": "OPEN",
-        "vehicle_id": 100,
         "port_call_id": 30
     }
 }
@@ -559,7 +556,6 @@ Création:
     "taken_at": "2025-08-28T09:30:00Z",
     "photo_description": "Vue avant",
     "follow_up_file_id": 10,
-    "vehicle_id": 100,
     "checkpoint_id": 77
 }
 ```
@@ -573,7 +569,6 @@ Réponse (201):
         "photo_id": 501,
         "photo_path": "/uploads/vehicules/100/front.jpg",
         "photo_description": "Vue avant",
-        "vehicle_id": 100,
         "checkpoint_id": 77,
         "taken_at": "2025-08-28T09:30:00Z"
     }
@@ -645,7 +640,6 @@ Création:
     "timestamp": "2025-08-28T11:00:00Z",
     "from": "Dock-5",
     "to": "Parking-B",
-    "vehicle_id": 100,
     "user_id": 1
 }
 ```
@@ -661,7 +655,6 @@ Réponse (201):
         "timestamp": "2025-08-28T11:00:00Z",
         "from": "Dock-5",
         "to": "Parking-B",
-        "vehicle_id": 100,
         "user_id": 1
     }
 }

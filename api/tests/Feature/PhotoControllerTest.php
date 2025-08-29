@@ -13,7 +13,9 @@ use App\Models\SurveyCheckpoint;
 use App\Models\User as EloquentUser;
 use App\Models\Vessel;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
@@ -109,15 +111,14 @@ class PhotoControllerTest extends TestCase
             'taken_at' => now()->subDay(),
             'photo_description' => 'Front',
             'follow_up_file_id' => $fufId,
-            'vehicle_id' => $vehicleId,
-            'checkpoint_id' => $checkpointId,
+            'checkpoint_id' => null,
         ]);
-
-        $response = $this->getJson('/api/photos?vehicle_id='.$vehicleId.'&per_page=1&page=1');
+        // Vehicle filter removed; filter by follow_up_file_id instead
+        $response = $this->getJson('/api/photos?follow_up_file_id='.$fufId.'&per_page=1&page=1');
         $response->assertOk()
             ->assertJsonStructure([
                 'data' => [[
-                    'photo_id', 'photo_path', 'taken_at', 'photo_description', 'follow_up_file_id', 'vehicle_id', 'checkpoint_id',
+                    'photo_id', 'photo_path', 'taken_at', 'photo_description', 'follow_up_file_id', 'checkpoint_id',
                 ]],
                 'meta' => ['current_page', 'from', 'last_page', 'path', 'per_page', 'to', 'total'],
             ]);
@@ -131,8 +132,7 @@ class PhotoControllerTest extends TestCase
             'taken_at' => now()->toDateTimeString(),
             'photo_description' => 'Back',
             'follow_up_file_id' => $fufId,
-            'vehicle_id' => $vehicleId,
-            'checkpoint_id' => $checkpointId,
+            // Only one of follow_up_file_id or checkpoint_id
         ];
 
         $res = $this->postJson('/api/photos', $payload);
@@ -141,8 +141,7 @@ class PhotoControllerTest extends TestCase
         $this->assertDatabaseHas('photos', [
             'photo_path' => 'path/b.jpg',
             'follow_up_file_id' => $fufId,
-            'vehicle_id' => $vehicleId,
-            'checkpoint_id' => $checkpointId,
+            'checkpoint_id' => null,
         ]);
     }
 
@@ -150,7 +149,39 @@ class PhotoControllerTest extends TestCase
     {
         $res = $this->postJson('/api/photos', []);
         $res->assertStatus(422)
-            ->assertJsonValidationErrors(['photo_path', 'taken_at', 'follow_up_file_id', 'vehicle_id', 'checkpoint_id']);
+            ->assertJsonValidationErrors(['taken_at', 'follow_up_file_id', 'checkpoint_id']);
+    }
+
+    public function test_creates_photo_without_photo_path_then_uploads(): void
+    {
+        [$fufId, $vehicleId, $checkpointId] = $this->seedGraphForPhoto();
+        $payload = [
+            // 'photo_path' omitted on purpose
+            'taken_at' => now()->toDateTimeString(),
+            'photo_description' => 'Front no path yet',
+            'follow_up_file_id' => $fufId,
+            // Only one of follow_up_file_id or checkpoint_id
+        ];
+
+        $res = $this->postJson('/api/photos', $payload);
+        $res->assertCreated();
+
+        $photoId = $res->json('data.photo_id');
+        $this->assertDatabaseHas('photos', [
+            'photo_id' => $photoId,
+            'photo_path' => '',
+        ]);
+
+        Storage::fake('r2');
+        $file = UploadedFile::fake()->image('later.jpg', 120, 120);
+        $upload = $this->postJson("/api/photos/{$photoId}/upload", [
+            'file' => $file,
+            'directory' => 'photos/follow-up/'.$fufId,
+        ]);
+        $upload->assertCreated();
+
+        $path = $upload->json('data.photo_path');
+        $this->assertTrue(Storage::disk('r2')->exists($path));
     }
 
     public function test_shows_a_photo(): void
@@ -161,7 +192,6 @@ class PhotoControllerTest extends TestCase
             'taken_at' => now(),
             'photo_description' => 'Side',
             'follow_up_file_id' => $fufId,
-            'vehicle_id' => $vehicleId,
             'checkpoint_id' => $checkpointId,
             'created_at' => now(),
             'updated_at' => now(),
@@ -179,8 +209,7 @@ class PhotoControllerTest extends TestCase
             'taken_at' => now(),
             'photo_description' => 'Old',
             'follow_up_file_id' => $fufId,
-            'vehicle_id' => $vehicleId,
-            'checkpoint_id' => $checkpointId,
+            'checkpoint_id' => null,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -202,7 +231,6 @@ class PhotoControllerTest extends TestCase
             'taken_at' => now(),
             'photo_description' => 'Tmp',
             'follow_up_file_id' => $fufId,
-            'vehicle_id' => $vehicleId,
             'checkpoint_id' => $checkpointId,
             'created_at' => now(),
             'updated_at' => now(),
@@ -222,5 +250,80 @@ class PhotoControllerTest extends TestCase
         $this->getJson('/api/photos/1')->assertStatus(401);
         $this->putJson('/api/photos/1', [])->assertStatus(401);
         $this->deleteJson('/api/photos/1')->assertStatus(401);
+    }
+
+    public function test_uploads_photo_file_to_r2_and_returns_url(): void
+    {
+        [$fufId, $vehicleId, $checkpointId] = $this->seedGraphForPhoto();
+        $photo = EloquentPhoto::query()->create([
+            'photo_path' => 'photos/misc/placeholder.jpg',
+            'taken_at' => now(),
+            'photo_description' => 'Tmp',
+            'follow_up_file_id' => $fufId,
+            'checkpoint_id' => $checkpointId,
+        ]);
+
+        Storage::fake('r2');
+
+        $file = UploadedFile::fake()->image('x.jpg', 100, 100);
+        $res = $this->postJson('/api/photos/'.$photo->photo_id.'/upload', [
+            'file' => $file,
+            'directory' => 'photos/follow-up/'.$fufId,
+            'visibility' => 'public',
+        ]);
+
+        $res->assertCreated()
+            ->assertJsonStructure(['data' => ['photo_path', 'url']]);
+
+        $path = $res->json('data.photo_path');
+        $this->assertTrue(Storage::disk('r2')->exists($path));
+    }
+
+    public function test_gets_temporary_url_for_photo(): void
+    {
+        [$fufId, $vehicleId, $checkpointId] = $this->seedGraphForPhoto();
+        $photo = EloquentPhoto::query()->create([
+            'photo_path' => 'photos/follow-up/'.$fufId.'/a.jpg',
+            'taken_at' => now(),
+            'photo_description' => 'Tmp',
+            'follow_up_file_id' => $fufId,
+            'checkpoint_id' => $checkpointId,
+        ]);
+
+        Storage::fake('r2');
+        Storage::disk('r2')->put($photo->photo_path, 'content');
+
+        $res = $this->getJson('/api/photos/'.$photo->photo_id.'/url?temporary=1&expires=600');
+        $res->assertOk()->assertJsonStructure(['data' => ['url', 'expires_in']]);
+        $this->assertSame(600, $res->json('data.expires_in'));
+    }
+
+    public function test_upload_photo_nested_under_follow_up_file(): void
+    {
+        [$fufId, $vehicleId, $checkpointId] = $this->seedGraphForPhoto();
+
+        Storage::fake('r2');
+        $file = UploadedFile::fake()->image('nested.jpg', 128, 128);
+
+        $res = $this->postJson("/api/follow-up-files/{$fufId}/photos", [
+            'file' => $file,
+            'taken_at' => now()->toDateTimeString(),
+            'photo_description' => 'Nested upload',
+            'checkpoint_id' => $checkpointId,
+            'visibility' => 'public',
+        ]);
+
+        $res->assertCreated()->assertJsonStructure(['data' => ['photo_id', 'photo_path', 'url', 'follow_up_file_id', 'checkpoint_id']]);
+
+        $photoId = $res->json('data.photo_id');
+        $path = $res->json('data.photo_path');
+        $this->assertNotEmpty($photoId);
+        $this->assertTrue(Storage::disk('r2')->exists($path));
+
+        $this->assertDatabaseHas('photos', [
+            'photo_id' => $photoId,
+            'follow_up_file_id' => $fufId,
+            'checkpoint_id' => $checkpointId,
+        ]);
     }
 }

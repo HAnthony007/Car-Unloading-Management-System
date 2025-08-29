@@ -157,6 +157,9 @@ Route::prefix('follow-up-files')
         Route::get('/{id}', [\App\Presentation\Http\Controllers\FollowUpFileController::class, 'show'])->name('followupfiles.show');
         Route::put('/{id}', [\App\Presentation\Http\Controllers\FollowUpFileController::class, 'update'])->name('followupfiles.update');
         Route::delete('/{id}', [\App\Presentation\Http\Controllers\FollowUpFileController::class, 'destroy'])->name('followupfiles.destroy');
+
+        // Nested: upload a photo for a specific follow-up file
+        Route::post('/{id}/photos', [\App\Presentation\Http\Controllers\FollowUpFilePhotoController::class, 'store'])->name('followupfiles.photos.store');
     });
 
 // Survey Checkpoints Management Routes
@@ -179,6 +182,9 @@ Route::prefix('photos')
         Route::get('/{id}', [\App\Presentation\Http\Controllers\PhotoController::class, 'show'])->name('photos.show');
         Route::put('/{id}', [\App\Presentation\Http\Controllers\PhotoController::class, 'update'])->name('photos.update');
         Route::delete('/{id}', [\App\Presentation\Http\Controllers\PhotoController::class, 'destroy'])->name('photos.destroy');
+        // File operations (Cloudflare R2)
+        Route::post('/{id}/upload', [\App\Presentation\Http\Controllers\PhotoController::class, 'upload'])->name('photos.upload');
+        Route::get('/{id}/url', [\App\Presentation\Http\Controllers\PhotoController::class, 'getUrl'])->name('photos.url');
     });
 
 // Documents Management Routes

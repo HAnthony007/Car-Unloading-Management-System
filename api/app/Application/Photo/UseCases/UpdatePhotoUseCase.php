@@ -8,7 +8,6 @@ use App\Domain\Photo\Entities\Photo;
 use App\Domain\Photo\Repositories\PhotoRepositoryInterface;
 use App\Domain\Photo\ValueObjects\PhotoId;
 use App\Domain\SurveyCheckpoint\ValueObjects\SurveyCheckpointId;
-use App\Domain\Vehicle\ValueObjects\VehicleId;
 use Carbon\Carbon;
 
 final class UpdatePhotoUseCase
@@ -22,14 +21,25 @@ final class UpdatePhotoUseCase
             throw new \RuntimeException('Photo not found.');
         }
 
+        $followUpFileId = isset($dto->followUpFileId)
+            ? ($dto->followUpFileId ? new FollowUpFileId($dto->followUpFileId) : null)
+            : $existing->getFollowUpFileId();
+        $checkpointId = isset($dto->checkpointId)
+            ? ($dto->checkpointId ? new SurveyCheckpointId($dto->checkpointId) : null)
+            : $existing->getCheckpointId();
+
+        // Enforce XOR at update time too if both provided
+        if (! is_null($followUpFileId) && ! is_null($checkpointId)) {
+            throw new \InvalidArgumentException('Provide either follow_up_file_id or checkpoint_id, not both.');
+        }
+
         $photo = new Photo(
             photoId: new PhotoId($dto->photoId),
             photoPath: $dto->photoPath ?? $existing->getPhotoPath(),
             takenAt: new Carbon($dto->takenAt ?? $existing->getTakenAt()->toISOString()),
             photoDescription: $dto->photoDescription ?? $existing->getPhotoDescription(),
-            followUpFileId: new FollowUpFileId($dto->followUpFileId ?? $existing->getFollowUpFileId()->getValue()),
-            vehicleId: new VehicleId($dto->vehicleId ?? $existing->getVehicleId()->getValue()),
-            checkpointId: new SurveyCheckpointId($dto->checkpointId ?? $existing->getCheckpointId()->getValue()),
+            followUpFileId: $followUpFileId,
+            checkpointId: $checkpointId,
             createdAt: $existing->getCreatedAt(),
             updatedAt: $existing->getUpdatedAt(),
         );

@@ -6,7 +6,6 @@ final class PhotoSearchCriteriaDTO
 {
     public function __construct(
         public readonly ?int $followUpFileId,
-        public readonly ?int $vehicleId,
         public readonly ?int $checkpointId,
         public readonly ?string $fromDate,
         public readonly ?string $toDate,
@@ -18,7 +17,6 @@ final class PhotoSearchCriteriaDTO
     {
         return new self(
             followUpFileId: isset($data['follow_up_file_id']) ? (int) $data['follow_up_file_id'] : null,
-            vehicleId: isset($data['vehicle_id']) ? (int) $data['vehicle_id'] : null,
             checkpointId: isset($data['checkpoint_id']) ? (int) $data['checkpoint_id'] : null,
             fromDate: $data['from_date'] ?? null,
             toDate: $data['to_date'] ?? null,
