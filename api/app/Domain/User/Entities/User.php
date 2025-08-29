@@ -18,7 +18,7 @@ final class User
         private readonly string $fullName,
         private readonly Email $email,
         private readonly string $hashedPassword,
-        private readonly ?string $avatar,
+        private ?string $avatar,
         private readonly ?PhoneNumber $phoneNumber,
         private readonly RoleId $roleId,
         private readonly ?Carbon $emailVerifiedAt,
@@ -69,6 +69,11 @@ final class User
     public function getAvatar(): ?string
     {
         return $this->avatar;
+    }
+
+    public function setAvatar(?string $avatar): void
+    {
+        $this->avatar = $avatar;
     }
 
     public function getPhoneNumber(): ?PhoneNumber
@@ -165,8 +170,15 @@ final class User
 
         // Use configured app URL to build a stable absolute URL during tests
         $baseUrl = rtrim(config('app.url', 'http://localhost'), '/');
-        $avatarPath = ltrim('storage/avatars/'.$this->avatar, '/');
+        // Normalize avatar path to avoid double 'avatars' when avatar already contains the folder
+        $normalized = ltrim($this->avatar, '/');
 
-        return $baseUrl.'/'.$avatarPath;
+        if (str_starts_with($normalized, 'avatars/')) {
+            $avatarPath = 'storage/'.$normalized;
+        } else {
+            $avatarPath = 'storage/avatars/'.$normalized;
+        }
+
+        return $baseUrl.'/'.ltrim($avatarPath, '/');
     }
 }

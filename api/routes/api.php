@@ -2,6 +2,7 @@
 
 use App\Models\User;
 use App\Presentation\Http\Controllers\AuthController;
+use App\Presentation\Http\Controllers\UserAvatarController;
 use App\Presentation\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -46,6 +47,11 @@ Route::prefix('users')
 
         // Delete user
         Route::delete('/{userId}', [UserController::class, 'destroy'])->name('users.destroy');
+
+        // User Avatar management
+        Route::post('/{userId}/avatar', [UserAvatarController::class, 'upload'])->name('users.avatar.upload');
+        Route::delete('/{userId}/avatar', [UserAvatarController::class, 'delete'])->name('users.avatar.delete');
+        Route::get('/{userId}/avatar', [UserAvatarController::class, 'getUrl'])->name('users.avatar.url');
     });
 
 // Surveys Management Routes

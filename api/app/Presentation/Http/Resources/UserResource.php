@@ -27,7 +27,10 @@ final class UserResource extends JsonResource
             'email' => $user->getEmail()->getValue(),
             'email_verified' => $user->isEmailVerified(),
             'email_verified_at' => $user->getEmailVerifiedAt()?->toISOString(),
-            'avatar' => $user->getAvatarUrl(),
+            'avatar' => [
+                'path' => $user->getAvatar(),
+                'url' => $user->getAvatarUrl(),
+            ],
             'phone' => $user->getPhoneNumber()?->getValue(),
             'has_phone' => $user->hasPhoneNumber(),
             'role_id' => $user->getRoleId()->getValue(),

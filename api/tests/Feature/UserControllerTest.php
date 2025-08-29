@@ -323,7 +323,8 @@ describe('User API Endpoints', function () {
                 ])
                 ->assertJsonPath('data.full_name', 'Updated Name')
                 ->assertJsonPath('data.phone', '+1234567890')
-                ->assertJsonPath('data.avatar', 'http://localhost/storage/avatars//avatars/updated.jpg');
+                ->assertJsonPath('data.avatar.path', '/avatars/updated.jpg')
+                ->assertJsonPath('data.avatar.url', 'http://localhost/storage/avatars/updated.jpg');
 
             $this->assertDatabaseHas('users', [
                 'user_id' => $testUser->user_id,
