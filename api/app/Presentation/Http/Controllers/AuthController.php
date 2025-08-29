@@ -13,6 +13,9 @@ use App\Presentation\Http\Requests\Auth\RegisterRequest;
 use App\Presentation\Http\Resources\UserResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Validation\ValidationException;
 
 final class AuthController extends Controller
 {
@@ -64,6 +67,43 @@ final class AuthController extends Controller
         }
     }
 
+    /**
+     * SPA login using session cookies (Sanctum stateful) - no token returned.
+     */
+    public function spaLogin(LoginRequest $request): JsonResponse
+    {
+        $credentials = $request->validated();
+
+        $key = 'login:'.strtolower($credentials['email']).':'.$request->ip();
+        if (RateLimiter::tooManyAttempts($key, 5)) {
+            throw ValidationException::withMessages([
+                'email' => ['Trop de tentatives. Réessayez plus tard.'],
+            ])->status(429);
+        }
+
+        $remember = (bool) $request->boolean('remember', false);
+
+        if (! Auth::guard('web')->attempt($credentials, $remember)) {
+            RateLimiter::hit($key, 60);
+            throw ValidationException::withMessages([
+                'email' => ['Identifiants invalides.'],
+            ]);
+        }
+
+        RateLimiter::clear($key);
+        $request->session()->regenerate();
+
+        $user = Auth::user();
+        $domainUser = $this->getUserUseCase->execute($user->getKey());
+
+        return response()->json([
+            'message' => 'Connecté avec succès.',
+            'data' => [
+                'user' => new UserResource($domainUser),
+            ],
+        ], 200);
+    }
+
     public function logout(): JsonResponse
     {
         try {
@@ -77,6 +117,20 @@ final class AuthController extends Controller
                 'error' => $exception->getMessage(),
             ], 400);
         }
+    }
+
+    /**
+     * SPA logout: invalidate session cookies.
+     */
+    public function spaLogout(Request $request): JsonResponse
+    {
+        Auth::guard('web')->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return response()->json([
+            'message' => 'Déconnecté avec succès.',
+        ]);
     }
 
     /**

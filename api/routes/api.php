@@ -15,10 +15,13 @@ Route::prefix('auth')
     ->group(function (): void {
         Route::post('/register', [AuthController::class, 'register'])->name('register');
         Route::post('/login', [AuthController::class, 'login'])->name('login');
+        // SPA cookie-based session authentication endpoints
+        Route::post('/spa/login', [AuthController::class, 'spaLogin'])->name('spa.login');
 
         Route::middleware('auth:sanctum')->group(function () {
             Route::get('/me', [AuthController::class, 'me'])->name('me');
             Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+            Route::post('/spa/logout', [AuthController::class, 'spaLogout'])->name('spa.logout');
         });
     });
 

@@ -15,11 +15,21 @@ return [
     |
     */
 
-    'paths' => ['api/*'],
+    // Include Sanctum's CSRF cookie endpoint for SPA auth
+    'paths' => ['api/*', 'sanctum/csrf-cookie'],
 
     'allowed_methods' => ['*'],
 
     'allowed_origins' => ['*'],
+    // List explicit origins since credentials are enabled (no wildcard allowed with cookies)
+    // 'allowed_origins' => [
+    //     'http://localhost',
+    //     'http://localhost:3000',
+    //     'http://localhost:5173',
+    //     'http://127.0.0.1:8000',
+    //     'http://127.0.0.1:5173',
+    //     'https://localhost',
+    // ],
 
     'allowed_origins_patterns' => [],
 

@@ -15,13 +15,12 @@ return [
     |
     */
 
-    'stateful' => [],
-    // 'stateful' => explode(',', env('SANCTUM_STATEFUL_DOMAINS', sprintf(
-    //     '%s%s',
-    //     'localhost,localhost:3000,127.0.0.1,127.0.0.1:8000,::1',
-    //     Sanctum::currentApplicationUrlWithPort(),
-    //     // Sanctum::currentRequestHost(),
-    // ))),
+    'stateful' => explode(',', env('SANCTUM_STATEFUL_DOMAINS', sprintf(
+        '%s%s',
+        'localhost,localhost:3000,127.0.0.1,127.0.0.1:8000,::1,localhost:5173,127.0.0.1:5173',
+        Sanctum::currentApplicationUrlWithPort(),
+        // Sanctum::currentRequestHost(),
+    ))),
 
     /*
     |--------------------------------------------------------------------------
@@ -50,7 +49,8 @@ return [
 
     'expiration' => null,
 
-    'prefix' => 'api',
+    // Sanctum's own routes (like /sanctum/csrf-cookie) prefix
+    'prefix' => 'sanctum',
 
     /*
     |--------------------------------------------------------------------------
@@ -81,6 +81,7 @@ return [
     'middleware' => [
         'authenticate_session' => Laravel\Sanctum\Http\Middleware\AuthenticateSession::class,
         'encrypt_cookies' => Illuminate\Cookie\Middleware\EncryptCookies::class,
+        // Use the framework's CSRF validator (VerifyCsrfToken alias in EnsureFrontendRequestsAreStateful handles it)
         'validate_csrf_token' => Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class,
     ],
 
