@@ -1,20 +1,17 @@
 "use client";
 
-import React from "react";
-import { QueryProvider } from "./query/query-provider";
-import { ThemeProvider } from "./theme/theme-provider";
+import type { ReactNode } from "react";
+import { ThemeProvider } from "./theme-provider";
 
-export default function Providers({ children }: { children: React.ReactNode }) {
-    return (
-        <QueryProvider>
-            <ThemeProvider
-                attribute="class"
-                defaultTheme="system"
-                enableSystem
-                disableTransitionOnChange
-            >
-                {children}
-            </ThemeProvider>
-        </QueryProvider>
-    );
+export default function Providers({ children }: { children: ReactNode }) {
+  return (
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem
+      disableTransitionOnChange
+    >
+      {children}
+    </ThemeProvider>
+  );
 }
