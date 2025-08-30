@@ -3,17 +3,21 @@
 namespace App\Application\Auth\UseCases;
 
 use App\Application\Auth\DTOs\LoginDTO;
+use App\Domain\User\Entities\User as DomainUser;
 use App\Domain\User\Repositories\UserRepositoryInterface;
-use App\Models\User as EloquentUser;
 
-final class LoginUseCase
+final class SpaLoginUseCase
 {
     public function __construct(private readonly UserRepositoryInterface $userRepository) {}
 
     /**
-     * Return ['user' => DomainUser, 'token' => string]
+     * Validate email and password using the domain repository and return the Domain User.
+     *
+     * @return DomainUser
+     *
+     * @throws \Illuminate\Validation\ValidationException
      */
-    public function execute(LoginDTO $dto): array
+    public function execute(LoginDTO $dto): DomainUser
     {
         $user = $this->userRepository->findByEmail(new \App\Domain\Auth\ValueObjects\Email($dto->email));
 
@@ -29,16 +33,6 @@ final class LoginUseCase
             ]);
         }
 
-        $eloquent = EloquentUser::where('user_id', $user->getUserId()?->getValue())->first();
-        if (! $eloquent) {
-            throw new \RuntimeException('Failed to retrieve user model for token creation.');
-        }
-
-        $token = $eloquent->createToken('api-token')->plainTextToken;
-
-        return [
-            'user' => $user,
-            'token' => $token,
-        ];
+        return $user;
     }
 }

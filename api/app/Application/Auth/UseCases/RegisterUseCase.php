@@ -34,7 +34,7 @@ final class RegisterUseCase
 
         if ($this->userRepository->exists(new EmailVo($dto->email))) {
             throw \Illuminate\Validation\ValidationException::withMessages([
-                'email' => ['Cette adresse email est déjà utilisée.'],
+                'email' => ['This email address is already taken.'],
             ]);
         }
 

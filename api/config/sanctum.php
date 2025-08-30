@@ -50,7 +50,7 @@ return [
     'expiration' => null,
 
     // Sanctum's own routes (like /sanctum/csrf-cookie) prefix
-    'prefix' => 'sanctum',
+    'prefix' => 'api/sanctum',
 
     /*
     |--------------------------------------------------------------------------

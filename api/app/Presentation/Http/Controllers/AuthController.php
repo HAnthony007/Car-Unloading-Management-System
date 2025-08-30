@@ -6,6 +6,7 @@ use App\Application\Auth\DTOs\LoginDTO;
 use App\Application\Auth\DTOs\RegisterDTO;
 use App\Application\Auth\UseCases\LoginUseCase;
 use App\Application\Auth\UseCases\LogoutUseCase;
+use App\Application\Auth\UseCases\SpaLoginUseCase;
 use App\Application\Auth\UseCases\RegisterUseCase;
 use App\Application\User\UseCases\GetUserUseCase;
 use App\Presentation\Http\Requests\Auth\LoginRequest;
@@ -14,15 +15,18 @@ use App\Presentation\Http\Resources\UserResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\ValidationException;
+use App\Models\User;
 
 final class AuthController extends Controller
 {
     public function __construct(
         private readonly RegisterUseCase $registerUseCase,
         private readonly LoginUseCase $loginUseCase,
-        private readonly LogoutUseCase $logoutUseCase,
+    private readonly LogoutUseCase $logoutUseCase,
+    private readonly SpaLoginUseCase $spaLoginUseCase,
         private readonly GetUserUseCase $getUserUseCase,
     ) {}
 
@@ -77,27 +81,37 @@ final class AuthController extends Controller
         $key = 'login:'.strtolower($credentials['email']).':'.$request->ip();
         if (RateLimiter::tooManyAttempts($key, 5)) {
             throw ValidationException::withMessages([
-                'email' => ['Trop de tentatives. Réessayez plus tard.'],
+                'email' => ['Too many attempts. Please try again later.'],
             ])->status(429);
         }
 
         $remember = (bool) $request->boolean('remember', false);
 
-        if (! Auth::guard('web')->attempt($credentials, $remember)) {
+        // Delegate validation of credentials to Application layer (Domain-aware)
+        $dto = LoginDTO::fromArray($credentials);
+        $domainUser = $this->spaLoginUseCase->execute($dto);
+
+        // Perform infrastructure login (session + remember) using Eloquent model
+        /** @var \App\Models\User|null $eloquent */
+        $eloquent = \App\Models\User::query()->where('user_id', $domainUser->getUserId()?->getValue())->first();
+        if ($eloquent === null) {
+            // If somehow not found, rate limit and bubble a validation-like error to avoid leaking info
             RateLimiter::hit($key, 60);
             throw ValidationException::withMessages([
-                'email' => ['Identifiants invalides.'],
+                'email' => ['Account not found.'],
             ]);
         }
+
+        Auth::guard('web')->login($eloquent, $remember);
 
         RateLimiter::clear($key);
         $request->session()->regenerate();
 
-        $user = Auth::user();
-        $domainUser = $this->getUserUseCase->execute($user->getKey());
+    $authUser = Auth::user();
+    $domainUser = $this->getUserUseCase->execute($authUser->getKey());
 
         return response()->json([
-            'message' => 'Connecté avec succès.',
+            'message' => 'Signed in successfully.',
             'data' => [
                 'user' => new UserResource($domainUser),
             ],
@@ -129,7 +143,7 @@ final class AuthController extends Controller
         $request->session()->regenerateToken();
 
         return response()->json([
-            'message' => 'Déconnecté avec succès.',
+            'message' => 'Signed out successfully.',
         ]);
     }
 

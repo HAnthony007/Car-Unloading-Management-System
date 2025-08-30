@@ -24,10 +24,10 @@ class LoginRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'email.required' => "L'adresse email est requise.",
-            'email.email' => "L'adresse email n'est pas valide.",
-            'password.required' => 'Le mot de passe est requis.',
-            'password.string' => 'Le mot de passe doit être une chaîne de caractères.',
+            'email.required' => 'Email is required.',
+            'email.email' => 'Email is not valid.',
+            'password.required' => 'Password is required.',
+            'password.string' => 'Password must be a string.',
         ];
     }
 
