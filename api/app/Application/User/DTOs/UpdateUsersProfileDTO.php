@@ -11,6 +11,7 @@ final class UpdateUsersProfileDTO
         public readonly ?string $fullName = null,
         public readonly ?string $avatar = null,
         public readonly ?string $phone = null,
+    public readonly ?int $roleId = null,
     ) {}
 
     public static function fromArray(array $data): self
@@ -20,6 +21,7 @@ final class UpdateUsersProfileDTO
             fullName: $data['full_name'] ?? null,
             avatar: $data['avatar'] ?? null,
             phone: $data['phone'] ?? null,
+            roleId: isset($data['role_id']) ? (int) $data['role_id'] : null,
         );
     }
 
