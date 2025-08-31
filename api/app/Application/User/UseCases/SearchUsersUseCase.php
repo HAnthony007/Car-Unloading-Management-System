@@ -25,8 +25,28 @@ final class SearchUsersUseCase
             });
         }
 
-        // Filter by role
-        if ($criteria->roleId) {
+        // Filter by role(s)
+        if ($criteria->roles && count($criteria->roles) > 0) {
+            $roleNames = array_flip($criteria->roles);
+            $users = array_filter($users, function ($user) use ($roleNames) {
+                $name = $user->getRole()?->getRoleName();
+                if ($name === null) {
+                    return false; // no role entity available → exclude unless we map IDs elsewhere
+                }
+                return isset($roleNames[strtolower($name)]);
+            });
+        } elseif ($criteria->role && $criteria->role !== '') {
+            $roleName = $criteria->role;
+            $users = array_filter($users, function ($user) use ($roleName) {
+                $name = $user->getRole()?->getRoleName();
+                return $name !== null && strtolower($name) === strtolower($roleName);
+            });
+        } elseif ($criteria->roleIds && count($criteria->roleIds) > 0) {
+            $roleSet = array_flip($criteria->roleIds);
+            $users = array_filter($users, function ($user) use ($roleSet) {
+                return isset($roleSet[$user->getRoleId()->getValue()]);
+            });
+        } elseif ($criteria->roleId) {
             $users = array_filter($users, function ($user) use ($criteria) {
                 return $user->getRoleId()->getValue() === $criteria->roleId;
             });
