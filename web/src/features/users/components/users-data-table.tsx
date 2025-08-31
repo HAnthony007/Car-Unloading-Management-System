@@ -24,22 +24,44 @@ import {
   useReactTable,
   type VisibilityState,
 } from "@tanstack/react-table";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { UsersDataTableToolbar } from "./users-data-table-toolbar";
 
 interface UsersDataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  isLoading?: boolean;
+  serverMeta?: {
+    currentPage: number;
+    lastPage: number;
+    perPage: number;
+    total: number;
+  };
+  onServerPageChange?: (page: number) => void; // 1-based
+  onServerPageSizeChange?: (size: number) => void;
+  // Server-driven filtering controls
+  query?: string;
+  onQueryChange?: (q: string) => void;
+  onRolesChange?: (roles: string[]) => void;
 }
 
 export function UsersDataTable<TData, TValue>({
   columns,
   data,
+  isLoading = false,
+  serverMeta,
+  onServerPageChange,
+  onServerPageSizeChange,
+  query,
+  onQueryChange,
+  onRolesChange,
 }: UsersDataTableProps<TData, TValue>) {
+  const isServer = Boolean(serverMeta);
   const [rowSelection, setRowSelection] = useState({});
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [dense, setDense] = useState(false);
 
   const table = useReactTable({
     data,
@@ -57,26 +79,70 @@ export function UsersDataTable<TData, TValue>({
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
 
-    onColumnFiltersChange: setColumnFilters,
+    onColumnFiltersChange: (updater) => {
+      const next =
+        typeof updater === "function" ? updater(columnFilters) : updater;
+      setColumnFilters(next);
+      if (onRolesChange) {
+        const role = next.find((f) => f.id === "role");
+        const roles = (role?.value as string[]) ?? [];
+        onRolesChange(roles);
+      }
+    },
     getFilteredRowModel: getFilteredRowModel(),
 
     onColumnVisibilityChange: setColumnVisibility,
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
-    getPaginationRowModel: getPaginationRowModel(),
+  // Disable client pagination when server-side pagination is used
+  getPaginationRowModel: isServer ? undefined : getPaginationRowModel(),
+  manualPagination: isServer,
   });
+
+  const visibleLeafColumns = table.getVisibleLeafColumns();
+  const visibleLeafColumnsCount = visibleLeafColumns.length;
+  const columnIds = visibleLeafColumns.map((c) => c.id);
+  const skeletonRowKeys = useMemo(
+    () => Array.from({ length: 8 }, () => Math.random().toString(36).slice(2)),
+    [],
+  );
+
+  // Keep table pageSize in sync with server perPage so visible rows match server
+  if (isServer && serverMeta?.perPage) {
+    const currentSize = (table.getState().pagination as any)?.pageSize;
+    if (currentSize && currentSize !== serverMeta.perPage) {
+      table.setPageSize(serverMeta.perPage);
+    }
+  }
 
   return (
     <div className="space-y-4">
-      <UsersDataTableToolbar table={table} />
-      <div className="rounded-md border">
+      <UsersDataTableToolbar
+        table={table}
+        dense={dense}
+        onToggleDensity={() => setDense((d) => !d)}
+        query={query}
+        onQueryChange={onQueryChange}
+  onClearFilters={() => onRolesChange?.([])}
+      />
+      <div className="rounded-md border shadow-sm">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id} colSpan={header.colSpan}>
+                    <TableHead
+                      key={header.id}
+                      colSpan={header.colSpan}
+                      className={
+                        "sticky top-0 z-20 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 " +
+                        (dense ? "h-9 py-2" : "h-11 py-3") +
+                        " " +
+                        // @ts-expect-error allow meta className if provided
+                        (header.column.columnDef?.meta?.className || "")
+                      }
+                    >
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -90,7 +156,28 @@ export function UsersDataTable<TData, TValue>({
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {isLoading ? (
+              skeletonRowKeys.map((rowKey) => (
+                <TableRow key={rowKey} className="animate-pulse">
+                  {Array.from({ length: visibleLeafColumnsCount }).map(
+                    (__, j) => (
+                      <TableCell
+                        key={`${rowKey}-${columnIds[j] ?? j}`}
+                        className={dense ? "py-2" : "py-3"}
+                      >
+                        <div
+                          className={
+                            j === 0
+                              ? "h-8 w-8 rounded-full bg-muted"
+                              : "h-3 w-32 rounded bg-muted"
+                          }
+                        />
+                      </TableCell>
+                    ),
+                  )}
+                </TableRow>
+              ))
+            ) : table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row, idx) => (
                 <TableRow
                   key={row.id}
@@ -102,7 +189,15 @@ export function UsersDataTable<TData, TValue>({
                   }
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell
+                      key={cell.id}
+                      className={
+                        (dense ? "py-2" : "py-3") +
+                        " " +
+                        // @ts-expect-error allow meta className if provided
+                        (cell.column.columnDef?.meta?.className || "")
+                      }
+                    >
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext(),
@@ -135,7 +230,12 @@ export function UsersDataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-      <DataTablePagination table={table} />
+      <DataTablePagination
+        table={table}
+        serverMeta={serverMeta}
+        onPageChange={onServerPageChange}
+        onPageSizeChange={onServerPageSizeChange}
+      />
     </div>
   );
 }

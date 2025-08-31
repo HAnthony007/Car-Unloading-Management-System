@@ -48,7 +48,7 @@ export const DataTableRowActions = ({ row }: DataTableRowActionsProps) => {
             setCurrentRow(row.original);
             setOpen("delete");
           }}
-          className="text-red-500!"
+          variant="destructive"
         >
           Delete
           <DropdownMenuShortcut>

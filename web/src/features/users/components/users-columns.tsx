@@ -1,6 +1,7 @@
 "use client";
 
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import type { ColumnDef } from "@tanstack/react-table";
 import { userRoles } from "../data/data";
@@ -12,23 +13,27 @@ export const UsersColumns: ColumnDef<User>[] = [
     id: "avatar",
     header: () => <span className="sr-only">Avatar</span>,
     cell: ({ row }) => {
-      const email = row.original.email;
-      const initials = email
-        .split("@")[0]
-        .split(/[.\-_]/)
-        .map((part) => part[0]?.toUpperCase() || "")
-        .join("")
-        .slice(0, 2);
+      const { avatarUrl, fullName, email } = row.original;
+      const buildInitials = (name: string) => {
+        const parts = name.trim().split(/\s+/);
+        if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+        return (parts[0][0] + (parts[1]?.[0] || "")).toUpperCase();
+      };
+      const initials = buildInitials(fullName || email);
       return (
         <div className="flex items-center justify-center">
-          <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-primary/20 text-primary font-bold text-base">
-            {initials}
-          </span>
+          <Avatar className="h-8 w-8 ring-1 ring-border">
+            <AvatarImage src={avatarUrl || undefined} alt={fullName} />
+            <AvatarFallback className="bg-primary/20 text-primary font-bold">
+              {initials}
+            </AvatarFallback>
+          </Avatar>
         </div>
       );
     },
     meta: {
-      className: "sticky left-0 z-10 bg-background",
+      className:
+        "sticky left-0 z-30 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-[inset_-1px_0_0_0_hsl(var(--border))]",
     },
     enableSorting: false,
     enableHiding: false,
@@ -37,12 +42,41 @@ export const UsersColumns: ColumnDef<User>[] = [
     maxSize: 60,
   },
   {
+    accessorKey: "matriculationNumber",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Matricule" />
+    ),
+    cell: ({ row }) => (
+      <div className="font-medium">{row.original.matriculationNumber}</div>
+    ),
+  },
+  {
+    accessorKey: "fullName",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Nom complet" />
+    ),
+    cell: ({ row }) => (
+      <div className="truncate max-w-[220px]">{row.original.fullName}</div>
+    ),
+  },
+  {
     accessorKey: "email",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Email" />
     ),
     cell: ({ row }) => (
-      <div className="w-fit text-nowrap">{row.getValue("email")}</div>
+      <div className="w-fit text-nowrap text-muted-foreground">
+        {row.original.email}
+      </div>
+    ),
+  },
+  {
+    accessorKey: "phone",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Téléphone" />
+    ),
+    cell: ({ row }) => (
+      <div className="w-fit text-nowrap">{row.original.phone}</div>
     ),
   },
   {
@@ -62,8 +96,8 @@ export const UsersColumns: ColumnDef<User>[] = [
           <Badge
             className={
               role === "admin"
-                ? "bg-red-100 text-red-700 border-none"
-                : "bg-blue-100 text-blue-700 border-none"
+                ? "bg-destructive/10 text-destructive border-none"
+                : "bg-primary/10 text-primary border-none"
             }
           >
             {role}
