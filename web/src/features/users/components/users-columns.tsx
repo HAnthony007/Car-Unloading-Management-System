@@ -4,13 +4,16 @@ import { DataTableColumnHeader } from "@/components/table/data-table-column-head
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import type { ColumnDef } from "@tanstack/react-table";
+import { useEffect, useState } from "react";
 import { userRoles } from "../data/data";
 import type { User } from "../data/schema";
 import { useTemporaryAvatar } from "../hooks/useTemporaryAvatar";
 import { DataTableRowActions } from "./data-table-row-actions";
 
 function UserAvatarCell({ user }: { user: User }) {
-  const { data: tempUrl } = useTemporaryAvatar(user.id, true);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const { data: tempUrl } = useTemporaryAvatar(user.id, mounted);
   const buildInitials = (name: string) => {
     const parts = name.trim().split(/\s+/);
     if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();

@@ -24,7 +24,7 @@ import {
   useReactTable,
   type VisibilityState,
 } from "@tanstack/react-table";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { UsersDataTableToolbar } from "./users-data-table-toolbar";
 
 interface UsersDataTableProps<TData, TValue> {
@@ -108,12 +108,13 @@ export function UsersDataTable<TData, TValue>({
   );
 
   // Keep table pageSize in sync with server perPage so visible rows match server
-  if (isServer && serverMeta?.perPage) {
+  useEffect(() => {
+    if (!isServer || !serverMeta?.perPage) return;
     const currentSize = (table.getState().pagination as any)?.pageSize;
-    if (currentSize && currentSize !== serverMeta.perPage) {
+    if (currentSize !== serverMeta.perPage) {
       table.setPageSize(serverMeta.perPage);
     }
-  }
+  }, [isServer, serverMeta?.perPage, table]);
 
   return (
     <div className="space-y-4">

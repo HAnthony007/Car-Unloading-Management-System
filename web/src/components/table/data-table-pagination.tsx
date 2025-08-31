@@ -1,5 +1,6 @@
 import type { UsersMeta } from "@/features/users/data/users";
 import type { Table } from "@tanstack/react-table";
+import { useEffect, useState } from "react";
 import { Icons } from "../icons/icon";
 import { Button } from "../ui/button";
 import {
@@ -24,14 +25,25 @@ export const DataTablePagination = <TData,>({
   onPageSizeChange,
 }: DataTablePaginationProps<TData>) => {
   const isServer = Boolean(serverMeta);
-  const currentPage =
-    serverMeta?.currentPage ?? table.getState().pagination.pageIndex + 1;
-  const lastPage = serverMeta?.lastPage ?? table.getPageCount();
-  const pageSize = serverMeta?.perPage ?? table.getState().pagination.pageSize;
-  const canPrev = isServer ? currentPage > 1 : table.getCanPreviousPage();
-  const canNext = isServer
-    ? currentPage < (lastPage ?? 1)
-    : table.getCanNextPage();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const currentPage = isServer
+    ? serverMeta?.currentPage ?? 1
+    : mounted
+      ? table.getState().pagination.pageIndex + 1
+      : 1;
+  const lastPage = isServer
+    ? serverMeta?.lastPage ?? 1
+    : mounted
+      ? table.getPageCount()
+      : 1;
+  const pageSize = isServer
+    ? serverMeta?.perPage ?? 10
+    : mounted
+      ? table.getState().pagination.pageSize
+      : 10;
+  const canPrev = isServer ? currentPage > 1 : mounted ? table.getCanPreviousPage() : false;
+  const canNext = isServer ? currentPage < (lastPage ?? 1) : mounted ? table.getCanNextPage() : false;
 
   const handleFirst = () => {
     if (isServer) onPageChange?.(1);
@@ -47,7 +59,7 @@ export const DataTablePagination = <TData,>({
   };
   const handleLast = () => {
     if (isServer) onPageChange?.(lastPage ?? 1);
-    else table.setPageIndex(table.getPageCount() - 1);
+    else if (mounted) table.setPageIndex(table.getPageCount() - 1);
   };
   const handlePageSize = (value: string) => {
     const size = Number(value);
@@ -59,10 +71,10 @@ export const DataTablePagination = <TData,>({
       className="flex items-center justify-end overflow-clip px-2"
       style={{ overflowClipMargin: 1 }}
     >
-      {!isServer && (
+    {!isServer && (
         <div className="text-muted-foreground hidden flex-1 text-sm sm:block">
-          {table.getSelectedRowModel().rows.length} sur{" "}
-          {table.getFilteredRowModel().rows.length} sélectionné(s)
+      {(mounted ? table.getSelectedRowModel().rows.length : 0)} sur{" "}
+      {(mounted ? table.getFilteredRowModel().rows.length : 0)} sélectionné(s)
         </div>
       )}
       <div className="flex items-center sm:space-x-6 lg:space-x-8">
