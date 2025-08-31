@@ -2,24 +2,58 @@ import type { SidebarItem } from "../types/sidebar-data-type";
 
 export const sidebarItems: SidebarItem[] = [
   {
-    title: "Home",
+    title: "Tableau de Bord",
     url: "/dashboard",
     icon: "overview",
   },
   {
-    title: "Follow Up Files",
+    title: "Dossiers de Suivi",
     url: "/dashboard/followup",
     icon: "folder",
+    item: [
+      {
+        title: "Import Manifest",
+        url: "/dashboard/followup/import",
+      },
+      {
+        title: "Dossiers des vehicules",
+        url: "/dashboard/followup/files",
+      },
+      {
+        title: "Liste des vehicules",
+        url: "/dashboard/followup/vehicules",
+      },
+    ]
   },
   {
-    title: "Import Manifest",
-    url: "/dashboard/manifest",
+    title: "Operations",
+    url: "/dashboard/operations",
     icon: "manifest",
+    item: [
+      {
+        title: "Escale",
+        url: "/dashboard/operations/escale",
+      },
+      {
+        title: "Debarquement",
+        url: "/dashboard/operations/debarquement",
+      },
+    ]
   },
   {
-    title: "Users",
-    url: "/dashboard/users",
+    title: "Gestion Portuaire",
+    url: "/dashboard/port",
     icon: "users",
+    item: [
+      {
+        title: "Liste des Navires",
+        url: "/dashboard/port/ships",
+      },
+      {
+        title: "Liste des Quais",
+        url: "/dashboard/port/wharves",
+      },
+    ]
   },
   {
     title: "Vehicles",
