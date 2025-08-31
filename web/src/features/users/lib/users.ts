@@ -1,3 +1,4 @@
+import { fetchWithCsrf } from "@/lib/http";
 import { parseUsersResponse } from "../data/users";
 export type GetUsersParams = {
   page?: number;
@@ -27,11 +28,10 @@ export async function getUsers(params: GetUsersParams = {}) {
   }
   url.search = search.toString();
 
-  const res = await fetch(url.toString(), {
+  const res = await fetchWithCsrf(url.toString(), {
     method: "GET",
     headers: { Accept: "application/json" },
     cache: "no-store",
-    credentials: "include",
   });
   if (!res.ok) throw new Error("Failed to fetch users");
   const payload = await res.json();

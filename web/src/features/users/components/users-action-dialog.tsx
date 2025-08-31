@@ -1,7 +1,9 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { Icons } from "@/components/icons/icon";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -24,19 +26,17 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { z } from "zod";
 import { userRoles } from "../data/data";
 import type { User } from "../data/schema";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { MAX_AVATAR_MB, ACCEPTED_IMAGE_TYPES } from "../lib/constants";
-import {
-  uploadUserAvatarAction,
-  createUserAction,
-  updateUserAction,
-  deleteUserAvatarAction,
-} from "../lib/server-actions";
+import { userFormSchema, type UserForm } from "../data/user-form-schema";
 import { useInvalidateUsers } from "../hooks/useInvalidateUsers";
+import { useTemporaryAvatar } from "../hooks/useTemporaryAvatar";
+import {
+  useCreateUser,
+  useDeleteUserAvatar,
+  useUpdateUser,
+  useUploadUserAvatar,
+} from "../hooks/useUserMutations";
 
 interface UsersActionDialogProps {
   currentRow?: User;
@@ -44,48 +44,7 @@ interface UsersActionDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-// constants moved to shared lib
-
-const formSchema = z.object({
-  fullName: z
-    .string()
-    .min(2, { message: "Le nom complet est requis" })
-    .max(120, { message: "Le nom est trop long" }),
-  email: z
-    .string()
-    .email({ message: "Please enter a valid email address" })
-    .min(1, "Email is required"),
-  matriculationNumber: z
-    .string()
-    .min(1, { message: "Le matricule est requis" })
-    .max(30, { message: "Le matricule est trop long" }),
-  phone: z
-    .string()
-    .optional()
-    .refine((v) => !v || v.length >= 6, {
-      message: "Numéro invalide",
-    }),
-  avatar: z
-    .any()
-    .refine(
-      (file) => file == null || file instanceof File,
-      "Fichier invalide",
-    )
-    .refine(
-      (file) => !file || file.size <= MAX_AVATAR_MB * 1024 * 1024,
-      `L'image doit être ≤ ${MAX_AVATAR_MB}MB`,
-    )
-    .refine(
-      (file) => !file || ACCEPTED_IMAGE_TYPES.includes(file.type),
-      "Formats acceptés: JPEG, PNG, WEBP, GIF",
-    )
-    .optional()
-    .nullable(),
-  role: z.enum(["admin", "user"], { message: "Role is required" }),
-  isEdit: z.boolean(),
-});
-
-type UserForm = z.infer<typeof formSchema>;
+const formSchema = userFormSchema;
 
 export const UsersActionDialog = ({
   currentRow,
@@ -98,36 +57,51 @@ export const UsersActionDialog = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const invalidateUsers = useInvalidateUsers();
+  const { mutateAsync: createUserMutate, isPending: isCreating } = useCreateUser();
+  const { mutateAsync: updateUserMutate, isPending: isUpdating } = useUpdateUser();
+  const { mutateAsync: uploadAvatarMutate, isPending: isUploading } = useUploadUserAvatar();
+  const { mutateAsync: deleteAvatarMutate } = useDeleteUserAvatar();
+
+  // Helpers
+  const getInitials = (name?: string | null, email?: string | null) => {
+    const source = (name && name.trim().length > 0 ? name : email) || "?";
+    return source
+      .split(" ")
+      .filter(Boolean)
+      .map((p) => p[0])
+      .slice(0, 2)
+      .join("")
+      .toUpperCase();
+  };
+
+  const makeDefaultValues = (row?: User | null): UserForm => ({
+    fullName: row?.fullName ?? "",
+    email: row?.email ?? "",
+    matriculationNumber: row?.matriculationNumber ?? "",
+    phone: row?.phone ?? "",
+    avatar: null,
+    role: (row?.role as UserForm["role"]) ?? "user",
+  });
 
   const form = useForm<UserForm>({
-  defaultValues: isEdit
-      ? {
-          fullName: currentRow?.fullName ?? "",
-          email: currentRow?.email ?? "",
-          matriculationNumber: currentRow?.matriculationNumber ?? "",
-          phone: currentRow?.phone ?? "",
-    avatar: null,
-          role: (currentRow?.role as UserForm["role"]) ?? "user",
-          isEdit,
-        }
-      : {
-          fullName: "",
-          email: "",
-          matriculationNumber: "",
-          phone: "",
-    avatar: null,
-          role: "user",
-          isEdit,
-        },
+    defaultValues: makeDefaultValues(currentRow),
     resolver: zodResolver(formSchema),
     mode: "onChange", // validation en temps réel
   });
 
+  // Temporary signed avatar URL served by backend (returns JSON with data.url)
+  const { data: tempAvatarUrl } = useTemporaryAvatar(currentRow?.id, open && isEdit);
+
   useEffect(() => {
-    if (open && firstInputRef.current) {
-      firstInputRef.current.focus();
-    }
-  }, [open]);
+    if (!open) return;
+    // Reset form values when opening or switching rows
+    form.reset(makeDefaultValues(currentRow));
+    // Clear local avatar selection on every open to avoid stale preview
+    setAvatarPreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+    // Focus the first input after reset
+    if (firstInputRef.current) firstInputRef.current.focus();
+  }, [open, currentRow, form]);
 
   // Avatar preview lifecycle
   useEffect(() => {
@@ -154,41 +128,36 @@ export const UsersActionDialog = ({
   const handleDeleteAvatarFromServer = async () => {
     if (!isEdit || !currentRow?.id) return;
     try {
-      await deleteUserAvatarAction(process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL, currentRow.id);
+      await deleteAvatarMutate({ id: currentRow.id });
       handleClearAvatar();
       toast.success("Avatar supprimé");
       invalidateUsers();
     } catch (e) {
-      toast.error("Suppression avatar échouée: " + e);
+      const msg = e instanceof Error ? e.message : String(e);
+      toast.error("Suppression avatar échouée: " + msg);
     }
   };
 
   async function uploadAvatar(userId: string | number, file: File) {
-    return uploadUserAvatarAction(
-      process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL,
-      userId,
-      file,
-    );
+    await uploadAvatarMutate({ id: userId, file });
   }
 
   const onSubmit = async (data: UserForm) => {
     setLoading(true);
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL;
-
-  if (isEdit && currentRow?.id) {
-        await updateUserAction(baseUrl, currentRow.id, {
+      if (isEdit && currentRow?.id) {
+        await updateUserMutate({ id: currentRow.id, payload: {
           fullName: data.fullName,
           email: data.email,
           matriculationNumber: data.matriculationNumber,
           phone: data.phone || null,
           role: data.role,
-        });
+        }});
         if (data.avatar instanceof File) {
           await uploadAvatar(currentRow.id, data.avatar);
         }
       } else {
-        const created = await createUserAction(baseUrl, {
+        const created = await createUserMutate({
           fullName: data.fullName,
           email: data.email,
           matriculationNumber: data.matriculationNumber,
@@ -200,16 +169,18 @@ export const UsersActionDialog = ({
           await uploadAvatar(newId, data.avatar);
         }
       }
-  invalidateUsers();
-      form.reset();
+      invalidateUsers();
+      form.reset(makeDefaultValues());
+      handleClearAvatar();
       if (isEdit) {
-        toast.success(data.avatar ? "User and avatar updated successfully" : "User updated successfully");
+        toast.success(data.avatar ? "Utilisateur et avatar mis à jour" : "Utilisateur mis à jour");
       } else {
-        toast.success("User added successfully");
+        toast.success("Utilisateur créé");
       }
       onOpenChange(false);
     } catch (e) {
-      toast.error("An error occurred. Please try again., " + e);
+      const msg = e instanceof Error ? e.message : String(e);
+      toast.error("Une erreur est survenue. Veuillez réessayer. " + msg);
     } finally {
       setLoading(false);
     }
@@ -219,7 +190,10 @@ export const UsersActionDialog = ({
     <Dialog
       open={open}
       onOpenChange={(state) => {
-        form.reset();
+        if (!state) {
+          form.reset(makeDefaultValues());
+          handleClearAvatar();
+        }
         onOpenChange(state);
       }}
     >
@@ -241,81 +215,70 @@ export const UsersActionDialog = ({
                   : "Créez un nouvel utilisateur et assignez-lui un rôle."}
               </DialogDescription>
             </div>
-            {isEdit && (
-              <div className="shrink-0">
-                <Avatar className="h-10 w-10 ring-1 ring-border">
-                  <AvatarImage src={currentRow?.avatarUrl || undefined} />
-                  <AvatarFallback className="bg-primary/10 text-primary font-semibold">
-                    {(currentRow?.fullName || currentRow?.email || "?")
-                      .split(" ")
-                      .map((p) => p[0])
-                      .slice(0, 2)
-                      .join("")
-                      .toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-              </div>
-            )}
+            <div className="shrink-0">
+              <Avatar className="h-10 w-10 ring-1 ring-border">
+                <AvatarImage src={avatarPreview || tempAvatarUrl || currentRow?.avatarUrl || undefined} />
+                <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+                  {getInitials(currentRow?.fullName ?? form.watch("fullName"), currentRow?.email ?? form.watch("email"))}
+                </AvatarFallback>
+              </Avatar>
+            </div>
           </div>
         </DialogHeader>
 
-        {(isEdit || true) && (
-          <div className="mb-2 -mt-2 flex items-center justify-between rounded-md border bg-muted/30 px-3 py-2">
-            <div className="min-w-0">
-              <p className="truncate text-sm font-medium">
-                {currentRow?.fullName || currentRow?.email}
-              </p>
-              <p className="truncate text-xs text-muted-foreground">
-                {currentRow?.email}
-              </p>
-            </div>
-            <div className="flex items-center gap-3">
-              {currentRow?.role && (
+        <div className="mb-2 -mt-2 flex items-center justify-between rounded-md border bg-muted/30 px-3 py-2">
+          <div className="min-w-0">
+            <p className="truncate text-sm font-medium">
+              {form.watch("fullName") || currentRow?.fullName || form.watch("email") || currentRow?.email || "Nouvel utilisateur"}
+            </p>
+            <p className="truncate text-xs text-muted-foreground">
+              {form.watch("email") || currentRow?.email || ""}
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            {(() => {
+              const role = form.watch("role") || (currentRow?.role as UserForm["role"] | undefined);
+              return role ? (
                 <Badge
                   className={
-                    (currentRow?.role === "admin"
+                    (role === "admin"
                       ? "bg-destructive/10 text-destructive"
                       : "bg-primary/10 text-primary") + " border-none capitalize"
                   }
                 >
-                  {currentRow?.role}
+                  {role}
                 </Badge>
-              )}
-              <div className="flex items-center gap-2">
-                <Avatar className="h-10 w-10 ring-1 ring-border">
-                  <AvatarImage src={avatarPreview || currentRow?.avatarUrl || undefined} />
-                  <AvatarFallback className="bg-primary/10 text-primary font-semibold">
-                    {(currentRow?.fullName || currentRow?.email || "?")
-                      .split(" ")
-                      .map((p) => p[0])
-                      .slice(0, 2)
-                      .join("")
-                      .toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleAvatarChange}
-                />
-                <Button type="button" variant="outline" size="sm" onClick={handlePickAvatar}>
-                  Importer
+              ) : null;
+            })()}
+            <div className="flex items-center gap-2">
+              <Avatar className="h-10 w-10 ring-1 ring-border">
+                <AvatarImage src={avatarPreview || tempAvatarUrl || currentRow?.avatarUrl || undefined} />
+                <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+                  {getInitials(currentRow?.fullName ?? form.watch("fullName"), currentRow?.email ?? form.watch("email"))}
+                </AvatarFallback>
+              </Avatar>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleAvatarChange}
+              />
+              <Button type="button" variant="outline" size="sm" onClick={handlePickAvatar}>
+                Importer
+              </Button>
+              {avatarPreview ? (
+                <Button type="button" variant="ghost" size="sm" onClick={handleClearAvatar}>
+                  Supprimer
                 </Button>
-                {avatarPreview ? (
-                  <Button type="button" variant="ghost" size="sm" onClick={handleClearAvatar}>
-                    Supprimer
-                  </Button>
-                ) : isEdit && currentRow?.avatarUrl ? (
-                  <Button type="button" variant="ghost" size="sm" onClick={handleDeleteAvatarFromServer}>
-                    Supprimer
-                  </Button>
-                ) : null}
-              </div>
+              ) : isEdit && currentRow?.avatarUrl ? (
+                <Button type="button" variant="ghost" size="sm" onClick={handleDeleteAvatarFromServer}>
+                  Supprimer
+                </Button>
+              ) : null}
             </div>
           </div>
-        )}
+        </div>
         <div className="-mr-4 h-[26.25rem] w-full overflow-y-auto py-1 pr-4">
           <div className="mb-2">
             <p className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
@@ -340,7 +303,10 @@ export const UsersActionDialog = ({
                       <Input
                         {...field}
                         id="user-fullname"
-                        ref={firstInputRef}
+                        ref={(el) => {
+                          field.ref(el);
+                          firstInputRef.current = el as HTMLInputElement | null;
+                        }}
                         placeholder="ex: Jean Dupont"
                         className="col-span-4"
                         autoComplete="off"
@@ -485,10 +451,10 @@ export const UsersActionDialog = ({
           <Button
             type="submit"
             form="user-form"
-            disabled={loading || !form.formState.isValid}
+            disabled={loading || isCreating || isUpdating || isUploading || !form.formState.isValid}
             aria-busy={loading}
           >
-            {loading ? "Enregistrement..." : isEdit ? "Enregistrer" : "Créer"}
+            {loading || isCreating || isUpdating || isUploading ? "Enregistrement..." : isEdit ? "Enregistrer" : "Créer"}
           </Button>
         </DialogFooter>
       </DialogContent>

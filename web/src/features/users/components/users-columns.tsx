@@ -6,31 +6,34 @@ import { Badge } from "@/components/ui/badge";
 import type { ColumnDef } from "@tanstack/react-table";
 import { userRoles } from "../data/data";
 import type { User } from "../data/schema";
+import { useTemporaryAvatar } from "../hooks/useTemporaryAvatar";
 import { DataTableRowActions } from "./data-table-row-actions";
+
+function UserAvatarCell({ user }: { user: User }) {
+  const { data: tempUrl } = useTemporaryAvatar(user.id, true);
+  const buildInitials = (name: string) => {
+    const parts = name.trim().split(/\s+/);
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+    return (parts[0][0] + (parts[1]?.[0] || "")).toUpperCase();
+  };
+  const initials = buildInitials(user.fullName || user.email);
+  return (
+    <div className="flex items-center justify-center">
+      <Avatar className="h-8 w-8 ring-1 ring-border">
+        <AvatarImage src={tempUrl || user.avatarUrl || undefined} alt={user.fullName} />
+        <AvatarFallback className="bg-primary/20 text-primary font-bold">
+          {initials}
+        </AvatarFallback>
+      </Avatar>
+    </div>
+  );
+}
 
 export const UsersColumns: ColumnDef<User>[] = [
   {
     id: "avatar",
     header: () => <span className="sr-only">Avatar</span>,
-    cell: ({ row }) => {
-      const { avatarUrl, fullName, email } = row.original;
-      const buildInitials = (name: string) => {
-        const parts = name.trim().split(/\s+/);
-        if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
-        return (parts[0][0] + (parts[1]?.[0] || "")).toUpperCase();
-      };
-      const initials = buildInitials(fullName || email);
-      return (
-        <div className="flex items-center justify-center">
-          <Avatar className="h-8 w-8 ring-1 ring-border">
-            <AvatarImage src={avatarUrl || undefined} alt={fullName} />
-            <AvatarFallback className="bg-primary/20 text-primary font-bold">
-              {initials}
-            </AvatarFallback>
-          </Avatar>
-        </div>
-      );
-    },
+  cell: ({ row }) => <UserAvatarCell user={row.original} />,
     meta: {
       className:
         "sticky left-0 z-30 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-[inset_-1px_0_0_0_hsl(var(--border))]",
