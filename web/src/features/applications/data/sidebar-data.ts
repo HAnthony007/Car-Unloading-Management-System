@@ -46,12 +46,16 @@ export const sidebarItems: SidebarItem[] = [
     icon: "dock",
     item: [
       {
-        title: "Liste des Navires",
-        url: "/dashboard/port/ships",
+        title: "Liste des Parkings",
+        url: "/dashboard/port/parkings",
       },
       {
         title: "Liste des Quais",
         url: "/dashboard/port/wharves",
+      },
+      {
+        title: "Liste des Navires",
+        url: "/dashboard/port/vessels",
       },
     ]
   },
