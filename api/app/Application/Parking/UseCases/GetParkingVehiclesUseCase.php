@@ -17,7 +17,7 @@ final class GetParkingVehiclesUseCase
     ) {}
 
     /**
-     * @return array{parking_id:int, parking_name:string, total:int, vehicles: array<int, Vehicle>}
+     * @return array{parking_id:int, parking_name:string, total:int, vehicles: array<int, Vehicle>, parking_numbers: array<int, string|null>}
      */
     public function execute(int $parkingId): array
     {
@@ -39,11 +39,15 @@ final class GetParkingVehiclesUseCase
             }
         }
 
+        $parkingNumbers = $this->movementRepository->findLatestParkingNumbersForVehiclesAtLocation($locationName);
+
         return [
             'parking_id' => $parking->getParkingId()?->getValue() ?? $parkingId,
             'parking_name' => $locationName,
             'total' => count($vehicles),
             'vehicles' => $vehicles,
+            // Map vehicle_id => parking_number (nullable). Only filled for Mahasarika; null elsewhere.
+            'parking_numbers' => $parkingNumbers,
         ];
     }
 }

@@ -9,6 +9,7 @@ final class CreateMovementDTO
         public readonly string $timestamp, // ISO string or Y-m-d H:i:s
         public readonly ?string $from,
         public readonly ?string $to,
+        public readonly ?string $parkingNumber,
         public readonly int $vehicleId,
         public readonly int $userId,
     ) {}
@@ -20,6 +21,7 @@ final class CreateMovementDTO
             timestamp: $data['timestamp'] ?? now()->toDateTimeString(),
             from: $data['from'] ?? null,
             to: $data['to'] ?? null,
+            parkingNumber: $data['parking_number'] ?? null,
             vehicleId: (int) ($data['vehicle_id'] ?? 0),
             userId: (int) ($data['user_id'] ?? 0),
         );

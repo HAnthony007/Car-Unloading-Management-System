@@ -13,6 +13,7 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
+        // Always create a fixed admin account
         User::insert([
             [
                 'matriculation_no' => 'ADM001',
@@ -23,15 +24,7 @@ class UserSeeder extends Seeder
                 'phone' => '0345511784',
                 'role_id' => 1,
             ],
-            [
-                'matriculation_no' => 'AGT001',
-                'full_name' => 'Rabe Anthony',
-                'email' => 'agent@gmail.com',
-                'password' => Hash::make('agent123'),
-                'avatar' => '',
-                'phone' => '0320228232',
-                'role_id' => 2,
-            ],
         ]);
+        User::factory()->count(20)->create();
     }
 }

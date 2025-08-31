@@ -23,8 +23,8 @@ final class ParkingController
         private readonly GetParkingsUseCase $getParkingsUseCase,
         private readonly GetParkingUseCase $getParkingUseCase,
         private readonly UpdateParkingUseCase $updateParkingUseCase,
-    private readonly DeleteParkingUseCase $deleteParkingUseCase,
-    private readonly GetParkingVehiclesUseCase $getParkingVehiclesUseCase,
+        private readonly DeleteParkingUseCase $deleteParkingUseCase,
+        private readonly GetParkingVehiclesUseCase $getParkingVehiclesUseCase,
     ) {}
 
     public function index(): AnonymousResourceCollection
@@ -109,11 +109,22 @@ final class ParkingController
         try {
             $result = $this->getParkingVehiclesUseCase->execute($parkingId);
 
+            // Inline parking_number into each vehicle item
+            $map = $result['parking_numbers'];
+            $vehicles = array_map(function ($v) use ($map) {
+                $resource = new \App\Presentation\Http\Resources\VehicleResource($v);
+                $data = $resource->toArray(request());
+                $vehicleId = $data['vehicle_id'] ?? null;
+                $data['parking_number'] = $vehicleId !== null ? ($map[$vehicleId] ?? null) : null;
+
+                return $data;
+            }, $result['vehicles']);
+
             return response()->json([
                 'parking_id' => $result['parking_id'],
                 'parking_name' => $result['parking_name'],
                 'total' => $result['total'],
-                'vehicles' => \App\Presentation\Http\Resources\VehicleResource::collection($result['vehicles']),
+                'vehicles' => $vehicles,
             ]);
         } catch (\Throwable $e) {
             return response()->json([

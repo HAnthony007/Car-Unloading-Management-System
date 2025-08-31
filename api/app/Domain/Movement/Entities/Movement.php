@@ -18,6 +18,7 @@ final class Movement
         private readonly VehicleLocation $to,
         private readonly VehicleId $vehicleId,
         private readonly UserId $userId,
+        private readonly ?string $parkingNumber = null,
         private readonly ?Carbon $createdAt = null,
         private readonly ?Carbon $updatedAt = null,
     ) {}
@@ -57,6 +58,11 @@ final class Movement
         return $this->userId;
     }
 
+    public function getParkingNumber(): ?string
+    {
+        return $this->parkingNumber;
+    }
+
     public function getCreatedAt(): ?Carbon
     {
         return $this->createdAt;
@@ -77,6 +83,7 @@ final class Movement
             'to' => $this->to->getValue(),
             'vehicle_id' => $this->vehicleId->getValue(),
             'user_id' => $this->userId->getValue(),
+            'parking_number' => $this->parkingNumber,
             'created_at' => $this->createdAt?->toISOString(),
             'updated_at' => $this->updatedAt?->toISOString(),
         ];

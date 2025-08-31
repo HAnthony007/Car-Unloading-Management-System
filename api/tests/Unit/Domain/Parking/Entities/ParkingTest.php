@@ -69,20 +69,10 @@ test('should convert to array correctly', function () {
     expect($array['updated_at'])->toBe($now->toISOString());
 });
 
-test('should throw exception for Mahasarika parking without parking number', function () {
-    expect(fn () => new Parking(
+test('should not require parking number on parking entity level', function () {
+    $parking = new Parking(
         parkingId: new ParkingId(1),
         parkingName: new ParkingName('Mahasarika'),
-        location: new Location('Location'),
-        capacity: new Capacity(100),
-        parkingNumber: null
-    ))->toThrow(InvalidArgumentException::class, 'Parking number is required for Mahasarika parking.');
-});
-
-test('should not throw exception for non-Mahasarika parking without parking number', function () {
-    $parking = new Parking(
-        parkingId: new ParkingId(2),
-        parkingName: new ParkingName('Other Parking'),
         location: new Location('Location'),
         capacity: new Capacity(100),
         parkingNumber: null

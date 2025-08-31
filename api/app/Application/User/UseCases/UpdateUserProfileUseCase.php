@@ -3,9 +3,9 @@
 namespace App\Application\User\UseCases;
 
 use App\Application\User\DTOs\UpdateUsersProfileDTO;
-use App\Domain\User\Entities\User;
 use App\Domain\Role\Repositories\RoleRepositoryInterface;
 use App\Domain\Role\ValueObjects\RoleId as DomainRoleId;
+use App\Domain\User\Entities\User;
 use App\Domain\User\Repositories\UserRepositoryInterface;
 use App\Domain\User\ValueObjects\UserId;
 

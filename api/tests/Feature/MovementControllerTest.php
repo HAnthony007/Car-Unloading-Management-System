@@ -67,6 +67,7 @@ function ensure_movement_schema(): void
             $table->dateTime('timestamp');
             $table->string('from')->nullable();
             $table->string('to')->nullable();
+            $table->string('parking_number', 50)->nullable();
             $table->unsignedBigInteger('vehicle_id');
             $table->unsignedBigInteger('user_id');
             $table->timestamps();

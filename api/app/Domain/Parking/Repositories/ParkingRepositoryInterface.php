@@ -9,6 +9,8 @@ interface ParkingRepositoryInterface
 {
     public function findById(ParkingId $parkingId): ?Parking;
 
+    public function findByName(string $parkingName): ?Parking;
+
     public function findAll(): array;
 
     public function save(Parking $parking): Parking;

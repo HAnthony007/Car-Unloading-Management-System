@@ -6,6 +6,9 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
+// Reuse helper from SpaAuthTest
+require_once __DIR__.'/SpaAuthTest.php';
+
 it('returns specific error when email does not exist', function (): void {
     // Arrange: only role, no user for provided email
     $role = Role::factory()->create();

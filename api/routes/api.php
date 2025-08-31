@@ -100,8 +100,8 @@ Route::prefix('parkings')
         Route::get('/', [\App\Presentation\Http\Controllers\ParkingController::class, 'index'])->name('parkings.index');
         Route::post('/', [\App\Presentation\Http\Controllers\ParkingController::class, 'store'])->name('parkings.store');
         Route::get('/{id}', [\App\Presentation\Http\Controllers\ParkingController::class, 'show'])->name('parkings.show');
-    // Vehicles currently in this parking (based on latest movement destination)
-    Route::get('/{id}/vehicles', [\App\Presentation\Http\Controllers\ParkingController::class, 'vehicles'])->name('parkings.vehicles');
+        // Vehicles currently in this parking (based on latest movement destination)
+        Route::get('/{id}/vehicles', [\App\Presentation\Http\Controllers\ParkingController::class, 'vehicles'])->name('parkings.vehicles');
         Route::put('/{id}', [\App\Presentation\Http\Controllers\ParkingController::class, 'update'])->name('parkings.update');
         Route::delete('/{id}', [\App\Presentation\Http\Controllers\ParkingController::class, 'destroy'])->name('parkings.destroy');
     });

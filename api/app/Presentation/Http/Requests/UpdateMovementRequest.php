@@ -20,6 +20,7 @@ final class UpdateMovementRequest extends FormRequest
             'timestamp' => ['nullable', 'date'],
             'from' => ['nullable', 'string', 'max:255'],
             'to' => ['nullable', 'string', 'max:255'],
+            'parking_number' => ['nullable', 'string', 'max:50', 'required_if:to,Mahasarika'],
         ];
     }
 

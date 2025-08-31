@@ -6,27 +6,26 @@ use App\Application\Auth\DTOs\LoginDTO;
 use App\Application\Auth\DTOs\RegisterDTO;
 use App\Application\Auth\UseCases\LoginUseCase;
 use App\Application\Auth\UseCases\LogoutUseCase;
-use App\Application\Auth\UseCases\SpaLoginUseCase;
 use App\Application\Auth\UseCases\RegisterUseCase;
+use App\Application\Auth\UseCases\SpaLoginUseCase;
 use App\Application\User\UseCases\GetUserUseCase;
+use App\Models\User;
 use App\Presentation\Http\Requests\Auth\LoginRequest;
 use App\Presentation\Http\Requests\Auth\RegisterRequest;
 use App\Presentation\Http\Resources\UserResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\ValidationException;
-use App\Models\User;
 
 final class AuthController extends Controller
 {
     public function __construct(
         private readonly RegisterUseCase $registerUseCase,
         private readonly LoginUseCase $loginUseCase,
-    private readonly LogoutUseCase $logoutUseCase,
-    private readonly SpaLoginUseCase $spaLoginUseCase,
+        private readonly LogoutUseCase $logoutUseCase,
+        private readonly SpaLoginUseCase $spaLoginUseCase,
         private readonly GetUserUseCase $getUserUseCase,
     ) {}
 
@@ -107,8 +106,8 @@ final class AuthController extends Controller
         RateLimiter::clear($key);
         $request->session()->regenerate();
 
-    $authUser = Auth::user();
-    $domainUser = $this->getUserUseCase->execute($authUser->getKey());
+        $authUser = Auth::user();
+        $domainUser = $this->getUserUseCase->execute($authUser->getKey());
 
         return response()->json([
             'message' => 'Signed in successfully.',

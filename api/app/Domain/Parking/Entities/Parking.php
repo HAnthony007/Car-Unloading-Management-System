@@ -19,12 +19,7 @@ final class Parking
         private readonly ?ParkingNumber $parkingNumber = null,
         private readonly ?Carbon $createdAt = null,
         private readonly ?Carbon $updatedAt = null
-    ) {
-        // Validation for Mahasarika parking
-        if ($this->parkingId?->getValue() === 1 && $this->parkingName->getValue() === 'Mahasarika' && $this->parkingNumber === null) {
-            throw new \InvalidArgumentException('Parking number is required for Mahasarika parking.');
-        }
-    }
+    ) {}
 
     public function getParkingId(): ?ParkingId
     {

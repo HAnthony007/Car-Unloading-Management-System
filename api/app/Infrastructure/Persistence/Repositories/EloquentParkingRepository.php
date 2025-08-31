@@ -13,6 +13,13 @@ use App\Models\Parking as EloquentParking;
 
 final class EloquentParkingRepository implements ParkingRepositoryInterface
 {
+    public function findByName(string $parkingName): ?Parking
+    {
+        $eloquentParking = EloquentParking::where('parking_name', $parkingName)->first();
+
+        return $eloquentParking ? $this->toDomainEntity($eloquentParking) : null;
+    }
+
     public function findById(ParkingId $parkingId): ?Parking
     {
         $eloquentParking = EloquentParking::find($parkingId->getValue());

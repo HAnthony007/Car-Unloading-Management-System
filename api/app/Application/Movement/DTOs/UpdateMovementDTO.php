@@ -10,6 +10,7 @@ final class UpdateMovementDTO
         public readonly ?string $timestamp,
         public readonly ?string $from,
         public readonly ?string $to,
+        public readonly ?string $parkingNumber = null,
     ) {}
 
     public static function fromArray(array $data): self
@@ -20,6 +21,7 @@ final class UpdateMovementDTO
             timestamp: $data['timestamp'] ?? null,
             from: $data['from'] ?? null,
             to: $data['to'] ?? null,
+            parkingNumber: $data['parking_number'] ?? null,
         );
     }
 }

@@ -1,1 +1,3 @@
-<?php // Deprecated file intentionally left blank.
+<?php
+
+// Deprecated file intentionally left blank.

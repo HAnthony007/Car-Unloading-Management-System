@@ -11,7 +11,7 @@ final class UpdateUsersProfileDTO
         public readonly ?string $fullName = null,
         public readonly ?string $avatar = null,
         public readonly ?string $phone = null,
-    public readonly ?int $roleId = null,
+        public readonly ?int $roleId = null,
     ) {}
 
     public static function fromArray(array $data): self

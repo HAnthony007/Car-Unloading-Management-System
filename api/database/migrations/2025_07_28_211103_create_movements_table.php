@@ -17,6 +17,8 @@ return new class extends Migration
             $table->dateTime('timestamp');
             $table->string('from')->nullable();
             $table->string('to')->nullable();
+            // Per-vehicle slot number when moving to Mahasarika; null elsewhere
+            $table->string('parking_number', 50)->nullable();
             $table->foreignId('vehicle_id')->constrained('vehicles', 'vehicle_id');
             $table->foreignId('user_id')->constrained('users', 'user_id');
             $table->timestamps();

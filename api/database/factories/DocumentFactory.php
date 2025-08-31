@@ -20,7 +20,8 @@ class DocumentFactory extends Factory
             'document_description' => fake()->sentence(),
             'type' => fake()->randomElement(['invoice', 'bill_of_lading', 'customs', 'other']),
             'uploaded_at' => fake()->dateTimeBetween('-10 days', 'now'),
-            'follow_up_file_id' => FollowUpFile::factory(),
+            // Prefer an existing FUF to avoid cascading new Vehicle creation
+            'follow_up_file_id' => fn () => FollowUpFile::query()->inRandomOrder()->value('follow_up_file_id') ?? FollowUpFile::factory(),
         ];
     }
 }

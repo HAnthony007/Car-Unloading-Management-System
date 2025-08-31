@@ -7,9 +7,9 @@ final class UserSearchCriteriaDTO
     public function __construct(
         public readonly ?string $matriculationPrefix = null,
         public readonly ?int $roleId = null,
-    public readonly ?array $roleIds = null,
-    public readonly ?string $role = null,
-    public readonly ?array $roles = null,
+        public readonly ?array $roleIds = null,
+        public readonly ?string $role = null,
+        public readonly ?array $roles = null,
         public readonly ?bool $emailVerified = null,
         public readonly ?bool $isActive = null,
         public readonly ?string $searchTerm = null,

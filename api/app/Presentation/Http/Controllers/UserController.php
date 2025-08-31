@@ -30,7 +30,7 @@ final class UserController extends Controller
         private readonly GetUsersByInstitutionUseCase $getUsersByInstitutionUseCase,
         private readonly SearchUsersUseCase $searchUsersUseCase,
         private readonly UpdateUserProfileUseCase $updateUserProfileUseCase,
-    private readonly ImportUsersUseCase $importUsersUseCase,
+        private readonly ImportUsersUseCase $importUsersUseCase,
     ) {}
 
     public function index(SearchUsersRequest $request): JsonResponse
@@ -164,5 +164,4 @@ final class UserController extends Controller
             ], 400);
         }
     }
-
 }

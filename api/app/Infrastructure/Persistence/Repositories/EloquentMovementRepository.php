@@ -59,6 +59,7 @@ final class EloquentMovementRepository implements MovementRepositoryInterface
         $e->to = $movement->getTo()->getValue();
         $e->vehicle_id = $movement->getVehicleId()->getValue();
         $e->user_id = $movement->getUserId()->getValue();
+        $e->parking_number = $movement->getParkingNumber();
         $e->save();
 
         return $this->toDomain($e);
@@ -118,15 +119,36 @@ final class EloquentMovementRepository implements MovementRepositoryInterface
 
         // Join to get the row(s) representing the latest movement per vehicle
         $rows = EloquentMovement::joinSub($sub, 'latest', function ($join) {
-                $join->on('movements.vehicle_id', '=', 'latest.vehicle_id')
-                    ->on('movements.timestamp', '=', 'latest.latest_ts');
-            })
+            $join->on('movements.vehicle_id', '=', 'latest.vehicle_id')
+                ->on('movements.timestamp', '=', 'latest.latest_ts');
+        })
             ->where('movements.to', $locationName)
             ->distinct()
             ->pluck('movements.vehicle_id')
             ->all();
 
         return array_map('intval', $rows);
+    }
+
+    public function findLatestParkingNumbersForVehiclesAtLocation(string $locationName): array
+    {
+        $sub = EloquentMovement::selectRaw('vehicle_id, MAX(timestamp) as latest_ts')
+            ->groupBy('vehicle_id');
+
+        // Map vehicle_id => parking_number for latest movement at location
+        $rows = EloquentMovement::joinSub($sub, 'latest', function ($join) {
+            $join->on('movements.vehicle_id', '=', 'latest.vehicle_id')
+                ->on('movements.timestamp', '=', 'latest.latest_ts');
+        })
+            ->where('movements.to', $locationName)
+            ->get(['movements.vehicle_id', 'movements.parking_number']);
+
+        $map = [];
+        foreach ($rows as $row) {
+            $map[(int) $row->vehicle_id] = $row->parking_number; // may be null
+        }
+
+        return $map;
     }
 
     private function toDomain(EloquentMovement $e): DomainMovement
@@ -139,6 +161,7 @@ final class EloquentMovementRepository implements MovementRepositoryInterface
             to: new VehicleLocation($e->to),
             vehicleId: new VehicleId($e->vehicle_id),
             userId: new UserId($e->user_id),
+            parkingNumber: $e->parking_number,
             createdAt: $e->created_at,
             updatedAt: $e->updated_at,
         );

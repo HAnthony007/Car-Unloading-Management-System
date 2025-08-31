@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Role;
+use Database\Factories\Providers\MalagasyPersonProvider;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -24,13 +25,19 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
+        // Register Malagasy provider once per factory instance
+        if (! collect($this->faker->getProviders())->first(fn ($p) => $p instanceof MalagasyPersonProvider)) {
+            $this->faker->addProvider(new MalagasyPersonProvider($this->faker));
+        }
+
         return [
             'matriculation_no' => 'USER'.fake()->unique()->numberBetween(1000, 9999),
-            'full_name' => fake()->name(),
+            'full_name' => $this->faker->malagasyFullName(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'role_id' => Role::factory(),
+            'phone' => $this->faker->malagasyPhone(),
             'remember_token' => Str::random(10),
         ];
     }

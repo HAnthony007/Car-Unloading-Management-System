@@ -13,7 +13,6 @@ final class SpaLoginUseCase
     /**
      * Validate email and password using the domain repository and return the Domain User.
      *
-     * @return DomainUser
      *
      * @throws \Illuminate\Validation\ValidationException
      */

@@ -35,4 +35,12 @@ interface MovementRepositoryInterface
      * @return array<int>
      */
     public function findVehicleIdsAtLocation(string $locationName): array;
+
+    /**
+     * Return a map of vehicle_id => parking_number (nullable) for vehicles whose latest
+     * movement destination equals the given location name.
+     *
+     * @return array<int, string|null>
+     */
+    public function findLatestParkingNumbersForVehiclesAtLocation(string $locationName): array;
 }

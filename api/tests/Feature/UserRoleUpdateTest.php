@@ -22,7 +22,7 @@ it('updates user role via PUT /api/users/{id}', function () {
         'email_verified_at' => now(),
     ]);
 
-    $response = \Pest\Laravel\putJson('/api/users/' . $target->user_id, [
+    $response = \Pest\Laravel\putJson('/api/users/'.$target->user_id, [
         'role_id' => $roleAdmin->role_id,
     ]);
 
@@ -49,7 +49,7 @@ it('validates role exists when updating via PUT /api/users/{id}', function () {
         'email_verified_at' => now(),
     ]);
 
-    $response = \Pest\Laravel\putJson('/api/users/' . $target->user_id, [
+    $response = \Pest\Laravel\putJson('/api/users/'.$target->user_id, [
         'role_id' => 999999,
     ]);
 

@@ -19,8 +19,9 @@ class SurveyFactory extends Factory
         return [
             'date' => fake()->date(),
             'result' => fake()->randomElement(['OK', 'KO', 'Pending']),
-            'user_id' => User::factory(),
-            'follow_up_file_id' => FollowUpFile::factory(),
+            // Prefer existing records to avoid inflating counts indirectly
+            'user_id' => fn () => User::query()->inRandomOrder()->value('user_id') ?? User::factory(),
+            'follow_up_file_id' => fn () => FollowUpFile::query()->inRandomOrder()->value('follow_up_file_id') ?? FollowUpFile::factory(),
         ];
     }
 }

@@ -9,6 +9,6 @@ class FollowUpFileSeeder extends Seeder
 {
     public function run(): void
     {
-        FollowUpFile::factory()->count(15)->create();
+        FollowUpFile::factory()->count(10)->create();
     }
 }

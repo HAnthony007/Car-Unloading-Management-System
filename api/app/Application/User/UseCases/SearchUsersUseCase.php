@@ -33,12 +33,14 @@ final class SearchUsersUseCase
                 if ($name === null) {
                     return false; // no role entity available → exclude unless we map IDs elsewhere
                 }
+
                 return isset($roleNames[strtolower($name)]);
             });
         } elseif ($criteria->role && $criteria->role !== '') {
             $roleName = $criteria->role;
             $users = array_filter($users, function ($user) use ($roleName) {
                 $name = $user->getRole()?->getRoleName();
+
                 return $name !== null && strtolower($name) === strtolower($roleName);
             });
         } elseif ($criteria->roleIds && count($criteria->roleIds) > 0) {

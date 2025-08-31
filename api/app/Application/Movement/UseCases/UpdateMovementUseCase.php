@@ -7,11 +7,15 @@ use App\Domain\Movement\Entities\Movement as DomainMovement;
 use App\Domain\Movement\Repositories\MovementRepositoryInterface;
 use App\Domain\Movement\ValueObjects\MovementId;
 use App\Domain\Movement\ValueObjects\VehicleLocation;
+use App\Domain\Parking\Repositories\ParkingRepositoryInterface;
 use Carbon\Carbon;
 
 final class UpdateMovementUseCase
 {
-    public function __construct(private readonly MovementRepositoryInterface $repository) {}
+    public function __construct(
+        private readonly MovementRepositoryInterface $repository,
+        private readonly ParkingRepositoryInterface $parkingRepository
+    ) {}
 
     public function execute(UpdateMovementDTO $dto): DomainMovement
     {
@@ -19,6 +23,25 @@ final class UpdateMovementUseCase
         if (! $existing) {
             throw new \RuntimeException('Movement not found.');
         }
+
+        $newTo = $dto->to !== null ? $dto->to : $existing->getTo()->getValue();
+
+        // Capacity check if destination changes into a known parking
+        if ($dto->to !== null && $dto->to !== $existing->getTo()->getValue()) {
+            $parking = $this->parkingRepository->findByName($newTo);
+            if ($parking) {
+                $capacity = $parking->getCapacity()->getValue();
+                $currentVehicleIds = $this->repository->findVehicleIdsAtLocation($newTo);
+                $currentCount = count($currentVehicleIds);
+                $effectiveAfter = $currentCount + 1; // this vehicle moves into this parking
+                if ($effectiveAfter > $capacity) {
+                    throw new \RuntimeException('Parking capacity exceeded for '.$newTo.'.');
+                }
+            }
+        }
+        $newParkingNumber = $newTo === 'Mahasarika'
+            ? ($dto->parkingNumber ?? $existing->getParkingNumber())
+            : null;
 
         $updated = new DomainMovement(
             movementId: $existing->getMovementId(),
@@ -28,6 +51,7 @@ final class UpdateMovementUseCase
             to: $dto->to !== null ? new VehicleLocation($dto->to) : $existing->getTo(),
             vehicleId: $existing->getVehicleId(),
             userId: $existing->getUserId(),
+            parkingNumber: $newParkingNumber,
             createdAt: $existing->getCreatedAt(),
             updatedAt: $existing->getUpdatedAt(),
         );
