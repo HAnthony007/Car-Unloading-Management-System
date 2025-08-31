@@ -18,6 +18,7 @@ export const vehicleSchema = z.object({
   dischargeId: z.number().nullable().optional(),
   createdAt: z.string().optional().or(z.literal("")),
   updatedAt: z.string().optional().or(z.literal("")),
+  parkingNumber: z.string().optional().or(z.literal("")),
 });
 
 export type Vehicle = z.infer<typeof vehicleSchema>;
