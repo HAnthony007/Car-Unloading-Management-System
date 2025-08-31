@@ -28,4 +28,11 @@ interface MovementRepositoryInterface
      * @return array{data: array<int, Movement>, current_page: int, from: int, last_page: int, path: string, per_page: int, to: int, total: int}
      */
     public function search(?int $vehicleId, ?int $userId, ?string $from, ?string $to, ?string $note, int $page, int $perPage): array;
+
+    /**
+     * Return vehicle IDs whose latest movement destination equals the given location name.
+     *
+     * @return array<int>
+     */
+    public function findVehicleIdsAtLocation(string $locationName): array;
 }

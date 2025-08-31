@@ -6,6 +6,7 @@ use App\Application\Parking\UseCases\CreateParkingUseCase;
 use App\Application\Parking\UseCases\DeleteParkingUseCase;
 use App\Application\Parking\UseCases\GetParkingsUseCase;
 use App\Application\Parking\UseCases\GetParkingUseCase;
+use App\Application\Parking\UseCases\GetParkingVehiclesUseCase;
 use App\Application\Parking\UseCases\UpdateParkingUseCase;
 use App\Domain\Parking\Repositories\ParkingRepositoryInterface;
 use App\Infrastructure\Persistence\Repositories\EloquentParkingRepository;
@@ -49,6 +50,14 @@ class ParkingServiceProvider extends ServiceProvider
         $this->app->bind(DeleteParkingUseCase::class, function ($app) {
             return new DeleteParkingUseCase(
                 $app->make(ParkingRepositoryInterface::class)
+            );
+        });
+
+        $this->app->bind(GetParkingVehiclesUseCase::class, function ($app) {
+            return new GetParkingVehiclesUseCase(
+                $app->make(ParkingRepositoryInterface::class),
+                $app->make(\App\Domain\Movement\Repositories\MovementRepositoryInterface::class),
+                $app->make(\App\Domain\Vehicle\Repositories\VehicleRepositoryInterface::class),
             );
         });
     }

@@ -1,3 +1,7 @@
+## Parking Vehicles Endpoint
+
+- GET /api/parkings/{id}/vehicles — retourne le nombre total et la liste des véhicules présents (basé sur le dernier mouvement)
+
 # Guide d'utilisation de l'API
 
 Ce document présente clairement comment utiliser les routes de l'API exposées dans `routes/api.php`.

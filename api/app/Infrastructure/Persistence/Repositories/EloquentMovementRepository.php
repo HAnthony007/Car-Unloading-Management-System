@@ -110,6 +110,25 @@ final class EloquentMovementRepository implements MovementRepositoryInterface
         ];
     }
 
+    public function findVehicleIdsAtLocation(string $locationName): array
+    {
+        // Subquery to get latest movement timestamp per vehicle
+        $sub = EloquentMovement::selectRaw('vehicle_id, MAX(timestamp) as latest_ts')
+            ->groupBy('vehicle_id');
+
+        // Join to get the row(s) representing the latest movement per vehicle
+        $rows = EloquentMovement::joinSub($sub, 'latest', function ($join) {
+                $join->on('movements.vehicle_id', '=', 'latest.vehicle_id')
+                    ->on('movements.timestamp', '=', 'latest.latest_ts');
+            })
+            ->where('movements.to', $locationName)
+            ->distinct()
+            ->pluck('movements.vehicle_id')
+            ->all();
+
+        return array_map('intval', $rows);
+    }
+
     private function toDomain(EloquentMovement $e): DomainMovement
     {
         return new DomainMovement(

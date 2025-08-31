@@ -8,6 +8,7 @@ use App\Application\Parking\UseCases\CreateParkingUseCase;
 use App\Application\Parking\UseCases\DeleteParkingUseCase;
 use App\Application\Parking\UseCases\GetParkingsUseCase;
 use App\Application\Parking\UseCases\GetParkingUseCase;
+use App\Application\Parking\UseCases\GetParkingVehiclesUseCase;
 use App\Application\Parking\UseCases\UpdateParkingUseCase;
 use App\Presentation\Http\Requests\StoreParkingRequest;
 use App\Presentation\Http\Requests\UpdateParkingRequest;
@@ -22,7 +23,8 @@ final class ParkingController
         private readonly GetParkingsUseCase $getParkingsUseCase,
         private readonly GetParkingUseCase $getParkingUseCase,
         private readonly UpdateParkingUseCase $updateParkingUseCase,
-        private readonly DeleteParkingUseCase $deleteParkingUseCase
+    private readonly DeleteParkingUseCase $deleteParkingUseCase,
+    private readonly GetParkingVehiclesUseCase $getParkingVehiclesUseCase,
     ) {}
 
     public function index(): AnonymousResourceCollection
@@ -97,6 +99,25 @@ final class ParkingController
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Failed to delete parking.',
+                'error' => $e->getMessage(),
+            ], 404);
+        }
+    }
+
+    public function vehicles(int $parkingId): JsonResponse
+    {
+        try {
+            $result = $this->getParkingVehiclesUseCase->execute($parkingId);
+
+            return response()->json([
+                'parking_id' => $result['parking_id'],
+                'parking_name' => $result['parking_name'],
+                'total' => $result['total'],
+                'vehicles' => \App\Presentation\Http\Resources\VehicleResource::collection($result['vehicles']),
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'message' => 'Failed to fetch parking vehicles.',
                 'error' => $e->getMessage(),
             ], 404);
         }
