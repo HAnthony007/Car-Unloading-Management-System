@@ -13,7 +13,7 @@ export const sidebarItems: SidebarItem[] = [
     item: [
       {
         title: "Import Manifest",
-        url: "/dashboard/followup/import",
+        url: "/dashboard/followup/manifest",
       },
       {
         title: "Dossiers des vehicules",
@@ -21,7 +21,7 @@ export const sidebarItems: SidebarItem[] = [
       },
       {
         title: "Liste des vehicules",
-        url: "/dashboard/followup/vehicules",
+        url: "/dashboard/followup/vehicles",
       },
     ]
   },
@@ -43,7 +43,7 @@ export const sidebarItems: SidebarItem[] = [
   {
     title: "Gestion Portuaire",
     url: "/dashboard/port",
-    icon: "users",
+    icon: "dock",
     item: [
       {
         title: "Liste des Navires",
@@ -56,19 +56,9 @@ export const sidebarItems: SidebarItem[] = [
     ]
   },
   {
-    title: "Vehicles",
-    url: "/dashboard/vehicles",
-    icon: "vehicle",
-  },
-  {
-    title: "Parkings",
-    url: "/dashboard/parkings",
-    icon: "area",
-  },
-  {
-    title: "Docks",
-    url: "/dashboard/docks",
-    icon: "dock",
+    title: "Utilisateurs",
+    url: "/dashboard/users",
+    icon: "users",
   },
   {
     title: "Settings",
