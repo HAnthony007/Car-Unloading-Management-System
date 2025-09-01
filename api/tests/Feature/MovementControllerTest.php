@@ -99,7 +99,7 @@ it('creates, shows, updates, deletes and lists movements (auth required)', funct
     $portCallId = DB::table('port_calls')->insertGetId([
         'vessel_agent' => 'Agent Z',
         'origin_port' => 'Origin Z',
-        'estimated_arrival' => null,
+        'estimated_arrival' => now(),
         'arrival_date' => now(),
         'estimated_departure' => null,
         'departure_date' => null,

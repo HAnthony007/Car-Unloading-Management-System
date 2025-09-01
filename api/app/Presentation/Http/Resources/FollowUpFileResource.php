@@ -16,9 +16,9 @@ final class FollowUpFileResource extends JsonResource
         $id = $f->getFollowUpFileId()?->getValue();
 
         // Fetch related entities for enriched response
-    $vehicle = null;
-    $portCall = null;
-    $survey = null;
+        $vehicle = null;
+        $portCall = null;
+        $survey = null;
 
         try {
             $vehicleId = $f->getVehicleId()->getValue();

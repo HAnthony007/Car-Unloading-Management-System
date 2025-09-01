@@ -15,7 +15,7 @@ class SearchFollowUpFilesRequest extends FormRequest
     {
         return [
             'bill_of_lading' => ['sometimes', 'string', 'max:255'],
-            'status' => ['sometimes', 'in:OPEN,IN_PROGRESS,CLOSED'],
+            'status' => ['sometimes', 'in:OPEN,IN_PROGRESS,CLOSED,PENDING'],
             'vehicle_id' => ['sometimes', 'integer'],
             'port_call_id' => ['sometimes', 'integer'],
             'page' => ['sometimes', 'integer', 'min:1'],

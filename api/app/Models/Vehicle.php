@@ -11,6 +11,9 @@ class Vehicle extends Model
 
     protected $primaryKey = 'vehicle_id';
 
+    // Allow mass assignment for all attributes except the primary key (align with other models)
+    protected $guarded = ['vehicle_id'];
+
     public function discharge(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Discharge::class, 'discharge_id');

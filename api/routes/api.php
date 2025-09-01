@@ -57,6 +57,13 @@ Route::prefix('users')
         Route::get('/{userId}/avatar', [UserAvatarController::class, 'getUrl'])->name('users.avatar.url');
     });
 
+// Manifest import route
+Route::prefix('imports')
+    ->middleware('auth:sanctum')
+    ->group(function (): void {
+        Route::post('/manifest', [\App\Presentation\Http\Controllers\ManifestImportController::class, 'import'])->name('imports.manifest');
+    });
+
 // Surveys Management Routes
 Route::prefix('surveys')
     ->middleware('auth:sanctum')

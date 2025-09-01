@@ -73,7 +73,7 @@ it('creates, shows, updates, deletes and searches vehicles (auth required)', fun
     $portCallId = DB::table('port_calls')->insertGetId([
         'vessel_agent' => 'Agent T',
         'origin_port' => 'Origin',
-        'estimated_arrival' => null,
+        'estimated_arrival' => now(),
         'arrival_date' => now(),
         'estimated_departure' => null,
         'departure_date' => null,
@@ -177,7 +177,7 @@ it('validates payload and unique vin, and rejects invalid discharge', function (
     $portCallId = DB::table('port_calls')->insertGetId([
         'vessel_agent' => 'Agent A',
         'origin_port' => 'P1',
-        'estimated_arrival' => null,
+        'estimated_arrival' => now(),
         'arrival_date' => now(),
         'estimated_departure' => null,
         'departure_date' => null,

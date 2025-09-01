@@ -17,7 +17,8 @@ class PortCallFactory extends Factory
     public function definition(): array
     {
         $arrival = fake()->dateTimeBetween('-10 days', '+1 day');
-        $eta = fake()->boolean(70) ? fake()->dateTimeBetween('-12 days', $arrival) : null;
+        // estimated_arrival is NOT NULL in schema; always set it
+        $eta = fake()->dateTimeBetween('-12 days', $arrival);
         $etd = fake()->boolean(70) ? fake()->dateTimeBetween($arrival, '+10 days') : null;
         $departure = fake()->boolean(60) ? fake()->dateTimeBetween($arrival, '+12 days') : null;
 

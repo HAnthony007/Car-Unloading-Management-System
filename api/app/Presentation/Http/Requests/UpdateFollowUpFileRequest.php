@@ -15,7 +15,7 @@ class UpdateFollowUpFileRequest extends FormRequest
     {
         return [
             'bill_of_lading' => ['sometimes', 'string', 'max:255'],
-            'status' => ['sometimes', 'in:OPEN,IN_PROGRESS,CLOSED'],
+            'status' => ['sometimes', 'in:OPEN,IN_PROGRESS,CLOSED,PENDING'],
             'vehicle_id' => ['sometimes', 'integer', 'exists:vehicles,vehicle_id'],
             'port_call_id' => ['sometimes', 'integer', 'exists:port_calls,port_call_id'],
         ];

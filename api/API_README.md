@@ -493,7 +493,7 @@ Création:
 ```json
 {
     "bill_of_lading": "BL-2025-0001",
-    "status": "OPEN", // OPEN | IN_PROGRESS | CLOSED
+    "status": "OPEN", // OPEN | IN_PROGRESS | CLOSED | PENDING
     "port_call_id": 30
 }
 ```
@@ -506,7 +506,7 @@ Réponse (201):
     "data": {
         "follow_up_file_id": 10,
         "bill_of_lading": "BL-2025-0001",
-        "status": "OPEN",
+    "status": "OPEN",
         "port_call_id": 30
     }
 }

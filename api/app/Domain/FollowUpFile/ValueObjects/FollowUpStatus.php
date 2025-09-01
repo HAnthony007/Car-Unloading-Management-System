@@ -6,7 +6,7 @@ use InvalidArgumentException;
 
 final class FollowUpStatus
 {
-    public const ALLOWED = ['OPEN', 'IN_PROGRESS', 'CLOSED'];
+    public const ALLOWED = ['OPEN', 'IN_PROGRESS', 'CLOSED', 'PENDING'];
 
     public function __construct(private string $value)
     {

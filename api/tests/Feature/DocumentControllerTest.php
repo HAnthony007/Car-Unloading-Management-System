@@ -37,6 +37,7 @@ class DocumentControllerTest extends TestCase
         $pc = PortCall::query()->create([
             'vessel_agent' => 'Agent X',
             'origin_port' => 'Origin',
+            'estimated_arrival' => now(),
             'arrival_date' => now(),
             'vessel_id' => $vessel->vessel_id,
             'dock_id' => $dock->dock_id,

@@ -18,7 +18,7 @@ class FollowUpFileFactory extends Factory
     {
         return [
             'bill_of_lading' => 'BOL'.fake()->bothify('########??'),
-            'status' => fake()->randomElement(['OPEN', 'IN_PROGRESS', 'CLOSED']),
+            'status' => fake()->randomElement(['OPEN', 'IN_PROGRESS', 'CLOSED', 'PENDING']),
             // Prefer an existing vehicle to avoid inflating Vehicle count during seeding
             'vehicle_id' => fn () => Vehicle::query()->inRandomOrder()->value('vehicle_id') ?? Vehicle::factory(),
             'port_call_id' => PortCall::factory(),

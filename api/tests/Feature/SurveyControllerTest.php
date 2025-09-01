@@ -34,6 +34,7 @@ function make_support_graph(): array
     $pc = new PortCall;
     $pc->vessel_agent = 'Agent X';
     $pc->origin_port = 'Origin';
+    $pc->estimated_arrival = now();
     $pc->arrival_date = now();
     $pc->vessel_id = $vessel->vessel_id;
     $pc->dock_id = $dock->dock_id;
