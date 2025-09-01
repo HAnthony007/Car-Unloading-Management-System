@@ -79,6 +79,18 @@ class NavireSheetImport implements SkipsOnError, SkipsOnFailure, ToCollection, W
                     'origin_port' => 'origin port',
                     'eta' => 'eta',
                     'estimated_arrival' => 'estimated arrival',
+                    // total vehicles count variants
+                    'nombre_total_de_vehicules' => 'nombre total de vehicules',
+                    'nombre_total_vehicules' => 'nombre total de vehicules',
+                    'vehicules_total' => 'nombre total de vehicules',
+                    'total_vehicules' => 'nombre total de vehicules',
+                    'total_vehicles' => 'nombre total de vehicules',
+                    'vehicles_total' => 'nombre total de vehicules',
+                    'vehicles_number' => 'nombre total de vehicules',
+                    'nb_vehicules' => 'nombre total de vehicules',
+                    'nb-vehicules' => 'nombre total de vehicules',
+                    'nbre_vehicules' => 'nombre total de vehicules',
+                    'nb_vehicles' => 'nombre total de vehicules',
                 ] as $rawKey => $alias) {
                     if (isset($row[$rawKey])) {
                         $kv[$alias] = trim((string) $row[$rawKey]);
@@ -94,6 +106,7 @@ class NavireSheetImport implements SkipsOnError, SkipsOnFailure, ToCollection, W
             $agent = (string) ($this->getKvVal($kv, ['agent maritime', 'vessel agent', 'agent']) ?? '');
             $provenance = (string) ($this->getKvVal($kv, ['port de provenance', 'origin port', 'provenance', 'port d origine']) ?? '');
             $etaRaw = (string) ($this->getKvVal($kv, ['eta', 'estimated arrival']) ?? '');
+            $vehiclesTotalRaw = $this->getKvVal($kv, ['nombre total de vehicules', 'total vehicles', 'vehicles total', 'vehicles number', 'total vehicules', 'nb vehicules', 'nbre vehicules']);
 
             if ($imo === '' || $nomNavire === '' || $pavillon === '' || $agent === '' || $provenance === '' || $etaRaw === '') {
                 // If nothing usable found, skip silently to let vehicles trigger explicit error if needed
@@ -139,6 +152,7 @@ class NavireSheetImport implements SkipsOnError, SkipsOnFailure, ToCollection, W
                 'departure_date' => null,
                 'vessel_id' => $vessel->getKey(),
                 'dock_id' => null,
+                'vehicles_number' => $this->parseIntNullable($vehiclesTotalRaw),
             ]);
 
             $this->ctx->portCall = $portCall;
@@ -178,6 +192,23 @@ class NavireSheetImport implements SkipsOnError, SkipsOnFailure, ToCollection, W
         }
 
         return null;
+    }
+
+    private function parseIntNullable(?string $value): ?int
+    {
+        if ($value === null) {
+            return null;
+        }
+        $value = trim($value);
+        if ($value === '') {
+            return null;
+        }
+        // Allow numbers possibly with spaces or commas
+        $digits = preg_replace('/[^0-9]/', '', $value);
+        if ($digits === '') {
+            return null;
+        }
+        return (int) $digits;
     }
 
     public function headingRow(): int

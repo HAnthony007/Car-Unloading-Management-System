@@ -1,678 +1,436 @@
-import { FollowupFile, FollowupFileFormData } from "./schema";
+import { fetchWithCsrf } from "@/lib/http";
+import { FollowupFile, FollowupFileFormData, WorkflowStep } from "./schema";
 
-// Données de démonstration
-const mockFollowupFiles: FollowupFile[] = [
-    {
-        id: "1",
-        reference_number: "FU-2024-001",
-        status: "Ouvert",
-        vehicle_id: "V001",
-        port_call_id: "PC-2024-001",
-        created_at: "2024-01-15T08:00:00Z",
-        updated_at: "2024-01-20T14:30:00Z",
-        vehicle_info: {
-            plate_number: "AB-123-CD",
-            brand: "Toyota",
-            model: "Camry",
-            year: 2023,
+// --- Helpers ---
+type UnknownRecord = Record<string, unknown>;
+function isRecord(v: unknown): v is UnknownRecord {
+    return typeof v === "object" && v !== null;
+}
+
+function mapStatusToUi(statusRaw: unknown): FollowupFile["status"] {
+    const s = String(statusRaw ?? "").toUpperCase();
+    switch (s) {
+        case "PENDING":
+        case "WAITING":
+            return "En attente";
+        case "COMPLETED":
+        case "DONE":
+        case "CLOSED":
+            return "Fermé";
+        case "IN_PROGRESS":
+        default:
+            return "Ouvert";
+    }
+}
+
+// --- Workflow defaults ---
+function makeDefaultWorkflowSteps(
+    status: unknown,
+    recordId?: string,
+): WorkflowStep[] {
+    const s = String(status ?? "Ouvert");
+    const closed = s === "Fermé";
+    const idPrefix = recordId ? `${recordId}-` : "";
+    // Requested order:
+    // 1. Manifeste importe
+    // 2. Debarquement
+    // 3. Inspection et expertise
+    // 4. Dossier cloture
+    const steps: WorkflowStep[] = [
+        {
+            id: `${idPrefix}s1`,
+            name: "Manifeste importe",
+            description: "Fichier manifeste importé dans le système",
+            status: closed ? "Terminé" : "Terminé", // considéré terminé dès création du dossier
+            order: 1,
+            is_required: true,
         },
-        documents: [
-            {
-                id: "doc1",
-                name: "Connaissement Toyota Camry",
-                type: "Connaissement",
-                file_url: "/documents/connaissement-001.pdf",
-                uploaded_at: "2024-01-15T08:30:00Z",
-                uploaded_by: "John Doe",
-                status: "Approuvé",
-            },
-        ],
-        photos: [
-            {
-                id: "photo1",
-                description: "État général du véhicule à l'arrivée",
-                file_url: "/photos/vehicle-001-arrival.jpg",
-                taken_at: "2024-01-15T09:00:00Z",
-                taken_by: "John Doe",
-                category: "État du véhicule",
-            },
-        ],
-        workflow_steps: [
-            {
-                id: "step1",
-                name: "Inspection initiale",
-                description: "Vérification de l'état du véhicule à l'arrivée",
-                status: "Terminé",
-                assigned_to: "John Doe",
-                started_at: "2024-01-15T09:00:00Z",
-                completed_at: "2024-01-15T10:00:00Z",
-                order: 1,
-                is_required: true,
-            },
-            {
-                id: "step2",
-                name: "Placement au parking",
-                description: "Transfert du véhicule vers la zone de stockage",
-                status: "En cours",
-                assigned_to: "Jane Smith",
-                started_at: "2024-01-16T08:00:00Z",
-                order: 2,
-                is_required: true,
-            },
-        ],
-        inspections: [
-            {
-                id: "insp1",
-                type: "SURVEY",
-                status: "Terminée",
-                inspector: "John Doe",
-                scheduled_at: "2024-01-15T09:00:00Z",
-                started_at: "2024-01-15T09:00:00Z",
-                completed_at: "2024-01-15T10:00:00Z",
-                results: "Véhicule en bon état général",
-                findings: ["Pneus en bon état", "Carrosserie sans dommage"],
-                recommendations: ["Procéder au placement au parking"],
-            },
-        ],
-        assigned_inspector: "John Doe",
-        notes: "Véhicule en excellent état, traitement prioritaire",
-        priority: "Élevée",
-        estimated_completion_date: "2024-01-25T17:00:00Z",
-    },
-    {
-        id: "2",
-        reference_number: "FU-2024-002",
-        status: "En attente",
-        vehicle_id: "V002",
-        port_call_id: "PC-2024-002",
-        created_at: "2024-01-18T10:00:00Z",
-        updated_at: "2024-01-18T10:00:00Z",
-        vehicle_info: {
-            plate_number: "XY-789-ZW",
-            brand: "Honda",
-            model: "Civic",
-            year: 2022,
+        {
+            id: `${idPrefix}s2`,
+            name: "Debarquement",
+            description: "Véhicule débarqué du navire",
+            status: closed ? "Terminé" : "En attente",
+            order: 2,
+            is_required: true,
         },
+        {
+            id: `${idPrefix}s3`,
+            name: "Inspection et expertise",
+            description: "Contrôle visuel et expertise du véhicule",
+            status: closed ? "Terminé" : "En attente",
+            order: 3,
+            is_required: true,
+        },
+        {
+            id: `${idPrefix}s4`,
+            name: "Dossier cloture",
+            description: "Clôture administrative du dossier",
+            status: closed ? "Terminé" : "En attente",
+            order: 4,
+            is_required: true,
+        },
+    ];
+    return steps;
+}
+
+// --- Business rules helpers ---
+function stripAccents(input: string): string {
+    try {
+        return input.normalize("NFD").replace(/\p{M}/gu, "");
+    } catch {
+        return input;
+    }
+}
+
+function hasNonEmpty(value: unknown): boolean {
+    if (value == null) return false;
+    const s = String(value).trim().toLowerCase();
+    if (s === "" || s === "null" || s === "undefined" || s === "0") return false;
+    return true;
+}
+
+function getDischargeValue(src: UnknownRecord): unknown {
+    const vehicle = isRecord(src.vehicle) ? (src.vehicle as UnknownRecord) : undefined;
+    return (
+        (src as any).discharge_id ??
+        (src as any).dischargeId ??
+        (src as any).discharge ??
+        (vehicle as any)?.discharge_id ??
+        (vehicle as any)?.dischargeId ??
+        (vehicle as any)?.discharge
+    );
+}
+
+function surveyPassedFromRaw(src: UnknownRecord, normalizedInspections: unknown[]): boolean {
+    // Direct flags on root
+    const direct = (src as any).survey_result ?? (src as any).surveyResult ?? (src as any).survey?.result;
+    if (hasNonEmpty(direct)) {
+        const s = String(direct).toLowerCase();
+        if (s.includes("pass")) return true; // pass / passed
+        if (["ok", "valide", "valid", "approved", "approuve"].includes(s)) return true;
+    }
+
+    // Look into provided inspections from payload if any
+    const rawInspections = Array.isArray((src as any)?.inspections) ? ((src as any).inspections as unknown[]) : [];
+    const all = [...rawInspections, ...(Array.isArray(normalizedInspections) ? normalizedInspections : [])];
+    for (const it of all) {
+        const obj = isRecord(it) ? (it as UnknownRecord) : undefined;
+        if (!obj) continue;
+        const typeRaw = (obj.type as string) ?? (obj.name as string) ?? "";
+        const type = String(typeRaw).toUpperCase();
+        if (!type.includes("SURVEY")) continue;
+        const resultRaw = (obj.results as string) ?? (obj.result as string) ?? (obj.outcome as string) ?? "";
+        if (hasNonEmpty(resultRaw)) {
+            const s = String(resultRaw).toLowerCase();
+            if (s.includes("pass")) return true;
+            if (["ok", "valide", "valid", "approved", "approuve"].includes(s)) return true;
+        }
+        const passedBool = (obj.passed as boolean) ?? (obj.success as boolean) ?? undefined;
+        if (passedBool === true) return true;
+    }
+    return false;
+}
+
+// --- Normalizers ---
+export function normalizeFollowup(input: unknown): Partial<FollowupFile> & { id?: string } {
+    const src = isRecord(input) ? input : ({} as UnknownRecord);
+    const idRaw = (src.follow_up_file_id as string | number | undefined) ?? (src.id as string | number | undefined);
+    const id = idRaw != null ? String(idRaw) : undefined;
+    const reference = (src.bill_of_lading as string) ?? (src.reference_number as string) ?? "";
+    const vehicleIdRaw =
+        (src.vehicle_id as string | number | undefined) ??
+        (isRecord(src.vehicle) ? ((src.vehicle as UnknownRecord).vehicle_id as string | number | undefined) : undefined);
+    const portCallIdRaw =
+        (src.port_call_id as string | number | undefined) ??
+        (isRecord(src.port_call) ? ((src.port_call as UnknownRecord).port_call_id as string | number | undefined) : undefined);
+    const createdAt = (src.created_at as string) ?? "";
+    const updatedAt = (src.updated_at as string) ?? "";
+
+    // vehicle_info from nested vehicle if available
+    const vehicle = isRecord(src.vehicle) ? (src.vehicle as UnknownRecord) : undefined;
+    const vehicle_info = vehicle
+        ? {
+                plate_number: (vehicle.vin as string) ?? "",
+                brand: (vehicle.make as string) ?? "",
+                model: (vehicle.model as string) ?? "",
+                year: Number(vehicle.year ?? 0) || 0,
+            }
+        : undefined;
+
+    const normalized: Partial<FollowupFile> & { id?: string } = {
+        id,
+        reference_number: reference,
+        status: mapStatusToUi(src.status),
+        vehicle_id: vehicleIdRaw != null ? String(vehicleIdRaw) : "",
+        port_call_id: portCallIdRaw != null ? String(portCallIdRaw) : "",
+        created_at: createdAt,
+        updated_at: updatedAt,
+        vehicle_info,
         documents: [],
         photos: [],
-        workflow_steps: [
-            {
-                id: "step3",
-                name: "Inspection initiale",
-                description: "Vérification de l'état du véhicule à l'arrivée",
-                status: "En attente",
-                order: 1,
-                is_required: true,
-            },
-        ],
+        workflow_steps: [],
         inspections: [],
         priority: "Moyenne",
-        estimated_completion_date: "2024-01-28T17:00:00Z",
-    },
-    {
-        id: "3",
-        reference_number: "FU-2024-003",
-        status: "Fermé",
-        vehicle_id: "V003",
-        port_call_id: "PC-2024-003",
-        created_at: "2024-01-10T08:00:00Z",
-        updated_at: "2024-01-17T16:00:00Z",
-        vehicle_info: {
-            plate_number: "EF-456-GH",
-            brand: "Ford",
-            model: "Focus",
-            year: 2021,
-        },
-        documents: [
-            {
-                id: "doc2",
-                name: "Bon de sortie Ford Focus",
-                type: "Bon de sortie",
-                file_url: "/documents/bon-sortie-003.pdf",
-                uploaded_at: "2024-01-17T15:00:00Z",
-                uploaded_by: "Jane Smith",
-                status: "Approuvé",
-            },
-        ],
-        photos: [],
-        workflow_steps: [
-            {
-                id: "step4",
-                name: "Inspection initiale",
-                description: "Vérification de l'état du véhicule à l'arrivée",
-                status: "Terminé",
-                assigned_to: "John Doe",
-                started_at: "2024-01-10T09:00:00Z",
-                completed_at: "2024-01-10T10:00:00Z",
-                order: 1,
-                is_required: true,
-            },
-            {
-                id: "step5",
-                name: "Autorisation de sortie",
-                description: "Validation finale avant sortie du port",
-                status: "Terminé",
-                assigned_to: "Jane Smith",
-                started_at: "2024-01-17T14:00:00Z",
-                completed_at: "2024-01-17T15:00:00Z",
-                order: 2,
-                is_required: true,
-            },
-        ],
-        inspections: [
-            {
-                id: "insp2",
-                type: "SURVEY",
-                status: "Terminée",
-                inspector: "John Doe",
-                scheduled_at: "2024-01-10T09:00:00Z",
-                started_at: "2024-01-10T09:00:00Z",
-                completed_at: "2024-01-10T10:00:00Z",
-                results: "Véhicule conforme aux standards",
-                findings: ["Tous les contrôles passés avec succès"],
-                recommendations: ["Autoriser la sortie"],
-            },
-        ],
-        assigned_inspector: "John Doe",
-        notes: "Dossier traité avec succès, véhicule sorti du port",
-        priority: "Faible",
-        estimated_completion_date: "2024-01-20T17:00:00Z",
-        actual_completion_date: "2024-01-17T16:00:00Z",
-    },
-    {
-        id: "4",
-        reference_number: "FU-2024-003",
-        status: "Fermé",
-        vehicle_id: "V003",
-        port_call_id: "PC-2024-003",
-        created_at: "2025-08-10T08:00:00Z",
-        updated_at: "2024-01-17T16:00:00Z",
-        vehicle_info: {
-            plate_number: "EF-456-GH",
-            brand: "Ford",
-            model: "Focus",
-            year: 2021,
-        },
-        documents: [
-            {
-                id: "doc2",
-                name: "Bon de sortie Ford Focus",
-                type: "Bon de sortie",
-                file_url: "/documents/bon-sortie-003.pdf",
-                uploaded_at: "2024-01-17T15:00:00Z",
-                uploaded_by: "Jane Smith",
-                status: "Approuvé",
-            },
-        ],
-        photos: [],
-        workflow_steps: [
-            {
-                id: "step4",
-                name: "Inspection initiale",
-                description: "Vérification de l'état du véhicule à l'arrivée",
-                status: "Terminé",
-                assigned_to: "John Doe",
-                started_at: "2024-01-10T09:00:00Z",
-                completed_at: "2024-01-10T10:00:00Z",
-                order: 1,
-                is_required: true,
-            },
-            {
-                id: "step5",
-                name: "Autorisation de sortie",
-                description: "Validation finale avant sortie du port",
-                status: "Terminé",
-                assigned_to: "Jane Smith",
-                started_at: "2024-01-17T14:00:00Z",
-                completed_at: "2024-01-17T15:00:00Z",
-                order: 2,
-                is_required: true,
-            },
-        ],
-        inspections: [
-            {
-                id: "insp2",
-                type: "SURVEY",
-                status: "Terminée",
-                inspector: "John Doe",
-                scheduled_at: "2024-01-10T09:00:00Z",
-                started_at: "2024-01-10T09:00:00Z",
-                completed_at: "2024-01-10T10:00:00Z",
-                results: "Véhicule conforme aux standards",
-                findings: ["Tous les contrôles passés avec succès"],
-                recommendations: ["Autoriser la sortie"],
-            },
-        ],
-        assigned_inspector: "John Doe",
-        notes: "Dossier traité avec succès, véhicule sorti du port",
-        priority: "Faible",
-        estimated_completion_date: "2024-01-20T17:00:00Z",
-        actual_completion_date: "2024-01-17T16:00:00Z",
-    },
-    {
-        id: "4",
-        reference_number: "FU-2024-003",
-        status: "Fermé",
-        vehicle_id: "V003",
-        port_call_id: "PC-2024-003",
-        created_at: "2024-01-10T08:00:00Z",
-        updated_at: "2024-01-17T16:00:00Z",
-        vehicle_info: {
-            plate_number: "EF-456-GH",
-            brand: "Ford",
-            model: "Focus",
-            year: 2021,
-        },
-        documents: [
-            {
-                id: "doc2",
-                name: "Bon de sortie Ford Focus",
-                type: "Bon de sortie",
-                file_url: "/documents/bon-sortie-003.pdf",
-                uploaded_at: "2024-01-17T15:00:00Z",
-                uploaded_by: "Jane Smith",
-                status: "Approuvé",
-            },
-        ],
-        photos: [],
-        workflow_steps: [
-            {
-                id: "step4",
-                name: "Inspection initiale",
-                description: "Vérification de l'état du véhicule à l'arrivée",
-                status: "Terminé",
-                assigned_to: "John Doe",
-                started_at: "2024-01-10T09:00:00Z",
-                completed_at: "2024-01-10T10:00:00Z",
-                order: 1,
-                is_required: true,
-            },
-            {
-                id: "step5",
-                name: "Autorisation de sortie",
-                description: "Validation finale avant sortie du port",
-                status: "Terminé",
-                assigned_to: "Jane Smith",
-                started_at: "2024-01-17T14:00:00Z",
-                completed_at: "2024-01-17T15:00:00Z",
-                order: 2,
-                is_required: true,
-            },
-        ],
-        inspections: [
-            {
-                id: "insp2",
-                type: "SURVEY",
-                status: "Terminée",
-                inspector: "John Doe",
-                scheduled_at: "2024-01-10T09:00:00Z",
-                started_at: "2024-01-10T09:00:00Z",
-                completed_at: "2024-01-10T10:00:00Z",
-                results: "Véhicule conforme aux standards",
-                findings: ["Tous les contrôles passés avec succès"],
-                recommendations: ["Autoriser la sortie"],
-            },
-        ],
-        assigned_inspector: "John Doe",
-        notes: "Dossier traité avec succès, véhicule sorti du port",
-        priority: "Faible",
-        estimated_completion_date: "2024-01-20T17:00:00Z",
-        actual_completion_date: "2024-01-17T16:00:00Z",
-    },
-    {
-        id: "4",
-        reference_number: "FU-2024-003",
-        status: "Fermé",
-        vehicle_id: "V003",
-        port_call_id: "PC-2024-003",
-        created_at: "2024-01-10T08:00:00Z",
-        updated_at: "2024-01-17T16:00:00Z",
-        vehicle_info: {
-            plate_number: "EF-456-GH",
-            brand: "Ford",
-            model: "Focus",
-            year: 2021,
-        },
-        documents: [
-            {
-                id: "doc2",
-                name: "Bon de sortie Ford Focus",
-                type: "Bon de sortie",
-                file_url: "/documents/bon-sortie-003.pdf",
-                uploaded_at: "2024-01-17T15:00:00Z",
-                uploaded_by: "Jane Smith",
-                status: "Approuvé",
-            },
-        ],
-        photos: [],
-        workflow_steps: [
-            {
-                id: "step4",
-                name: "Inspection initiale",
-                description: "Vérification de l'état du véhicule à l'arrivée",
-                status: "Terminé",
-                assigned_to: "John Doe",
-                started_at: "2024-01-10T09:00:00Z",
-                completed_at: "2024-01-10T10:00:00Z",
-                order: 1,
-                is_required: true,
-            },
-            {
-                id: "step5",
-                name: "Autorisation de sortie",
-                description: "Validation finale avant sortie du port",
-                status: "Terminé",
-                assigned_to: "Jane Smith",
-                started_at: "2024-01-17T14:00:00Z",
-                completed_at: "2024-01-17T15:00:00Z",
-                order: 2,
-                is_required: true,
-            },
-        ],
-        inspections: [
-            {
-                id: "insp2",
-                type: "SURVEY",
-                status: "Terminée",
-                inspector: "John Doe",
-                scheduled_at: "2024-01-10T09:00:00Z",
-                started_at: "2024-01-10T09:00:00Z",
-                completed_at: "2024-01-10T10:00:00Z",
-                results: "Véhicule conforme aux standards",
-                findings: ["Tous les contrôles passés avec succès"],
-                recommendations: ["Autoriser la sortie"],
-            },
-        ],
-        assigned_inspector: "John Doe",
-        notes: "Dossier traité avec succès, véhicule sorti du port",
-        priority: "Faible",
-        estimated_completion_date: "2024-01-20T17:00:00Z",
-        actual_completion_date: "2024-01-17T16:00:00Z",
-    },
-    {
-        id: "4",
-        reference_number: "FU-2024-003",
-        status: "Fermé",
-        vehicle_id: "V003",
-        port_call_id: "PC-2024-003",
-        created_at: "2024-01-10T08:00:00Z",
-        updated_at: "2024-01-17T16:00:00Z",
-        vehicle_info: {
-            plate_number: "EF-456-GH",
-            brand: "Ford",
-            model: "Focus",
-            year: 2021,
-        },
-        documents: [
-            {
-                id: "doc2",
-                name: "Bon de sortie Ford Focus",
-                type: "Bon de sortie",
-                file_url: "/documents/bon-sortie-003.pdf",
-                uploaded_at: "2024-01-17T15:00:00Z",
-                uploaded_by: "Jane Smith",
-                status: "Approuvé",
-            },
-        ],
-        photos: [],
-        workflow_steps: [
-            {
-                id: "step4",
-                name: "Inspection initiale",
-                description: "Vérification de l'état du véhicule à l'arrivée",
-                status: "Terminé",
-                assigned_to: "John Doe",
-                started_at: "2024-01-10T09:00:00Z",
-                completed_at: "2024-01-10T10:00:00Z",
-                order: 1,
-                is_required: true,
-            },
-            {
-                id: "step5",
-                name: "Autorisation de sortie",
-                description: "Validation finale avant sortie du port",
-                status: "Terminé",
-                assigned_to: "Jane Smith",
-                started_at: "2024-01-17T14:00:00Z",
-                completed_at: "2024-01-17T15:00:00Z",
-                order: 2,
-                is_required: true,
-            },
-        ],
-        inspections: [
-            {
-                id: "insp2",
-                type: "SURVEY",
-                status: "Terminée",
-                inspector: "John Doe",
-                scheduled_at: "2024-01-10T09:00:00Z",
-                started_at: "2024-01-10T09:00:00Z",
-                completed_at: "2024-01-10T10:00:00Z",
-                results: "Véhicule conforme aux standards",
-                findings: ["Tous les contrôles passés avec succès"],
-                recommendations: ["Autoriser la sortie"],
-            },
-        ],
-        assigned_inspector: "John Doe",
-        notes: "Dossier traité avec succès, véhicule sorti du port",
-        priority: "Faible",
-        estimated_completion_date: "2024-01-20T17:00:00Z",
-        actual_completion_date: "2024-01-17T16:00:00Z",
-    },
-    {
-        id: "4",
-        reference_number: "FU-2024-003",
-        status: "Fermé",
-        vehicle_id: "V003",
-        port_call_id: "PC-2024-003",
-        created_at: "2024-01-10T08:00:00Z",
-        updated_at: "2024-01-17T16:00:00Z",
-        vehicle_info: {
-            plate_number: "EF-456-GH",
-            brand: "Ford",
-            model: "Focus",
-            year: 2021,
-        },
-        documents: [
-            {
-                id: "doc2",
-                name: "Bon de sortie Ford Focus",
-                type: "Bon de sortie",
-                file_url: "/documents/bon-sortie-003.pdf",
-                uploaded_at: "2024-01-17T15:00:00Z",
-                uploaded_by: "Jane Smith",
-                status: "Approuvé",
-            },
-        ],
-        photos: [],
-        workflow_steps: [
-            {
-                id: "step4",
-                name: "Inspection initiale",
-                description: "Vérification de l'état du véhicule à l'arrivée",
-                status: "Terminé",
-                assigned_to: "John Doe",
-                started_at: "2024-01-10T09:00:00Z",
-                completed_at: "2024-01-10T10:00:00Z",
-                order: 1,
-                is_required: true,
-            },
-            {
-                id: "step5",
-                name: "Autorisation de sortie",
-                description: "Validation finale avant sortie du port",
-                status: "Terminé",
-                assigned_to: "Jane Smith",
-                started_at: "2024-01-17T14:00:00Z",
-                completed_at: "2024-01-17T15:00:00Z",
-                order: 2,
-                is_required: true,
-            },
-        ],
-        inspections: [
-            {
-                id: "insp2",
-                type: "SURVEY",
-                status: "Terminée",
-                inspector: "John Doe",
-                scheduled_at: "2024-01-10T09:00:00Z",
-                started_at: "2024-01-10T09:00:00Z",
-                completed_at: "2024-01-10T10:00:00Z",
-                results: "Véhicule conforme aux standards",
-                findings: ["Tous les contrôles passés avec succès"],
-                recommendations: ["Autoriser la sortie"],
-            },
-        ],
-        assigned_inspector: "John Doe",
-        notes: "Dossier traité avec succès, véhicule sorti du port",
-        priority: "Faible",
-        estimated_completion_date: "2024-01-20T17:00:00Z",
-        actual_completion_date: "2024-01-17T16:00:00Z",
-    },
-    {
-        id: "4",
-        reference_number: "FU-2024-003",
-        status: "Fermé",
-        vehicle_id: "V003",
-        port_call_id: "PC-2024-003",
-        created_at: "2024-01-10T08:00:00Z",
-        updated_at: "2024-01-17T16:00:00Z",
-        vehicle_info: {
-            plate_number: "EF-456-GH",
-            brand: "Ford",
-            model: "Focus",
-            year: 2021,
-        },
-        documents: [
-            {
-                id: "doc2",
-                name: "Bon de sortie Ford Focus",
-                type: "Bon de sortie",
-                file_url: "/documents/bon-sortie-003.pdf",
-                uploaded_at: "2024-01-17T15:00:00Z",
-                uploaded_by: "Jane Smith",
-                status: "Approuvé",
-            },
-        ],
-        photos: [],
-        workflow_steps: [
-            {
-                id: "step4",
-                name: "Inspection initiale",
-                description: "Vérification de l'état du véhicule à l'arrivée",
-                status: "Terminé",
-                assigned_to: "John Doe",
-                started_at: "2024-01-10T09:00:00Z",
-                completed_at: "2024-01-10T10:00:00Z",
-                order: 1,
-                is_required: true,
-            },
-            {
-                id: "step5",
-                name: "Autorisation de sortie",
-                description: "Validation finale avant sortie du port",
-                status: "Terminé",
-                assigned_to: "Jane Smith",
-                started_at: "2024-01-17T14:00:00Z",
-                completed_at: "2024-01-17T15:00:00Z",
-                order: 2,
-                is_required: true,
-            },
-        ],
-        inspections: [
-            {
-                id: "insp2",
-                type: "SURVEY",
-                status: "Terminée",
-                inspector: "John Doe",
-                scheduled_at: "2024-01-10T09:00:00Z",
-                started_at: "2024-01-10T09:00:00Z",
-                completed_at: "2024-01-10T10:00:00Z",
-                results: "Véhicule conforme aux standards",
-                findings: ["Tous les contrôles passés avec succès"],
-                recommendations: ["Autoriser la sortie"],
-            },
-        ],
-        assigned_inspector: "John Doe",
-        notes: "Dossier traité avec succès, véhicule sorti du port",
-        priority: "Faible",
-        estimated_completion_date: "2024-01-20T17:00:00Z",
-        actual_completion_date: "2024-01-17T16:00:00Z",
-    },
-];
+    } as Partial<FollowupFile> & { id?: string };
+
+    // If backend provided inspections, adopt them leniently (minimal fields)
+    if (Array.isArray((src as any)?.inspections)) {
+        const rawInspections = (src as any).inspections as unknown[];
+        normalized.inspections = rawInspections
+            .map((r, idx) => {
+                if (!isRecord(r)) return null;
+                const typeRaw = (r as any).type ?? (r as any).name ?? "";
+                const typeUpper = String(typeRaw).toUpperCase();
+                const type: any = typeUpper.includes("SURVEY")
+                    ? "SURVEY"
+                    : typeUpper.includes("DOC")
+                        ? "Vérification documentaire"
+                        : typeUpper.includes("QUAL")
+                            ? "Contrôle qualité"
+                            : "Inspection technique";
+                return {
+                    id: String((r as any).id ?? `${id ?? ""}-i${idx + 1}`),
+                    type,
+                    status: (String((r as any).status ?? "Planifiée") as any),
+                    inspector: String((r as any).inspector ?? (r as any).inspector_name ?? ""),
+                    scheduled_at: String((r as any).scheduled_at ?? (r as any).scheduledAt ?? (r as any).date ?? ""),
+                    started_at: (r as any).started_at ?? (r as any).startedAt ?? undefined,
+                    completed_at: (r as any).completed_at ?? (r as any).completedAt ?? undefined,
+                    results: (r as any).results ?? (r as any).result ?? undefined,
+                    findings: Array.isArray((r as any).findings) ? (r as any).findings : undefined,
+                    recommendations: Array.isArray((r as any).recommendations) ? (r as any).recommendations : undefined,
+                };
+            })
+            .filter(Boolean) as any;
+    }
+
+    // If backend provided workflow steps, try to adopt them (very lenient)
+    if (Array.isArray((src as any)?.workflow_steps)) {
+        const raw = (src as any).workflow_steps as unknown[];
+        const steps: WorkflowStep[] = raw
+            .map((r, idx): WorkflowStep | null => {
+                if (!isRecord(r)) return null;
+                const name = String((r as any).name ?? "").trim();
+                const status = String((r as any).status ?? "En attente");
+                const order = Number((r as any).order ?? idx + 1) || idx + 1;
+                const idVal = String(((r as any).id ?? `${id ?? ""}-s${order}`) || `s${order}`);
+                return {
+                    id: idVal,
+                    name: name || `Étape ${order}`,
+                    description: String((r as any).description ?? ""),
+                    status: (status as WorkflowStep["status"]) || "En attente",
+                    order,
+                    is_required: Boolean((r as any).is_required ?? true),
+                };
+            })
+            .filter(Boolean) as WorkflowStep[];
+        if (steps.length > 0) normalized.workflow_steps = steps;
+    }
+
+    // Fallback to default template if empty
+    if (!normalized.workflow_steps || normalized.workflow_steps.length === 0) {
+        normalized.workflow_steps = makeDefaultWorkflowSteps(normalized.status, id);
+    }
+
+    // Apply auto-status rules based on domain data
+    try {
+        const dischargeVal = getDischargeValue(src);
+        const hasDischarge = hasNonEmpty(dischargeVal);
+        const surveyPassed = surveyPassedFromRaw(src, normalized.inspections || []);
+
+        if (Array.isArray(normalized.workflow_steps)) {
+            normalized.workflow_steps = normalized.workflow_steps.map((step) => {
+                const nameKey = stripAccents(String(step.name || "").toLowerCase());
+                const isDebark = step.order === 2 || nameKey.includes("debarquement");
+                const isSurvey = step.order === 3 || (nameKey.includes("inspection") && nameKey.includes("expertise"));
+                if (isDebark && hasDischarge && step.status !== "Terminé") {
+                    return { ...step, status: "Terminé" };
+                }
+                if (isSurvey && surveyPassed && step.status !== "Terminé") {
+                    return { ...step, status: "Terminé" };
+                }
+                return step;
+            });
+        }
+    } catch {
+        // best-effort; ignore errors
+    }
+
+    return normalized;
+}
+
+export function parseFollowupFiles(payload: unknown): FollowupFile[] {
+    const list: unknown[] = Array.isArray((payload as any)?.data)
+        ? (payload as any).data
+        : Array.isArray(payload)
+            ? (payload as unknown[])
+            : [];
+    const normalized = list.map(normalizeFollowup);
+    return normalized
+        .filter((it) => it.id && it.reference_number)
+        .map((it) => ({
+            id: it.id!,
+            reference_number: it.reference_number || "",
+            status: (it.status as FollowupFile["status"]) || "Ouvert",
+            vehicle_id: it.vehicle_id || "",
+            port_call_id: it.port_call_id || "",
+            created_at: it.created_at || "",
+            updated_at: it.updated_at || "",
+            vehicle_info: it.vehicle_info,
+            documents: it.documents || [],
+            photos: it.photos || [],
+            workflow_steps: it.workflow_steps || [],
+            inspections: it.inspections || [],
+            assigned_inspector: it.assigned_inspector,
+            notes: it.notes,
+            priority: it.priority || "Moyenne",
+            estimated_completion_date: it.estimated_completion_date,
+            actual_completion_date: it.actual_completion_date,
+        }));
+}
+
+// --- Public API ---
+export type FollowupMeta = {
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+    from?: number;
+    to?: number;
+    path?: string;
+};
+
+export type FollowupFilesResponse = { data: FollowupFile[]; meta: FollowupMeta };
+
+export async function fetchFollowupFilesResponse(): Promise<FollowupFilesResponse> {
+    const base = process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL;
+    if (!base) throw new Error("Backend base URL not configured");
+    // Backend (Laravel) route: /api/follow-up-files
+    const url = new URL(`${base}/follow-up-files`);
+
+    const res = await fetchWithCsrf(url.toString(), {
+        method: "GET",
+        headers: { Accept: "application/json" },
+        cache: "no-store",
+    });
+    if (!res.ok) {
+        let message = `Failed to fetch follow-up files (HTTP ${res.status})`;
+        try {
+            const body = await res.clone().text();
+            if (body) message += `: ${body.slice(0, 240)}`;
+        } catch {}
+        throw new Error(message);
+    }
+    const raw = await res.json();
+
+    const data = parseFollowupFiles(raw);
+        const meta: FollowupMeta = {
+        current_page: Number(raw?.meta?.current_page ?? 1),
+        last_page: Number(raw?.meta?.last_page ?? 1),
+            per_page: Number((raw?.meta?.per_page ?? data.length) || 10),
+        total: Number(raw?.meta?.total ?? data.length),
+        from: raw?.meta?.from != null ? Number(raw.meta.from) : undefined,
+        to: raw?.meta?.to != null ? Number(raw.meta.to) : undefined,
+        path: typeof raw?.meta?.path === "string" ? raw.meta.path : undefined,
+    };
+    return { data, meta };
+}
 
 export const fetchFollowupFiles = async (): Promise<FollowupFile[]> => {
-    // Simulation d'un appel API
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    return mockFollowupFiles;
+    const { data } = await fetchFollowupFilesResponse();
+    return data;
 };
+
+// CamelCase meta response, aligned with Users feature
+export type FollowupsMeta = {
+    currentPage: number;
+    lastPage: number;
+    perPage: number;
+    total: number;
+};
+
+export type FollowupsResponse = { data: FollowupFile[]; meta: FollowupsMeta };
+
+export function parseFollowupsResponse(payload: unknown): FollowupsResponse {
+    const data = parseFollowupFiles(payload);
+    let meta: FollowupsMeta = {
+        currentPage: 1,
+        lastPage: 1,
+        perPage: data.length,
+        total: data.length,
+    };
+    if (typeof payload === "object" && payload !== null && typeof (payload as any).meta === "object") {
+        const m = (payload as any).meta as Record<string, unknown>;
+        const current = Number(m.current_page ?? 1);
+        const last = Number(m.last_page ?? 1);
+        const per = Number(((m.per_page as number | string | undefined) ?? data.length) || 10);
+        const total = Number(m.total ?? data.length);
+        meta = {
+            currentPage: Number.isFinite(current) ? current : 1,
+            lastPage: Number.isFinite(last) ? last : 1,
+            perPage: Number.isFinite(per) ? per : data.length || 10,
+            total: Number.isFinite(total) ? total : data.length,
+        };
+    }
+    return { data, meta };
+}
 
 export const createFollowupFile = async (
     data: FollowupFileFormData
 ): Promise<FollowupFile> => {
-    // Simulation d'un appel API
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    const newFile: FollowupFile = {
-        id: Date.now().toString(),
+    // TODO: Wire to backend POST /follow-up-files when API is ready
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    const newId = Date.now().toString();
+    const status: FollowupFile["status"] = "Ouvert";
+    return {
+        id: newId,
         reference_number: data.reference_number,
-        status: "Ouvert",
+        status,
         vehicle_id: data.vehicle_id,
         port_call_id: data.port_call_id,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         documents: [],
         photos: [],
-        workflow_steps: [
-            {
-                id: "step-" + Date.now(),
-                name: "Inspection initiale",
-                description: "Vérification de l'état du véhicule à l'arrivée",
-                status: "En attente",
-                order: 1,
-                is_required: true,
-            },
-        ],
+        workflow_steps: makeDefaultWorkflowSteps(status, newId),
         inspections: [],
         assigned_inspector: data.assigned_inspector,
         notes: data.notes,
         priority: data.priority,
         estimated_completion_date: data.estimated_completion_date,
     };
-
-    mockFollowupFiles.push(newFile);
-    return newFile;
 };
 
 export const updateFollowupFile = async (
     id: string,
     data: Partial<FollowupFile>
 ): Promise<FollowupFile> => {
-    // Simulation d'un appel API
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    const index = mockFollowupFiles.findIndex((file) => file.id === id);
-    if (index === -1) {
-        throw new Error("Dossier de suivi non trouvé");
-    }
-
-    mockFollowupFiles[index] = {
-        ...mockFollowupFiles[index],
-        ...data,
+    // TODO: Wire to backend PUT /follow-up-files/{id} when API is ready
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    return {
+        id,
+        reference_number: data.reference_number || "",
+        status: (data.status as FollowupFile["status"]) || "Ouvert",
+        vehicle_id: data.vehicle_id || "",
+        port_call_id: data.port_call_id || "",
+        created_at: data.created_at || new Date().toISOString(),
         updated_at: new Date().toISOString(),
+        vehicle_info: data.vehicle_info,
+        documents: data.documents || [],
+        photos: data.photos || [],
+        workflow_steps: (data.workflow_steps && data.workflow_steps.length > 0)
+            ? data.workflow_steps
+            : makeDefaultWorkflowSteps(data.status ?? "Ouvert", id),
+        inspections: data.inspections || [],
+        assigned_inspector: data.assigned_inspector,
+        notes: data.notes,
+        priority: data.priority || "Moyenne",
+        estimated_completion_date: data.estimated_completion_date,
+        actual_completion_date: data.actual_completion_date,
     };
-
-    return mockFollowupFiles[index];
 };
 
 export const deleteFollowupFile = async (id: string): Promise<void> => {
-    // Simulation d'un appel API
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    const index = mockFollowupFiles.findIndex((file) => file.id === id);
-    if (index === -1) {
-        throw new Error("Dossier de suivi non trouvé");
-    }
-
-    mockFollowupFiles.splice(index, 1);
+    // TODO: Wire to backend DELETE /follow-up-files/{id} when API is ready
+    await new Promise((resolve) => setTimeout(resolve, 200));
 };

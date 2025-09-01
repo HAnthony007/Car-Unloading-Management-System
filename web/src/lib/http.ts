@@ -25,6 +25,8 @@ export async function fetchWithCsrf(
   // Merge XSRF header always
   const xsrf = xsrfHeader();
   for (const [k, v] of Object.entries(xsrf)) headers.set(k, v);
+  // Hint Laravel we're an AJAX request
+  if (!headers.has("X-Requested-With")) headers.set("X-Requested-With", "XMLHttpRequest");
   headers.set("Accept", headers.get("Accept") || "application/json");
 
   const attempt = async () =>
@@ -41,6 +43,7 @@ export async function fetchWithCsrf(
     const refreshedHeaders = new Headers(init.headers || {});
     const refreshedXsrf = xsrfHeader();
     for (const [k, v] of Object.entries(refreshedXsrf)) refreshedHeaders.set(k, v);
+  if (!refreshedHeaders.has("X-Requested-With")) refreshedHeaders.set("X-Requested-With", "XMLHttpRequest");
     refreshedHeaders.set("Accept", refreshedHeaders.get("Accept") || "application/json");
     res = await fetch(input, {
       ...init,

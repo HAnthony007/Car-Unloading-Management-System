@@ -28,10 +28,16 @@ Deux formats supportés:
 
 2) En-têtes sur une ligne (colonnes): `nom_du_navire`, `numero_imo`, `pavillon`, `agent_maritime`, `port_de_provenance`, `eta`
 
+Champs optionnels supportés:
+
+- Nombre total de véhicules: permet de renseigner le total attendu et sera stocké sur le PortCall (`vehicles_number`).
+  - Alias acceptés (FR/EN): `nombre_total_de_vehicules`, `nombre total de vehicules`, `total_vehicules`, `vehicules_total`, `nb_vehicules`, `nbre_vehicules`, `total_vehicles`, `vehicles_total`, `vehicles_number`.
+
 Création:
 
 - Vessel: trouvé/créé par `imo_no` (unique)
 - PortCall: créé avec `vessel_agent`, `origin_port`, `estimated_arrival` (ETA), `dock_id = null`, lié au Vessel
+- Si présent, `vehicles_number` est renseigné à partir de la feuille Navire (nombre total de véhicules).
 
 ### Feuille « Véhicules »
 

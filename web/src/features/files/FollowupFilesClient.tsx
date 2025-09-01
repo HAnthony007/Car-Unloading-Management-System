@@ -8,16 +8,20 @@ import { FollowupListView } from "./components/followup-list-view";
 import { FollowupPagination } from "./components/followup-pagination";
 import { FollowupToolbar } from "./components/followup-toolbar";
 import { FollowupViewOptions } from "./components/followup-view-options";
+import { WorkflowLegend } from "./components/workflow-legend";
 import { FollowupFile } from "./data/schema";
+import { useFollowups } from "./hooks/useFollowups";
 
 type Props = {
-    initialData: FollowupFile[];
+    initialData?: FollowupFile[];
 };
 
 export default function FollowupFilesClient({ initialData }: Props) {
-    const [data, setData] = useState<FollowupFile[]>(initialData);
-    const [filteredData, setFilteredData] = useState<FollowupFile[]>(initialData);
-    const [loading] = useState(false);
+    const [data, setData] = useState<FollowupFile[]>(initialData ?? []);
+    const [filteredData, setFilteredData] = useState<FollowupFile[]>(initialData ?? []);
+    const [loading, setLoading] = useState(false);
+
+    const { data: remote, isLoading } = useFollowups({ page: 1, perPage: 50 });
 
     const [sortConfig, setSortConfig] = useState({
         field: "created_at",
@@ -30,9 +34,20 @@ export default function FollowupFilesClient({ initialData }: Props) {
     const [pageSize, setPageSize] = useState(25);
 
     useEffect(() => {
-        setData(initialData);
-        setFilteredData(initialData);
+        if (initialData && initialData.length > 0) {
+            setData(initialData);
+            setFilteredData(initialData);
+        }
     }, [initialData]);
+
+    useEffect(() => {
+        // When remote data arrives, prefer it over initialData
+        if (remote?.data) {
+            setData(remote.data);
+            setFilteredData(remote.data);
+        }
+        setLoading(isLoading);
+    }, [remote, isLoading]);
 
     const sortData = (dataToSort: FollowupFile[]) => {
         return [...dataToSort].sort((a, b) => {
@@ -137,6 +152,8 @@ export default function FollowupFilesClient({ initialData }: Props) {
             </div>
 
             <FollowupToolbar data={data} onFilterChange={handleFilterChange} />
+
+            <WorkflowLegend className="mt-2" />
 
             <FollowupViewOptions
                 onSortChange={handleSortChange}

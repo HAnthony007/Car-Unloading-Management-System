@@ -68,14 +68,60 @@ final class EloquentSurveyRepository implements SurveyRepositoryInterface
 
     private function toDomainEntity(EloquentSurvey $e): DomainSurvey
     {
+        $normalizedResult = $this->normalizeResult($e->result);
         return new DomainSurvey(
             surveyId: new SurveyId($e->survey_id),
             date: new SurveyDate($e->date ? Carbon::parse($e->date) : null),
-            result: new SurveyResult($e->result),
+            result: new SurveyResult($normalizedResult),
             userId: new UserId($e->user_id),
             followUpFileId: new FollowUpFileId($e->follow_up_file_id),
             createdAt: $e->created_at,
             updatedAt: $e->updated_at,
         );
+    }
+
+    /**
+     * Coerce arbitrary DB values into allowed SurveyResult enum values.
+     */
+    private function normalizeResult(mixed $value): string
+    {
+        if ($value === null) {
+            return 'PENDING';
+        }
+
+        // Handle booleans and numeric-like values
+        if (is_bool($value)) {
+            return $value ? 'PASSED' : 'FAILED';
+        }
+        if (is_int($value)) {
+            return $value === 1 ? 'PASSED' : ($value === 0 ? 'FAILED' : 'PENDING');
+        }
+
+        $str = strtoupper(trim((string) $value));
+        if ($str === '') {
+            return 'PENDING';
+        }
+
+        // Direct allowed values
+        if (in_array($str, SurveyResult::ALLOWED, true)) {
+            return $str;
+        }
+
+        // Common synonyms mapping
+        // Passed
+        if (str_contains($str, 'PASS') || in_array($str, ['OK', 'VALID', 'APPROVED', 'APPROUVE', 'APPROUVÉ', 'SUCCESS', 'SUCCEEDED'], true)) {
+            return 'PASSED';
+        }
+        // Failed
+        if (str_contains($str, 'FAIL') || in_array($str, ['REJECT', 'REJECTED', 'KO', 'ERROR'], true)) {
+            return 'FAILED';
+        }
+        // Pending-like
+        if (in_array($str, ['PEND', 'PENDING', 'WAIT', 'WAITING', 'IN_PROGRESS', 'DRAFT'], true)) {
+            return 'PENDING';
+        }
+
+        // Fallback to PENDING to keep domain invariant stable
+        return 'PENDING';
     }
 }
