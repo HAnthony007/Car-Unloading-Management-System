@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { useMemo, useState } from "react";
 import type { Parking } from "../data/schema";
@@ -65,7 +66,7 @@ const getStatusBadgeVariant = (status: "available" | "busy" | "full") => {
 };
 
 export const ParkingsCardList = () => {
-    const { data, isLoading, isError } = useParkings();
+    const { data, isLoading, isError, isFetching, refetch } = useParkings();
     const [selectedParking, setSelectedParking] = useState<UiParking | null>(null);
     const [detailOpen, setDetailOpen] = useState(false);
     const [editOpen, setEditOpen] = useState(false);
@@ -76,9 +77,9 @@ export const ParkingsCardList = () => {
         return items.map((p) => ({ ...p }));
     }, [data]);
 
-        // Fetch totals per parking to display real occupancy on cards
-        const parkingIds = useMemo(() => list.map((p) => p.id), [list]);
-        const { totalsById } = useParkingTotals(parkingIds);
+    // Fetch totals per parking to display real occupancy on cards
+    const parkingIds = useMemo(() => list.map((p) => p.id), [list]);
+    const { totalsById, isLoading: isTotalsLoading } = useParkingTotals(parkingIds);
 
     const totalCapacity = list.reduce((sum, p) => sum + (p.capacity || 0), 0);
     const knownOccupied = list.reduce((sum, p) => sum + (p.occupied || 0), 0);
@@ -101,14 +102,103 @@ export const ParkingsCardList = () => {
     };
 
     if (isLoading) {
+        // Skeleton UI while initial list loads
+        const skeletonCards = Array.from({ length: 6 });
         return (
-            <div className="flex items-center gap-2 text-muted-foreground">
-                <Icons.spinner className="h-4 w-4 animate-spin" /> Chargement des parkings...
+            <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
+                    {skeletonCards.map((_, i) => (
+                        <Card key={i} className="overflow-hidden">
+                            <CardHeader className="pb-3">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        <Skeleton className="h-9 w-9 rounded-lg" />
+                                        <Skeleton className="h-5 w-40" />
+                                    </div>
+                                    <Skeleton className="h-5 w-16 rounded-full" />
+                                </div>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="space-y-4">
+                                    <div className="space-y-2">
+                                        <div className="flex items-center gap-2">
+                                            <Skeleton className="h-4 w-4 rounded" />
+                                            <Skeleton className="h-4 w-32" />
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <Skeleton className="h-3 w-20" />
+                                            <Skeleton className="h-3 w-10" />
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <div className="flex items-center justify-between text-xs">
+                                            <Skeleton className="h-3 w-24" />
+                                            <Skeleton className="h-3 w-10" />
+                                        </div>
+                                        <Skeleton className="h-2 w-full" />
+                                        <div className="flex items-center justify-between">
+                                            <Skeleton className="h-3 w-24" />
+                                            <Skeleton className="h-3 w-16" />
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-2 pt-2">
+                                        <Skeleton className="h-8 w-full" />
+                                        <Skeleton className="h-8 w-full" />
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    ))}
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-8">
+                    {Array.from({ length: 4 }).map((_, i) => (
+                        <Card key={i}>
+                            <CardContent className="p-4">
+                                <div className="flex items-center gap-3">
+                                    <Skeleton className="h-9 w-9 rounded-lg" />
+                                    <div className="space-y-2 w-full">
+                                        <Skeleton className="h-3 w-28" />
+                                        <Skeleton className="h-6 w-16" />
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    ))}
+                </div>
             </div>
         );
     }
     if (isError) {
-        return <div className="text-destructive">Erreur lors du chargement des parkings.</div>;
+        return (
+            <Card className="border-destructive/20">
+                <CardContent className="p-6">
+                    <div className="flex items-start justify-between gap-4">
+                        <div className="flex items-center gap-3">
+                            <Icons.alertCircle className="h-5 w-5 text-destructive" />
+                            <div>
+                                <p className="font-medium">Erreur lors du chargement des parkings.</p>
+                                <p className="text-sm text-muted-foreground">Vérifiez votre connexion puis réessayez.</p>
+                            </div>
+                        </div>
+                        <div className="flex gap-2">
+                            <Button variant="outline" onClick={() => refetch()} disabled={isFetching}>
+                                {isFetching ? (
+                                    <>
+                                        <Icons.spinner className="mr-2 h-4 w-4 animate-spin" /> Réessayer
+                                    </>
+                                ) : (
+                                    <>Réessayer</>
+                                )}
+                            </Button>
+                            <Button variant="secondary" onClick={() => window.location.reload()}>
+                                Rafraîchir la page
+                            </Button>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+        );
     }
 
     return (
@@ -116,7 +206,8 @@ export const ParkingsCardList = () => {
             {/* Grille des cartes */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
                         {list.map((p) => {
-                            const occupied = totalsById[p.id] ?? 0;
+                            const occupiedKnown = totalsById[p.id];
+                            const occupied = occupiedKnown ?? 0;
                     const capacity = p.capacity || 0;
                     const pct = capacity > 0 ? Math.round((occupied / capacity) * 100) : 0;
                     const status = getStatus(occupied, capacity);
@@ -168,15 +259,31 @@ export const ParkingsCardList = () => {
 
                                     {/* Barre de progression */}
                                     <div className="space-y-2">
-                                        <div className="flex items-center justify-between text-xs">
-                                            <span className="text-muted-foreground">Occupation</span>
-                                            <span className="font-medium">{pct}%</span>
-                                        </div>
-                                        <Progress value={pct} className="h-2" />
-                                        <div className="flex items-center justify-between text-xs text-muted-foreground">
-                                            <span>Places occupées</span>
-                                            <span className="font-medium">{occupied}/{capacity}</span>
-                                        </div>
+                                        {isTotalsLoading && occupiedKnown === undefined ? (
+                                            <>
+                                                <div className="flex items-center justify-between text-xs">
+                                                    <Skeleton className="h-3 w-24" />
+                                                    <Skeleton className="h-3 w-10" />
+                                                </div>
+                                                <Skeleton className="h-2 w-full" />
+                                                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                                                    <Skeleton className="h-3 w-24" />
+                                                    <Skeleton className="h-3 w-12" />
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <div className="flex items-center justify-between text-xs">
+                                                    <span className="text-muted-foreground">Occupation</span>
+                                                    <span className="font-medium">{pct}%</span>
+                                                </div>
+                                                <Progress value={pct} className="h-2" />
+                                                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                                                    <span>Places occupées</span>
+                                                    <span className="font-medium">{occupied}/{capacity}</span>
+                                                </div>
+                                            </>
+                                        )}
                                     </div>
 
                                     {/* Actions */}
