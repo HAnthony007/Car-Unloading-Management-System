@@ -39,7 +39,11 @@ export async function middleware(request: NextRequest) {
       url.searchParams.set("reason", "forbidden");
       return NextResponse.redirect(url);
     }
-    // 401/419 or anything else: allow and let client guard decide
+    if (res.status === 401 || res.status === 419) {
+      url.searchParams.set("reason", "unauthenticated");
+      return NextResponse.redirect(url);
+    }
+    // Anything else: allow and let client guard decide
     return NextResponse.next();
   } catch {
     // Backend not reachable: allow and let client guard decide

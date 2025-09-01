@@ -41,7 +41,7 @@ final class EloquentPortCallRepository implements PortCallRepositoryInterface
         $eloquent->estimated_departure = $portCall->getEstimatedDeparture()->getValue();
         $eloquent->departure_date = $portCall->getDepartureDate()->getValue();
         $eloquent->vessel_id = $portCall->getVesselId()->getValue();
-        $eloquent->dock_id = $portCall->getDockId()->getValue();
+    $eloquent->dock_id = $portCall->getDockId()?->getValue();
         $eloquent->save();
 
         return $this->toDomainEntity($eloquent);
@@ -68,7 +68,7 @@ final class EloquentPortCallRepository implements PortCallRepositoryInterface
             estimatedDeparture: new DateTimeValue($e->estimated_departure ? Carbon::parse($e->estimated_departure) : null),
             departureDate: new DateTimeValue($e->departure_date ? Carbon::parse($e->departure_date) : null),
             vesselId: new VesselId($e->vessel_id),
-            dockId: new DockId($e->dock_id),
+            dockId: $e->dock_id !== null ? new DockId($e->dock_id) : null,
             createdAt: $e->created_at,
             updatedAt: $e->updated_at,
         );

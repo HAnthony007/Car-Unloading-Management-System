@@ -22,7 +22,7 @@ final class PortCallResource extends JsonResource
             'estimated_departure' => $pc->getEstimatedDeparture()->getValue()?->toISOString(),
             'departure_date' => $pc->getDepartureDate()->getValue()?->toISOString(),
             'vessel_id' => $pc->getVesselId()->getValue(),
-            'dock_id' => $pc->getDockId()->getValue(),
+            'dock_id' => $pc->getDockId()?->getValue(),
             'created_at' => $pc->getCreatedAt()?->toISOString(),
             'updated_at' => $pc->getUpdatedAt()?->toISOString(),
         ];

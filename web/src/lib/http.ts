@@ -1,5 +1,22 @@
 import { ensureCsrfCookie, xsrfHeader } from "./csrf";
 
+function redirectToLoginIfNeeded(status: number) {
+  if (typeof window === "undefined") return;
+  if (status !== 401 && status !== 419) return;
+  try {
+    const isAlreadyOnLogin = window.location.pathname.startsWith("/login");
+    if (isAlreadyOnLogin) return;
+    const from = encodeURIComponent(
+      `${window.location.pathname}${window.location.search}`,
+    );
+    const reason = "unauthenticated";
+    const target = `/login?from=${from}&reason=${reason}`;
+    window.location.assign(target);
+  } catch {
+    // noop
+  }
+}
+
 export async function fetchWithCsrf(
   input: RequestInfo | URL,
   init: RequestInit = {},
@@ -30,6 +47,10 @@ export async function fetchWithCsrf(
       credentials: "include",
       headers: refreshedHeaders,
     });
+  }
+  // If still unauthorized after retry (or initially), trigger login redirect on client
+  if (res.status === 401 || res.status === 419) {
+    redirectToLoginIfNeeded(res.status);
   }
   return res;
 }

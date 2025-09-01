@@ -20,7 +20,14 @@ export async function login(email: string, password: string) {
     throw new Error("Login failed");
   }
 
-  return response.json();
+  const data = await response.json();
+  // Set a lightweight marker cookie for middleware (non-sensitive)
+  try {
+    if (typeof document !== "undefined") {
+      document.cookie = "app_auth=1; Path=/; SameSite=Lax";
+    }
+  } catch {}
+  return data;
 }
 
 export async function getMe() {
@@ -35,6 +42,8 @@ export async function getMe() {
   );
 
   if (!response.ok) {
+    // Let client redirect run; keep query calm
+    if ([401, 419, 204].includes(response.status)) return null;
     throw new Error("Failed to fetch user");
   }
 
@@ -56,5 +65,13 @@ export async function logout() {
     throw new Error("Logout failed");
   }
 
+  // Unset marker cookie for middleware
+  try {
+    if (typeof document !== "undefined") {
+      // Set expiration in the past to delete
+      document.cookie = "app_auth=; Path=/; SameSite=Lax; Expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    }
+  } catch {}
+  if (response.status === 204) return { success: true } as const;
   return response.json();
 }

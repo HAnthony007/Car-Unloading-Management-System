@@ -21,7 +21,7 @@ final class PortCall
         private readonly DateTimeValue $estimatedDeparture,
         private readonly DateTimeValue $departureDate,
         private readonly VesselId $vesselId,
-        private readonly DockId $dockId,
+    private readonly ?DockId $dockId,
         private readonly ?Carbon $createdAt = null,
         private readonly ?Carbon $updatedAt = null,
     ) {}
@@ -66,7 +66,7 @@ final class PortCall
         return $this->vesselId;
     }
 
-    public function getDockId(): DockId
+    public function getDockId(): ?DockId
     {
         return $this->dockId;
     }
@@ -92,7 +92,7 @@ final class PortCall
             'estimated_departure' => $this->estimatedDeparture->getValue()?->toISOString(),
             'departure_date' => $this->departureDate->getValue()?->toISOString(),
             'vessel_id' => $this->vesselId->getValue(),
-            'dock_id' => $this->dockId->getValue(),
+            'dock_id' => $this->dockId?->getValue(),
             'created_at' => $this->createdAt?->toISOString(),
             'updated_at' => $this->updatedAt?->toISOString(),
         ];
