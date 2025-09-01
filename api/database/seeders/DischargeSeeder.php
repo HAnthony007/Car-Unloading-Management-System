@@ -9,6 +9,6 @@ class DischargeSeeder extends Seeder
 {
     public function run(): void
     {
-        Discharge::factory()->count(5)->create();
+        Discharge::factory()->count(15)->create();
     }
 }

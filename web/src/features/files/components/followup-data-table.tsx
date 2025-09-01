@@ -80,11 +80,22 @@ export const FollowupDataTable = ({ data }: FollowupDataTableProps) => {
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {data.map((file) => (
-                <Card
-                    key={file.id}
-                    className="hover:shadow-lg transition-shadow duration-200"
-                >
+            {(() => {
+                const seen = new Map<string, number>();
+                return data.map((file) => {
+                    const baseKey = `${file.reference_number}:${file.id}`;
+                    const count = seen.get(baseKey) ?? 0;
+                    seen.set(baseKey, count + 1);
+                    const uniqueKey = count === 0 ? baseKey : `${baseKey}:${count}`;
+                    return (
+                        <Card
+                            key={uniqueKey}
+                            className="hover:shadow-lg transition-shadow duration-200"
+                        >
+                            {/* existing content below remains unchanged */}
+                            
+                            
+                
                     <CardHeader className="pb-3">
                         <div className="flex items-start justify-between">
                             <div className="space-y-1">
@@ -239,7 +250,9 @@ export const FollowupDataTable = ({ data }: FollowupDataTableProps) => {
                         </div>
                     </CardContent>
                 </Card>
-            ))}
+                    );
+                });
+            })()}
         </div>
     );
 };

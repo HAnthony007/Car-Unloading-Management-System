@@ -9,6 +9,6 @@ class SurveyCheckpointSeeder extends Seeder
 {
     public function run(): void
     {
-        SurveyCheckpoint::factory()->count(30)->create();
+        SurveyCheckpoint::factory()->count(20)->create();
     }
 }

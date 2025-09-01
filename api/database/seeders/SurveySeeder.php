@@ -9,6 +9,6 @@ class SurveySeeder extends Seeder
 {
     public function run(): void
     {
-        Survey::factory()->count(10)->create();
+        Survey::factory()->count(15)->create();
     }
 }
