@@ -13,28 +13,39 @@ import {
   ChevronsUpDownIcon,
   ChevronUpIcon,
   CircleParkingIcon,
+  ClockIcon,
   EditIcon,
   EyeIcon,
   EyeOffIcon,
   FileIcon,
+  FilterIcon,
   FolderKanbanIcon,
+  GridIcon,
+  ImageMinusIcon,
   ImportIcon,
   InboxIcon,
+  InfoIcon,
+  InspectionPanelIcon,
   LayoutDashboardIcon,
+  ListIcon,
   Loader2Icon,
   MoreHorizontalIcon,
   ParkingSquareIcon,
   PlusCircleIcon,
+  PlusIcon,
+  SaveIcon,
   SearchIcon,
   SettingsIcon,
   SlashIcon,
   SortAscIcon,
   SortDescIcon,
+  TableIcon,
   TrashIcon,
   User2Icon,
   UserCog2Icon,
   UserRoundPlus,
   UsersIcon,
+  WorkflowIcon,
   XIcon,
 } from "lucide-react";
 
@@ -87,4 +98,22 @@ export const Icons = {
 
   admin: UserCog2Icon,
   user: User2Icon,
+
+  plus: PlusIcon,
+
+  car: CarIcon,
+  clock: ClockIcon,
+
+  save: SaveIcon,
+
+  filter: FilterIcon,
+
+  grid: GridIcon,
+  list: ListIcon,
+  table: TableIcon,
+
+  info: InfoIcon,
+  workflow: WorkflowIcon,
+  inspection: InspectionPanelIcon,
+  photo: ImageMinusIcon,
 };
