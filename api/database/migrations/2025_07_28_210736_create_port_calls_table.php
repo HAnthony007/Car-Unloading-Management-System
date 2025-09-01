@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id('port_call_id');
             $table->string('vessel_agent');
             $table->string('origin_port');
-            $table->dateTime('estimated_arrival')->nullable();
-            $table->dateTime('arrival_date');
+            $table->dateTime('estimated_arrival');
+            $table->dateTime('arrival_date')->nullable();
             $table->dateTime('estimated_departure')->nullable();
             $table->dateTime('departure_date')->nullable();
             $table->foreignId('vessel_id')->constrained('vessels', 'vessel_id');

@@ -13,7 +13,7 @@ export const sidebarItems: SidebarItem[] = [
     item: [
       {
         title: "Import Manifest",
-        url: "/dashboard/followup/manifest",
+        url: "/dashboard/followup/import",
       },
       {
         title: "Dossiers des vehicules",
