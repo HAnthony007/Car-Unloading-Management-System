@@ -89,7 +89,7 @@ final class EloquentVehicleRepository implements VehicleRepositoryInterface
         );
     }
 
-    public function search(?string $vin, ?int $dischargeId, ?string $make, ?string $model, int $page, int $perPage): array
+    public function search(?string $vin, ?int $dischargeId, ?string $make, ?string $model, ?string $ownerName, ?string $color, ?string $type, ?string $originCountry, ?string $searchTerm, int $page, int $perPage): array
     {
         $query = EloquentVehicle::query();
 
@@ -104,6 +104,32 @@ final class EloquentVehicleRepository implements VehicleRepositoryInterface
         }
         if ($model) {
             $query->where('model', 'like', '%'.$model.'%');
+        }
+        if ($ownerName) {
+            $query->where('owner_name', 'like', '%'.$ownerName.'%');
+        }
+        if ($color) {
+            $query->where('color', 'like', '%'.$color.'%');
+        }
+        if ($type) {
+            $query->where('type', 'like', '%'.$type.'%');
+        }
+        if ($originCountry) {
+            $query->where('origin_country', 'like', '%'.$originCountry.'%');
+        }
+
+        // Global search term across several text columns
+        if ($searchTerm && trim($searchTerm) !== '') {
+            $t = '%'.$searchTerm.'%';
+            $query->where(function ($q) use ($t) {
+                $q->where('vin', 'like', $t)
+                  ->orWhere('make', 'like', $t)
+                  ->orWhere('model', 'like', $t)
+                  ->orWhere('owner_name', 'like', $t)
+                  ->orWhere('color', 'like', $t)
+                  ->orWhere('type', 'like', $t)
+                  ->orWhere('origin_country', 'like', $t);
+            });
         }
 
         $paginator = $query->orderByDesc('created_at')->paginate($perPage, ['*'], 'page', $page);

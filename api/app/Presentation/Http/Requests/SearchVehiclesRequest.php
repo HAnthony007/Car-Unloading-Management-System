@@ -20,6 +20,11 @@ final class SearchVehiclesRequest extends FormRequest
             'discharge_id' => ['sometimes', 'integer', 'exists:discharges,discharge_id'],
             'make' => ['sometimes', 'string', 'max:255'],
             'model' => ['sometimes', 'string', 'max:255'],
+            'owner_name' => ['sometimes', 'string', 'max:255'],
+            'color' => ['sometimes', 'string', 'max:255'],
+            'type' => ['sometimes', 'string', 'max:255'],
+            'origin_country' => ['sometimes', 'string', 'max:255'],
+            'search_term' => ['sometimes', 'nullable', 'string', 'max:100'],
             'page' => ['sometimes', 'integer', 'min:1'],
             'per_page' => ['sometimes', 'integer', 'min:1', 'max:100'],
         ];

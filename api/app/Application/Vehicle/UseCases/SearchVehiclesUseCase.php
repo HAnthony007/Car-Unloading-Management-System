@@ -16,6 +16,11 @@ final class SearchVehiclesUseCase
             dischargeId: $criteria->dischargeId,
             make: $criteria->make,
             model: $criteria->model,
+            ownerName: $criteria->ownerName,
+            color: $criteria->color,
+            type: $criteria->type,
+            originCountry: $criteria->originCountry,
+            searchTerm: $criteria->searchTerm,
             page: $criteria->page,
             perPage: $criteria->perPage,
         );
