@@ -25,17 +25,24 @@ export async function uploadManifest(file: File): Promise<ManifestApiResponse> {
     method: "POST",
     body: formData,
   });
-  let payload: ManifestApiResponse | null = null;
+  let payload: any = null;
   try {
-    payload = (await res.json()) as ManifestApiResponse;
+    payload = await res.json();
   } catch {
     // ignore json parse errors
   }
   if (!res.ok) {
-    const msg = payload?.message || `Echec de l'import (${res.status})`;
-    const apiErrors = (payload?.data?.errors && payload?.data?.errors.length > 0 ? payload?.data?.errors : []) || [];
-    const err = new Error([msg, ...apiErrors].join("\n"));
+    // Backend now returns: { message, rolled_back, stats, errors } with 422
+    const msg: string = payload?.message || `Echec de l'import (${res.status})`;
+    const apiErrors: string[] = Array.isArray(payload?.errors)
+      ? (payload.errors as string[])
+      : Array.isArray(payload?.data?.errors)
+      ? (payload.data.errors as string[])
+      : [];
+    const err = new Error(msg) as Error & { errors?: string[]; status?: number };
+    err.errors = apiErrors;
+    err.status = res.status;
     throw err;
   }
-  return payload || {};
+  return (payload as ManifestApiResponse) || {};
 }

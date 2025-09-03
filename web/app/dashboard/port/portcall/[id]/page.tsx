@@ -10,9 +10,10 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
+import { getPortCallById } from "@/features/portcall/lib/portcalls";
 import { cn } from "@/lib/utils";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ComponentType } from "react";
 
 interface PortCall {
     port_call_id: number;
@@ -28,61 +29,7 @@ interface PortCall {
     updated_at: string;
 }
 
-// Données d'exemple (en production, cela viendrait de votre API)
-const samplePortCalls: PortCall[] = [
-    {
-        port_call_id: 5,
-        vessel_agent: "Lesch and Sons",
-        origin_port: "East Mohamed",
-        estimated_arrival: "2025-08-22T01:27:32.000000Z",
-        arrival_date: "2025-08-31T22:49:55.000000Z",
-        estimated_departure: "2025-09-01T22:07:37.000000Z",
-        departure_date: "2025-09-05T19:36:31.000000Z",
-        vessel_id: 10,
-        dock_id: 8,
-        created_at: "2025-09-01T19:24:25.000000Z",
-        updated_at: "2025-09-01T19:24:25.000000Z",
-    },
-    {
-        port_call_id: 6,
-        vessel_agent: "Maritime Solutions Ltd",
-        origin_port: "Port of Rotterdam",
-        estimated_arrival: "2025-09-10T08:00:00.000000Z",
-        arrival_date: "2025-09-10T08:15:00.000000Z",
-        estimated_departure: "2025-09-12T18:00:00.000000Z",
-        departure_date: "2025-09-12T17:45:00.000000Z",
-        vessel_id: 15,
-        dock_id: 12,
-        created_at: "2025-09-08T10:30:00.000000Z",
-        updated_at: "2025-09-12T17:45:00.000000Z",
-    },
-    {
-        port_call_id: 7,
-        vessel_agent: "Global Shipping Co",
-        origin_port: "Singapore Port",
-        estimated_arrival: "2025-09-15T12:00:00.000000Z",
-        arrival_date: "2025-09-15T11:45:00.000000Z",
-        estimated_departure: "2025-09-18T06:00:00.000000Z",
-        departure_date: "2025-09-18T06:30:00.000000Z",
-        vessel_id: 22,
-        dock_id: 5,
-        created_at: "2025-09-12T14:20:00.000000Z",
-        updated_at: "2025-09-18T06:30:00.000000Z",
-    },
-    {
-        port_call_id: 8,
-        vessel_agent: "Ocean Freight Services",
-        origin_port: "Marseille Port",
-        estimated_arrival: "2025-09-20T16:00:00.000000Z",
-        arrival_date: "2025-09-20T16:30:00.000000Z",
-        estimated_departure: "2025-09-22T10:00:00.000000Z",
-        departure_date: "2025-09-22T10:15:00.000000Z",
-        vessel_id: 18,
-        dock_id: 9,
-        created_at: "2025-09-18T09:15:00.000000Z",
-        updated_at: "2025-09-22T10:15:00.000000Z",
-    },
-];
+// plus de données d'exemple; on utilise l'API réelle
 
 // Fonction utilitaire pour formater les dates
 const formatDate = (dateString: string) => {
@@ -127,7 +74,7 @@ const InfoRow = ({
     value,
     className,
 }: {
-    icon: any;
+    icon: ComponentType<{ className?: string }>;
     label: string;
     value: string | number;
     className?: string;
@@ -146,17 +93,29 @@ export default function PortCallDetail() {
     const router = useRouter();
     const [portCall, setPortCall] = useState<PortCall | null>(null);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<Error | null>(null);
 
     useEffect(() => {
-        const id = parseInt(params.id as string);
-        const foundPortCall = samplePortCalls.find(
-            (pc) => pc.port_call_id === id
-        );
-
-        if (foundPortCall) {
-            setPortCall(foundPortCall);
-        }
-        setLoading(false);
+        let mounted = true;
+        const id = parseInt(params.id as string, 10);
+        setLoading(true);
+        getPortCallById(id)
+            .then((pc) => {
+                if (!mounted) return;
+                setPortCall(pc as PortCall);
+                setError(null);
+            })
+            .catch((err) => {
+                if (!mounted) return;
+                setError(err as Error);
+            })
+            .finally(() => {
+                if (!mounted) return;
+                setLoading(false);
+            });
+        return () => {
+            mounted = false;
+        };
     }, [params.id]);
 
     if (loading) {
@@ -165,6 +124,23 @@ export default function PortCallDetail() {
                 <div className="flex items-center justify-center h-64">
                     <Icons.spinner className="h-8 w-8 animate-spin" />
                 </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="container mx-auto p-6">
+                <Card>
+                    <CardContent className="p-8 text-center">
+                        <Icons.alertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+                        <h3 className="text-lg font-semibold mb-2">Erreur</h3>
+                        <p className="text-muted-foreground mb-4">{error.message}</p>
+                        <Button onClick={() => router.push("/dashboard/port/portcall")}>
+                            Retour à la liste
+                        </Button>
+                    </CardContent>
+                </Card>
             </div>
         );
     }
@@ -181,11 +157,7 @@ export default function PortCallDetail() {
                         <p className="text-muted-foreground mb-4">
                             Le Port Call demandé n'existe pas ou a été supprimé.
                         </p>
-                        <Button
-                            onClick={() =>
-                                router.push("/dashboard/port/portcall")
-                            }
-                        >
+                        <Button onClick={() => router.push("/dashboard/port/portcall")}>
                             Retour à la liste
                         </Button>
                     </CardContent>

@@ -1,11 +1,13 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useRef, useState } from "react";
 import { toast } from "sonner";
 import { uploadManifest, type ManifestApiResponse } from "../lib/api";
 import type { ImportStats } from "../types/manifest";
 
 export function useManifestUpload() {
+  const queryClient = useQueryClient();
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [importStats, setImportStats] = useState<ImportStats | null>(null);
@@ -81,12 +83,29 @@ export function useManifestUpload() {
         const successMsg = payload?.message || "Importation du manifeste terminée.";
         setSuccess(successMsg);
         toast.success(successMsg);
+        // Refresh lists that depend on imported data
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: ["followups"] }),
+          queryClient.invalidateQueries({ queryKey: ["vehicles"] }),
+        ]);
         return { ok: true as const };
       } catch (e) {
-        const message = e instanceof Error ? e.message : "Echec de l'import";
-        setErrors(message.split(/\n+/));
+        const err = e as Error & { errors?: string[]; status?: number };
+        const message = err?.message || "Echec de l'import";
+        const details = Array.isArray(err?.errors) ? (err.errors as string[]) : [];
+        // Toast only the main message
         toast.error(message);
-        setImportStats((s) => (s ? { ...s, status: "failed" } : s));
+        // Display detailed errors on the page
+        setErrors(details.length ? details : message.split(/\n+/));
+        setImportStats((s) =>
+          s
+            ? {
+                ...s,
+                status: "failed",
+                errorCount: details.length || s.errorCount || 0,
+              }
+            : s
+        );
         return { ok: false as const };
       } finally {
         stopProgress();
