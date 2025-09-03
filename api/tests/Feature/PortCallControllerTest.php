@@ -47,6 +47,7 @@ function ensurePortCallRelatedTables(): void
             $table->dateTime('departure_date')->nullable();
             $table->foreignId('vessel_id')->constrained('vessels', 'vessel_id');
             $table->foreignId('dock_id')->constrained('docks', 'dock_id');
+                $table->enum('status', ['pending','in_progress','completed'])->default('pending');
             $table->timestamps();
         });
     }
@@ -94,7 +95,7 @@ it('allows an authenticated user to create, show, update and delete a port call'
             'data' => [
                 'port_call_id', 'vessel_agent', 'origin_port',
                 'estimated_arrival', 'arrival_date', 'estimated_departure', 'departure_date',
-                'vessel_id', 'dock_id', 'created_at', 'updated_at',
+                'vessel_id', 'dock_id', 'status', 'created_at', 'updated_at',
             ],
         ]);
 

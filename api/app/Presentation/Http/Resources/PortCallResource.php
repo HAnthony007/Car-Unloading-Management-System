@@ -35,6 +35,7 @@ final class PortCallResource extends JsonResource
             'dock_id' => $pc->getDockId()?->getValue(),
             // Extra attributes
             'vehicles_number' => $pcModel?->vehicles_number,
+            'status' => $pcModel?->status ?? 'pending',
             'vessel' => $pcModel && $pcModel->relationLoaded('vessel') && $pcModel->vessel ? $pcModel->vessel->toArray() : null,
             'dock' => $pcModel && $pcModel->relationLoaded('dock') && $pcModel->dock ? $pcModel->dock->toArray() : null,
             'created_at' => $pc->getCreatedAt()?->toISOString(),

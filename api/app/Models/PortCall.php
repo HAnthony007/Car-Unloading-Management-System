@@ -9,12 +9,17 @@ class PortCall extends Model
 {
     use HasFactory;
 
+    public const STATUS_PENDING = 'pending';
+    public const STATUS_IN_PROGRESS = 'in_progress';
+    public const STATUS_COMPLETED = 'completed';
+
     protected $primaryKey = 'port_call_id';
 
     protected $guarded = ['port_call_id'];
 
     protected $casts = [
         'vehicles_number' => 'integer',
+    'status' => 'string',
     ];
 
     public function vessel(): \Illuminate\Database\Eloquent\Relations\BelongsTo

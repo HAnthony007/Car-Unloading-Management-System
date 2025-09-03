@@ -22,6 +22,7 @@ return new class extends Migration
             $table->foreignId('vessel_id')->constrained('vessels', 'vessel_id');
             $table->foreignId('dock_id')->nullable()->constrained('docks', 'dock_id');
             $table->unsignedInteger('vehicles_number')->nullable();
+            $table->enum('status', ['pending', 'in_progress', 'completed'])->default('pending');
             $table->timestamps();
         });
     }

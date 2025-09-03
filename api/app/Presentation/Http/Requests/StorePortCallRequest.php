@@ -24,6 +24,7 @@ class StorePortCallRequest extends FormRequest
             'departure_date' => ['nullable', 'date', 'after_or_equal:arrival_date'],
             'vessel_id' => ['required', 'integer', 'exists:vessels,vessel_id'],
             'dock_id' => ['required', 'integer', 'exists:docks,dock_id'],
+            'status' => ['sometimes', 'nullable', 'in:pending,in_progress,completed'],
         ];
     }
 

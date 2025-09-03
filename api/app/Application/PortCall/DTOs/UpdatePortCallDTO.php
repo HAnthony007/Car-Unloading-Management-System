@@ -13,7 +13,8 @@ final class UpdatePortCallDTO
         public readonly ?string $estimatedDeparture = null,
         public readonly ?string $departureDate = null,
         public readonly ?int $vesselId = null,
-        public readonly ?int $dockId = null,
+    public readonly ?int $dockId = null,
+    public readonly ?string $status = null,
     ) {}
 
     public static function fromArray(array $data): self
@@ -28,6 +29,7 @@ final class UpdatePortCallDTO
             departureDate: $data['departure_date'] ?? null,
             vesselId: isset($data['vessel_id']) ? (int) $data['vessel_id'] : null,
             dockId: isset($data['dock_id']) ? (int) $data['dock_id'] : null,
+            status: $data['status'] ?? null,
         );
     }
 }

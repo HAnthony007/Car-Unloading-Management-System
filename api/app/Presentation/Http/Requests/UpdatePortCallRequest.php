@@ -24,6 +24,7 @@ class UpdatePortCallRequest extends FormRequest
             'departure_date' => ['sometimes', 'nullable', 'date'],
             'vessel_id' => ['sometimes', 'integer', 'exists:vessels,vessel_id'],
             'dock_id' => ['sometimes', 'integer', 'exists:docks,dock_id'],
+            'status' => ['sometimes', 'in:pending,in_progress,completed'],
         ];
     }
 

@@ -81,6 +81,15 @@ final class PortCall
         return $this->updatedAt;
     }
 
+    /**
+     * Optional status getter for compatibility if domain ever holds status
+     */
+    public function getStatus(): ?string
+    {
+        // The domain entity currently doesn't store status; return null
+        return null;
+    }
+
     public function toArray(): array
     {
         return [
