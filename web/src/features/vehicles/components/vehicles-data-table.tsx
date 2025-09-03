@@ -42,6 +42,8 @@ interface VehiclesDataTableProps<TData, TValue> {
   // Server-driven filtering controls
   query?: string;
   onQueryChange?: (q: string) => void;
+  onFiltersChange?: (filters: { ownerName?: string[]; color?: string[]; type?: string[] }) => void;
+  onClearFilters?: () => void;
 }
 
 export function VehiclesDataTable<TData, TValue>({
@@ -53,6 +55,8 @@ export function VehiclesDataTable<TData, TValue>({
   onServerPageSizeChange,
   query,
   onQueryChange,
+  onFiltersChange,
+  onClearFilters,
 }: VehiclesDataTableProps<TData, TValue>) {
   const isServer = Boolean(serverMeta);
   const [rowSelection, setRowSelection] = useState({});
@@ -78,6 +82,8 @@ export function VehiclesDataTable<TData, TValue>({
     getSortedRowModel: getSortedRowModel(),
 
     onColumnFiltersChange: setColumnFilters,
+  // propagate faceted column filters to parent for server-driven filtering
+  // we'll watch columnFilters via effect below and call onFiltersChange
     getFilteredRowModel: getFilteredRowModel(),
 
     onColumnVisibilityChange: setColumnVisibility,
@@ -105,6 +111,25 @@ export function VehiclesDataTable<TData, TValue>({
     }
   }, [isServer, serverMeta?.perPage, table]);
 
+  // Watch columnFilters and forward selected values for certain columns
+  useEffect(() => {
+    if (!onFiltersChange) return;
+    const filters = table.getState().columnFilters;
+    const out: { ownerName?: string[]; color?: string[]; type?: string[] } = {};
+    for (const f of filters) {
+      if (f.id === "ownerName") {
+        out.ownerName = Array.isArray(f.value) ? f.value : [String(f.value)];
+      }
+      if (f.id === "color") {
+        out.color = Array.isArray(f.value) ? f.value : [String(f.value)];
+      }
+      if (f.id === "type") {
+        out.type = Array.isArray(f.value) ? f.value : [String(f.value)];
+      }
+    }
+    onFiltersChange(out);
+  }, [table.getState().columnFilters]);
+
   return (
     <div className="space-y-4">
       <VehiclesDataTableToolbar
@@ -113,6 +138,7 @@ export function VehiclesDataTable<TData, TValue>({
         onToggleDensity={() => setDense((d) => !d)}
         query={query}
         onQueryChange={onQueryChange}
+  onClearFilters={onClearFilters}
       />
       <div className="rounded-md border shadow-sm">
         <Table>

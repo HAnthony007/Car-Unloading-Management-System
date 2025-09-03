@@ -13,8 +13,12 @@ export default function Vehicles() {
     const [page, setPage] = useState(1);
     const [perPage, setPerPage] = useState(15);
     const [q, setQ] = useState("");
+    const [ownerName, setOwnerName] = useState("");
+    const [color, setColor] = useState("");
+    const [typeFilter, setTypeFilter] = useState("");
+    const [originCountry, setOriginCountry] = useState("");
 
-    const { data: queryData, isLoading } = useVehicles({ page, perPage, q });
+    const { data: queryData, isLoading } = useVehicles({ page, perPage, q, ownerName, color, type: typeFilter, originCountry });
     const data = useMemo<Vehicle[]>(() => queryData?.data ?? [], [queryData]);
     const meta = queryData?.meta;
 
@@ -31,7 +35,18 @@ export default function Vehicles() {
                                           <VehiclesAddButtons />
                 </div>
                 <div className="-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-y-0 lg:space-x-12">
-                                <VehiclesDataTable
+                    <div className="mb-4 flex flex-wrap items-center gap-2">
+                        <input
+                            placeholder="Pays d'origine"
+                            value={originCountry}
+                            onChange={(e) => {
+                                setOriginCountry(e.target.value);
+                                setPage(1);
+                            }}
+                            className="input input-sm mr-2 rounded border px-2 py-1"
+                        />
+                    </div>
+                    <VehiclesDataTable
                         columns={VehiclesColumns}
                         data={data}
                         isLoading={isLoading}
@@ -44,6 +59,20 @@ export default function Vehicles() {
                         query={q}
                                     onQueryChange={(value: string) => {
                             setQ(value);
+                            setPage(1);
+                        }}
+                        onFiltersChange={({ ownerName: o, color: c, type: t }) => {
+                            // take first selected value for each filter if present
+                            setOwnerName(o && o.length ? o[0] : "");
+                            setColor(c && c.length ? c[0] : "");
+                            setTypeFilter(t && t.length ? t[0] : "");
+                            setPage(1);
+                        }}
+                        onClearFilters={() => {
+                            setOwnerName("");
+                            setColor("");
+                            setTypeFilter("");
+                            setQ("");
                             setPage(1);
                         }}
                     />

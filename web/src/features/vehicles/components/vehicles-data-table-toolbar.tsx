@@ -1,4 +1,5 @@
 import { Icons } from "@/components/icons/icon";
+import { DataTableFacetedFilter } from "@/components/table/data-table-faceted-filter";
 import { DataTableViewOptions } from "@/components/table/data-table-view-options";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +11,7 @@ interface VehiclesDataTableToolbarProps<TData> {
   onToggleDensity?: () => void;
   query?: string;
   onQueryChange?: (q: string) => void;
+  onClearFilters?: () => void;
 }
 
 export const VehiclesDataTableToolbar = <TData,>({
@@ -18,6 +20,7 @@ export const VehiclesDataTableToolbar = <TData,>({
   onToggleDensity,
   query,
   onQueryChange,
+  onClearFilters,
 }: VehiclesDataTableToolbarProps<TData>) => {
   const hasQuery = Boolean((query ?? "").trim() !== "");
 
@@ -34,11 +37,37 @@ export const VehiclesDataTableToolbar = <TData,>({
           className="h-8 w-[150px] lg:w-auto"
         />
 
-        {hasQuery && (
+        <div className="flex gap-x-2">
+          {table.getColumn("ownerName") && (
+            <DataTableFacetedFilter
+              column={table.getColumn("ownerName")}
+              title="Propriétaire"
+              options={[]}
+            />
+          )}
+          {table.getColumn("color") && (
+            <DataTableFacetedFilter
+              column={table.getColumn("color")}
+              title="Couleur"
+              options={[]}
+            />
+          )}
+          {table.getColumn("type") && (
+            <DataTableFacetedFilter
+              column={table.getColumn("type")}
+              title="Type"
+              options={[]}
+            />
+          )}
+        </div>
+
+        {(hasQuery || table.getState().columnFilters.length > 0) && (
           <Button
             variant="ghost"
             onClick={() => {
+              table.resetColumnFilters();
               onQueryChange?.("");
+              if (onClearFilters) onClearFilters();
             }}
             className="h-8 px-2 lg:px-3"
           >

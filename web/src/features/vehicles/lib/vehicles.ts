@@ -5,6 +5,10 @@ export type GetVehiclesParams = {
   page?: number;
   perPage?: number;
   q?: string;
+  ownerName?: string;
+  color?: string;
+  type?: string;
+  originCountry?: string;
 };
 
 export async function getVehicles(params: GetVehiclesParams = {}) {
@@ -13,6 +17,10 @@ export async function getVehicles(params: GetVehiclesParams = {}) {
   if (params.page) search.set("page", String(params.page));
   if (params.perPage) search.set("per_page", String(params.perPage));
   if (params.q && params.q.trim() !== "") search.set("search_term", params.q.trim());
+  if (params.ownerName && params.ownerName.trim() !== "") search.set("owner_name", params.ownerName.trim());
+  if (params.color && params.color.trim() !== "") search.set("color", params.color.trim());
+  if (params.type && params.type.trim() !== "") search.set("type", params.type.trim());
+  if (params.originCountry && params.originCountry.trim() !== "") search.set("origin_country", params.originCountry.trim());
   url.search = search.toString();
 
   const res = await fetchWithCsrf(url.toString(), {
