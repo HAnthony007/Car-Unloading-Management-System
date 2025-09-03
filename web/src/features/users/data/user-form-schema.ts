@@ -12,8 +12,8 @@ export const userFormSchema = z.object({
     .min(1, "Email is required"),
   matriculationNumber: z
     .string()
-    .min(1, { message: "Le matricule est requis" })
-    .max(30, { message: "Le matricule est trop long" }),
+    .max(30, { message: "Le matricule est trop long" })
+    .optional(),
   phone: z
     .string()
     .optional()
@@ -36,7 +36,7 @@ export const userFormSchema = z.object({
     )
     .optional()
     .nullable(),
-  role: z.enum(["admin", "user"], { message: "Role is required" }),
+  role: z.enum(["admin", "agent"], { message: "Role is required" }),
 });
 
 export type UserForm = z.infer<typeof userFormSchema>;

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const userRoleSchema = z.union([z.literal("admin"), z.literal("user")]);
+const userRoleSchema = z.union([z.literal("admin"), z.literal("agent")]);
 
 const userSchema = z.object({
   id: z.string(),

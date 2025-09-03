@@ -17,7 +17,15 @@ export async function login(email: string, password: string) {
   );
 
   if (!response.ok) {
-    throw new Error("Login failed");
+    let parsed: any = null;
+    try {
+      parsed = await response.json();
+    } catch {}
+    const message = parsed?.message || parsed?.error || (response.status === 422 ? "Validation failed" : "Login failed");
+    const err: any = new Error(message);
+    err.status = response.status;
+    if (parsed) err.response = parsed;
+    throw err;
   }
 
   const data = await response.json();

@@ -36,6 +36,10 @@ export const LoginForm = ({ className }: ComponentProps<"div">) => {
   const onSubmit = (data: loginSchemaType) => {
     mutate(data, {
       onSuccess: () => {
+        // show a welcome toast using the submitted email
+        try {
+          toast.success(`Bienvenue${data.email ? `, ${data.email}` : ""}`);
+        } catch {}
         // Compute safe redirect target from query param
         const rawFrom = searchParams.get("from");
         let target = "/dashboard";
@@ -56,12 +60,48 @@ export const LoginForm = ({ className }: ComponentProps<"div">) => {
           router.push("/dashboard");
         }
       },
+      onError: (e: any) => {
+        // Map server validation errors (422) to form fields and toast
+        const resp = e?.response;
+        const errors = resp?.errors as Record<string, string[] | string> | undefined;
+        // Attach field errors if present
+        if (errors && typeof errors === "object") {
+          const keyMap: Record<string, keyof loginSchemaType> = {
+            email: "email",
+            password: "password",
+          };
+          const seen = new Set<string>();
+          Object.entries(errors).forEach(([rawKey, msgs]) => {
+            const normKey = rawKey.replace(/\[\d+\]|\.\d+/g, "");
+            const field = (keyMap[normKey] ?? (normKey as keyof loginSchemaType));
+            if (!seen.has(String(field))) {
+              const message = Array.isArray(msgs) ? msgs[0] : String(msgs);
+              form.setError(field, { type: "server", message });
+              seen.add(String(field));
+            }
+          });
+        }
+        // Show the exact server message in a toast
+        let serverMessage: string | null = null;
+        if (errors && typeof errors === "object") {
+          const firstField = Object.keys(errors)[0];
+          const firstMsg = firstField ? (Array.isArray((errors as any)[firstField]) ? (errors as any)[firstField][0] : (errors as any)[firstField]) : null;
+          if (firstMsg) serverMessage = String(firstMsg);
+        }
+        if (!serverMessage) serverMessage = resp?.message || (e instanceof Error ? e.message : "Login failed");
+        if (serverMessage) toast.error(serverMessage);
+      },
     });
   };
 
   useEffect(() => {
+    // Fallback toast only if there is no structured server response (onError already handled 422)
     if (error) {
-      toast.error((error as Error).message);
+      const err: any = error;
+      if (!err?.response) {
+        const message = (error as Error).message;
+        if (message) toast.error(message);
+      }
     }
   }, [error]);
 

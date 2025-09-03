@@ -10,6 +10,7 @@ final class UserSearchCriteriaDTO
         public readonly ?array $roleIds = null,
         public readonly ?string $role = null,
         public readonly ?array $roles = null,
+    public readonly ?int $excludeUserId = null,
         public readonly ?bool $emailVerified = null,
         public readonly ?bool $isActive = null,
         public readonly ?string $searchTerm = null,
@@ -29,6 +30,7 @@ final class UserSearchCriteriaDTO
             roles: isset($data['roles']) && is_array($data['roles'])
                 ? array_values(array_map(fn ($v) => strtolower((string) $v), $data['roles']))
                 : null,
+            excludeUserId: isset($data['exclude_user_id']) ? (int) $data['exclude_user_id'] : null,
             emailVerified: isset($data['email_verified']) ? (bool) $data['email_verified'] : null,
             isActive: isset($data['is_active']) ? (bool) $data['is_active'] : null,
             searchTerm: $data['search_term'] ?? null,

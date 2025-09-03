@@ -181,7 +181,7 @@ export default function PortCallDetail() {
                         <p className="text-muted-foreground mb-4">
                             Le Port Call demandé n'existe pas ou a été supprimé.
                         </p>
-                        <Button onClick={() => router.push("/portcall")}>
+                        <Button onClick={() => router.push("/portcall" as any)}>
                             Retour à la liste
                         </Button>
                     </CardContent>
@@ -200,7 +200,7 @@ export default function PortCallDetail() {
                     <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => router.push("/portcall")}
+                        onClick={() => router.push("/portcall" as any)}
                         className="flex items-center gap-2"
                     >
                         <Icons.arrowLeft className="h-4 w-4" />

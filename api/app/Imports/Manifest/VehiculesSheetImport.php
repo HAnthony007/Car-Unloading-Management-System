@@ -40,8 +40,12 @@ class VehiculesSheetImport implements SkipsOnError, SkipsOnFailure, ToCollection
                 $proprietaire = trim((string) ($this->getVal($row, ['proprietaire_destinataire', 'proprietaire-destinataire', 'propriétaire_destinataire', 'proprietairedestinataire', 'owner', 'proprietaire', 'owner_name', 'owner-name', 'destinataire']) ?? ''));
                 $bl = trim((string) ($this->getVal($row, ['connaissement_b_l', 'connaissement_bl', 'connaissement-b-l', 'connaissement', 'bill_of_lading', 'bill-of-lading', 'bl', 'b_l', 'b-l', 'b/l']) ?? ''));
                 $emplacement = trim((string) ($this->getVal($row, ['emplacement_navire', 'emplacement-navire', 'ship_location', 'ship-location', 'emplacement']) ?? ''));
-                $statut = trim((string) ($this->getVal($row, ['statut', 'status', 'etat', 'état', 'vehicle_condition']) ?? ''));
-                // Map common localized labels to canonical codes
+                // Vehicle condition comes from the Vehicules sheet "status" column (physical condition)
+                $vehicleCondition = '';
+                $fileStatus = '';
+                $vehicleCondition = trim((string) ($this->getVal($row, ['status', 'statut', 'etat', 'état', 'vehicle_condition']) ?? ''));
+
+                // Normalize known workflow status labels
                 $statusMap = [
                     'ouvert' => 'OPEN',
                     'open' => 'OPEN',
@@ -58,14 +62,18 @@ class VehiculesSheetImport implements SkipsOnError, SkipsOnFailure, ToCollection
                     'en-attente' => 'PENDING',
                     'en attente' => 'PENDING',
                 ];
-                $statutKey = strtolower($statut);
-                if (array_key_exists($statutKey, $statusMap)) {
-                    $statut = $statusMap[$statutKey];
-                }
                 $allowedStatuses = ['OPEN', 'IN_PROGRESS', 'CLOSED', 'PENDING'];
-                $statut = $statut !== '' ? strtoupper($statut) : '';
-                if ($statut !== '' && ! in_array($statut, $allowedStatuses, true)) {
-                    $statut = 'PENDING';
+                // Derive workflow status for FollowUpFile from the same "status" column
+                if ($vehicleCondition !== '') {
+                    $key = strtolower($vehicleCondition);
+                    if (array_key_exists($key, $statusMap)) {
+                        $fileStatus = $statusMap[$key];
+                    } else {
+                        $fileStatus = strtoupper($vehicleCondition);
+                    }
+                    if (! in_array($fileStatus, $allowedStatuses, true)) {
+                        $fileStatus = 'PENDING';
+                    }
                 }
                 $obs = trim((string) ($this->getVal($row, ['observations', 'observation', 'vehicle_observation', 'vehicle-observation', 'remarques']) ?? ''));
                 $amorce = $this->getVal($row, ['amorce', 'is_primed', 'is-primed', 'apprete', 'apprêté']); // bool
@@ -103,7 +111,7 @@ class VehiculesSheetImport implements SkipsOnError, SkipsOnFailure, ToCollection
                     continue;
                 }
 
-                DB::transaction(function () use ($vin, $marque, $modele, $annee, $proprietaire, $couleur, $type, $poids, $statut, $obs, $pays, $emplacement, $amorce, $bl) {
+                DB::transaction(function () use ($vin, $marque, $modele, $annee, $proprietaire, $couleur, $type, $poids, $vehicleCondition, $fileStatus, $obs, $pays, $emplacement, $amorce, $bl) {
                     // Create vehicle
                     // Enforce unique B/L as per schema
                     if ($bl === '' || FollowUpFile::where('bill_of_lading', $bl)->exists()) {
@@ -120,7 +128,8 @@ class VehiculesSheetImport implements SkipsOnError, SkipsOnFailure, ToCollection
                         'color' => $couleur ?: null,
                         'type' => $type,
                         'weight' => $poids !== null ? (string) $poids : '',
-                        'vehicle_condition' => $statut ?: 'Inconnu',
+                        // Keep the raw physical condition from the sheet (default to 'Inconnu' if empty)
+                        'vehicle_condition' => $vehicleCondition !== '' ? $vehicleCondition : 'Inconnu',
                         'vehicle_observation' => $obs ?: null,
                         'origin_country' => $pays,
                         'ship_location' => $emplacement ?: null,
@@ -133,8 +142,8 @@ class VehiculesSheetImport implements SkipsOnError, SkipsOnFailure, ToCollection
                     // Create Follow Up File (one per vehicle)
                     FollowUpFile::create([
                         'bill_of_lading' => $bl,
-                        // Default to PENDING if not provided or not recognized
-                        'status' => $statut ?: 'PENDING',
+                        // Use normalized workflow status if provided; default to PENDING
+                        'status' => $fileStatus !== '' ? $fileStatus : 'PENDING',
                         'vehicle_id' => $vehicle->getKey(),
                         'port_call_id' => $this->ctx->portCall->getKey(),
                     ]);

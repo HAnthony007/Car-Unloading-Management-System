@@ -4,7 +4,10 @@ import { DialogConfirm } from "@/components/ui/dialog-confirm";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
+import { toast } from "sonner";
 import type { User } from "../data/schema";
+import { useDeleteUser } from "../hooks/useUserMutations";
+import { useUsersStore } from "../store/users-store";
 
 interface UsersDeleteDialogProps {
   open: boolean;
@@ -20,16 +23,34 @@ export const UsersDeleteDialog = ({
   const [value, setValue] = useState("");
 
   const handleDelete = () => {
-    if (value.trim() !== currentRow.email) return;
-
-    onOpenChange(false);
+    // Compare with matriculationNumber if present, otherwise fallback to id
+    const expected = currentRow.matriculationNumber || String(currentRow.id);
+    if (value.trim() !== expected) return;
+    // trigger deletion with callbacks
+    deleteUserMutate(
+      { id: currentRow.id },
+      {
+        onSuccess: () => {
+          toast.success("Utilisateur supprimé");
+          onOpenChange(false);
+          setCurrentRow(null);
+        },
+        onError: (err: unknown) => {
+          const msg = err instanceof Error ? err.message : String(err);
+          toast.error("Suppression échouée: " + msg);
+        },
+      },
+    );
   };
+
+  const setCurrentRow = useUsersStore((s) => s.setCurrentRow);
+  const { mutate: deleteUserMutate, isPending: isDeleting } = useDeleteUser();
   return (
     <DialogConfirm
       open={open}
       onOpenChange={onOpenChange}
-      handleConfirm={handleDelete}
-      disabled={value.trim() !== currentRow.email}
+  handleConfirm={handleDelete}
+  disabled={value.trim() !== (currentRow.matriculationNumber || String(currentRow.id)) || isDeleting}
       title={
         <span className="text-destructive">
           <Icons.alertTriangle
@@ -57,7 +78,7 @@ export const UsersDeleteDialog = ({
             <Input
               value={value}
               onChange={(event) => setValue(event.target.value)}
-              placeholder="Enter registration number to confirm deletion."
+              placeholder={`Enter ${currentRow.matriculationNumber ? 'matriculation number' : 'id'} to confirm deletion.`}
             />
           </Label>
           <Alert variant="destructive">

@@ -47,8 +47,8 @@ export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
                 const Icon = item.icon ? Icons[item.icon] : Icons.overview;
                 return (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild isActive={pathname === item.url}>
-                      <Link href={item.url}>
+                      <SidebarMenuButton asChild isActive={pathname === item.url}>
+                      <Link href={item.url as any}>
                         {item.icon && <Icon />}
                         <span>{item.title}</span>
                       </Link>
@@ -57,8 +57,8 @@ export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
                       <SidebarMenuSub>
                         {item.item.map((subItem) => (
                           <SidebarMenuItem key={subItem.title}>
-                            <SidebarMenuButton asChild isActive={pathname === subItem.url}>
-                              <Link href={subItem.url}>
+                              <SidebarMenuButton asChild isActive={pathname === subItem.url}>
+                              <Link href={subItem.url as any}>
                                 <span>{subItem.title}</span>
                               </Link>
                             </SidebarMenuButton>

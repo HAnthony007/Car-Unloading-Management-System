@@ -20,7 +20,8 @@ return new class extends Migration
             $table->dateTime('estimated_departure')->nullable();
             $table->dateTime('departure_date')->nullable();
             $table->foreignId('vessel_id')->constrained('vessels', 'vessel_id');
-            $table->foreignId('dock_id')->constrained('docks', 'dock_id');
+            $table->foreignId('dock_id')->nullable()->constrained('docks', 'dock_id');
+            $table->unsignedInteger('vehicles_number')->nullable();
             $table->timestamps();
         });
     }

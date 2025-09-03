@@ -18,7 +18,8 @@ final class MatriculationNumberGeneratorService
 
         $counter = 1;
         do {
-            $sequence = str_pad($counter, 3, '0', STR_PAD_LEFT);
+            // Use 4 digits for the sequence (e.g. 0001)
+            $sequence = str_pad($counter, 4, '0', STR_PAD_LEFT);
             $candidate = $pattern.$sequence;
             $matriculationNumber = new MatriculationNumber($candidate);
             $counter++;

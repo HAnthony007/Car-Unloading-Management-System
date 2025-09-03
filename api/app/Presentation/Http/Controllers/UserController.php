@@ -36,7 +36,13 @@ final class UserController extends Controller
     public function index(SearchUsersRequest $request): JsonResponse
     {
         try {
-            $criteria = UserSearchCriteriaDTO::fromArray($request->validated());
+            $validated = $request->validated();
+            // Exclude the currently authenticated user from the list
+            $authUser = $request->user();
+            if ($authUser !== null) {
+                $validated['exclude_user_id'] = $authUser->getKey();
+            }
+            $criteria = UserSearchCriteriaDTO::fromArray($validated);
             $users = $this->searchUsersUseCase->execute($criteria);
 
             return response()->json([

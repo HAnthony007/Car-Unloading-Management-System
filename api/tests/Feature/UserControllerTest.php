@@ -120,7 +120,7 @@ describe('User API Endpoints', function () {
             $response->assertStatus(200)
                 ->assertJsonPath('meta.current_page', 2)
                 ->assertJsonPath('meta.per_page', 10)
-                ->assertJsonPath('meta.total', 26); // 25 créés + 1 dans beforeEach
+                ->assertJsonPath('meta.total', 25); // 25 créés (authenticated user excluded)
         });
     });
 
@@ -162,7 +162,6 @@ describe('User API Endpoints', function () {
 
             $response->assertStatus(422)
                 ->assertJsonValidationErrors([
-                    'matriculation_no',
                     'full_name',
                     'email',
                     'password',

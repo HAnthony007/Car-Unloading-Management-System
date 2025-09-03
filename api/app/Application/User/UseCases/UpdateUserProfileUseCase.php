@@ -41,7 +41,7 @@ final class UpdateUserProfileUseCase
             userId: $user->getUserId(),
             matriculationNumber: $user->getMatriculationNumber(),
             fullName: $dto->fullName ?? $user->getFullName(),
-            email: $user->getEmail(),
+            email: $dto->email ? new \App\Domain\Auth\ValueObjects\Email($dto->email) : $user->getEmail(),
             hashedPassword: $user->getHashedPassword(),
             avatar: $dto->avatar ?? $user->getAvatar(),
             phoneNumber: $dto->getPhoneAsV0() ?? $user->getPhoneNumber(),

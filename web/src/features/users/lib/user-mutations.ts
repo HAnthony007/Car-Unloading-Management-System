@@ -1,5 +1,5 @@
 import { fetchWithCsrf } from "@/lib/http";
-export type RoleName = "admin" | "user";
+export type RoleName = "admin" | "agent";
 
 export type UpsertUserPayload = {
   fullName: string;
@@ -26,18 +26,17 @@ export async function createUser(payload: UpsertUserPayload) {
       email: payload.email,
       password: payload.password ?? "password12345",
       password_confirmation: payload.password ?? "password12345",
-      avatar: null,
       phone: payload.phone ?? null,
       role_id: mapRoleNameToId(payload.role),
     }),
   });
   if (!res.ok) {
-    let message = "Erreur lors de la création";
-    try {
-      const p = await res.json();
-      message = p?.message || p?.error || message;
-    } catch {}
-    throw new Error(message);
+  let parsed: any = null;
+  try { parsed = await res.json(); } catch {}
+  const message = parsed?.message || parsed?.error || "Erreur lors de la création";
+  const err: any = new Error(message);
+  if (parsed) err.response = parsed;
+  throw err;
   }
   return res.json();
 }
@@ -50,17 +49,18 @@ export async function updateUser(userId: string | number, payload: Omit<UpsertUs
     headers: { "Content-Type": "application/json", Accept: "application/json" },
     body: JSON.stringify({
       full_name: payload.fullName,
+  ...(payload.email ? { email: payload.email } : {}),
       phone: payload.phone ?? null,
       role_id: mapRoleNameToId(payload.role),
     }),
   });
   if (!res.ok) {
-    let message = "Erreur lors de la mise à jour";
-    try {
-      const p = await res.json();
-      message = p?.message || p?.error || message;
-    } catch {}
-    throw new Error(message);
+  let parsed: any = null;
+  try { parsed = await res.json(); } catch {}
+  const message = parsed?.message || parsed?.error || "Erreur lors de la mise à jour";
+  const err: any = new Error(message);
+  if (parsed) err.response = parsed;
+  throw err;
   }
   return res.json();
 }
@@ -95,6 +95,24 @@ export async function deleteUserAvatar(userId: string | number) {
   });
   if (!res.ok) {
     let message = "Erreur lors de la suppression de l’avatar";
+    try {
+      const p = await res.json();
+      message = p?.message || p?.error || message;
+    } catch {}
+    throw new Error(message);
+  }
+  return true;
+}
+
+export async function deleteUser(userId: string | number) {
+  const base = process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL;
+  if (!base) throw new Error("Backend base URL not configured");
+  const res = await fetchWithCsrf(`${base}/users/${userId}`, {
+    method: "DELETE",
+    headers: { Accept: "application/json" },
+  });
+  if (!res.ok) {
+    let message = "Erreur lors de la suppression de l'utilisateur";
     try {
       const p = await res.json();
       message = p?.message || p?.error || message;

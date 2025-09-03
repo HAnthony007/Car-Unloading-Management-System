@@ -17,7 +17,8 @@ final class CreateUserRequest extends FormRequest
     {
         return [
             'matriculation_no' => [
-                'required',
+                'sometimes',
+                'nullable',
                 'string',
                 'max:50',
                 'unique:users,matriculation_no',
@@ -51,6 +52,8 @@ final class CreateUserRequest extends FormRequest
                 'nullable',
                 'string',
                 'max:20',
+                'regex:/^[0-9+\\-\\s\\(\\)]+$/',
+                'unique:users,phone',
             ],
             'role_id' => [
                 'required',
@@ -70,6 +73,8 @@ final class CreateUserRequest extends FormRequest
             'email.required' => 'Email is required.',
             'email.unique' => 'Email is already taken.',
             'password.min' => 'Password must be at least 8 characters.',
+            'phone.unique' => 'Phone number is already taken.',
+            'phone.regex' => 'Phone number format is invalid.',
             'role_id.exists' => 'Role does not exist.',
         ];
     }

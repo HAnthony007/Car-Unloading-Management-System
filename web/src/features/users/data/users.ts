@@ -24,7 +24,7 @@ export function normalizeUser(input: unknown): Partial<User> & { id?: string } {
       (src.role.display_name as string) ||
       (src.role.name as string);
   else roleName = (src.userRole as string) ?? undefined;
-  const role = (roleName === "admin" ? "admin" : "user") as User["role"];
+  const role = (roleName === "admin" ? "admin" : "agent") as User["role"];
   const fullName =
     ((src.display_name as string) ??
       (src.fullName as string) ??

@@ -39,7 +39,7 @@ export const Login = ({ className, ...props }: ComponentProps<"div">) => {
 
           <div className="text-sm font-medium leading-none">
             Don&apos;t have an account?{" "}
-            <Link href="/register" prefetch={true} className="underline">
+            <Link href={"/register" as any} prefetch={true} className="underline">
               Sign Up
             </Link>
           </div>

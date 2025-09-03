@@ -86,6 +86,13 @@ final class SearchUsersUseCase
         // Convert to array and reset keys
         $users = array_values($users);
 
+        // Exclude a specific user id if requested (useful to hide the authenticated user)
+        if ($criteria->excludeUserId !== null) {
+            $users = array_values(array_filter($users, function ($user) use ($criteria) {
+                return $user->getUserId()?->getValue() !== $criteria->excludeUserId;
+            }));
+        }
+
         // Pagination
         $total = count($users);
         $perPage = $criteria->perPage;

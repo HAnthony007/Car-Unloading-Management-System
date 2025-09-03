@@ -80,13 +80,13 @@ export const UsersActionDialog = ({
     matriculationNumber: row?.matriculationNumber ?? "",
     phone: row?.phone ?? "",
     avatar: null,
-    role: (row?.role as UserForm["role"]) ?? "user",
+    role: (row?.role as UserForm["role"]) ?? "agent",
   });
 
   const form = useForm<UserForm>({
     defaultValues: makeDefaultValues(currentRow),
     resolver: zodResolver(formSchema),
-    mode: "onChange", // validation en temps réel
+    mode: "onChange",
   });
 
   // Temporary signed avatar URL served by backend (returns JSON with data.url)
@@ -94,16 +94,12 @@ export const UsersActionDialog = ({
 
   useEffect(() => {
     if (!open) return;
-    // Reset form values when opening or switching rows
     form.reset(makeDefaultValues(currentRow));
-    // Clear local avatar selection on every open to avoid stale preview
     setAvatarPreview(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
-    // Focus the first input after reset
     if (firstInputRef.current) firstInputRef.current.focus();
   }, [open, currentRow, form]);
 
-  // Avatar preview lifecycle
   useEffect(() => {
     return () => {
       if (avatarPreview) URL.revokeObjectURL(avatarPreview);
@@ -146,29 +142,41 @@ export const UsersActionDialog = ({
     setLoading(true);
     try {
       if (isEdit && currentRow?.id) {
-        await updateUserMutate({ id: currentRow.id, payload: {
-          fullName: data.fullName,
-          email: data.email,
-          matriculationNumber: data.matriculationNumber,
-          phone: data.phone || null,
-          role: data.role,
-        }});
+        await updateUserMutate({
+          id: currentRow.id,
+          payload: {
+            fullName: data.fullName,
+            email: data.email,
+            phone: data.phone || null,
+            role: data.role ?? "agent",
+          },
+        });
         if (data.avatar instanceof File) {
           await uploadAvatar(currentRow.id, data.avatar);
         }
       } else {
-        const created = await createUserMutate({
+        const payload: Record<string, any> = {
           fullName: data.fullName,
           email: data.email,
-          matriculationNumber: data.matriculationNumber,
           phone: data.phone || null,
-          role: data.role,
-        });
+          role: data.role ?? "agent",
+        };
+        if (data.matriculationNumber && data.matriculationNumber.trim().length > 0) {
+          payload.matriculationNumber = data.matriculationNumber;
+        }
+
+        const created = await createUserMutate(payload as any);
         const newId = created?.data?.user_id ?? created?.data?.id ?? created?.user_id ?? created?.id;
+        const generatedMatriculation =
+          created?.data?.matriculation_number ?? created?.matriculation_number ?? null;
         if (newId && data.avatar instanceof File) {
           await uploadAvatar(newId, data.avatar);
         }
+        if (generatedMatriculation) {
+          toast.success(`Utilisateur créé — Matricule: ${generatedMatriculation}`);
+        }
       }
+
       invalidateUsers();
       form.reset(makeDefaultValues());
       handleClearAvatar();
@@ -180,7 +188,81 @@ export const UsersActionDialog = ({
       onOpenChange(false);
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
-      toast.error("Une erreur est survenue. Veuillez réessayer. " + msg);
+      const anyErr = e as any;
+
+      if (anyErr?.response?.errors && typeof anyErr.response.errors === "object") {
+        const errors = anyErr.response.errors as Record<string, string[]>;
+        const keyMap: Record<string, { field: string; id: string }> = {
+          matriculation_no: { field: "matriculationNumber", id: "user-matricule" },
+          full_name: { field: "fullName", id: "user-fullname" },
+          email: { field: "email", id: "user-email" },
+          phone: { field: "phone", id: "user-phone" },
+          role_id: { field: "role", id: "user-role" },
+        };
+
+        let firstField: string | null = null;
+        let firstMessage: string | null = null;
+        let focusId: string | null = null;
+
+        // Clear previous server errors
+        // (keeps client-side validation messages intact)
+        // We only clear fields we are about to set to avoid stomping unrelated errors.
+        const keysToSet: string[] = [];
+        Object.entries(errors).forEach(([k]) => keysToSet.push(k));
+        // fallback helper: convert snake_case -> camelCase
+        const snakeToCamel = (s: string) => s.replace(/_([a-z])/g, (_, c) => c.toUpperCase());
+
+        Object.entries(errors).forEach(([key, msgs]) => {
+          // handle cases like "email[0]" or "email.0"
+          const base = String(key).split(/[.\[]/)[0];
+          const mapping = keyMap[key] ?? keyMap[base] ?? null;
+          const fallbackField = (() => {
+            // try direct base
+            if (base in form.getValues()) return base;
+            // try snake->camel
+            const camel = snakeToCamel(base);
+            if (camel in form.getValues()) return camel;
+            // as last resort, return base
+            return base;
+          })();
+          const fieldName = mapping ? mapping.field : fallbackField;
+          const id = mapping ? mapping.id : `user-${fieldName}`;
+          const message = Array.isArray(msgs) ? msgs.join(" ") : String(msgs);
+          if (!firstField) {
+            firstField = fieldName;
+            firstMessage = message;
+            focusId = id;
+          }
+          form.setError(fieldName as any, { type: "server", message });
+        });
+
+        if (focusId) {
+          setTimeout(() => {
+            const id = focusId as string;
+            const input = document.getElementById(id);
+            input?.focus();
+          }, 50);
+        }
+
+        // Prefer the exact first server validation message if available
+  let serverMessage: string | null = firstMessage ?? null;
+        if (!serverMessage) {
+          for (const val of Object.values(errors)) {
+            if (Array.isArray(val) && val.length > 0 && val[0]) {
+              serverMessage = String(val[0]);
+              break;
+            }
+            if (typeof val === "string" && val) {
+              serverMessage = val;
+              break;
+            }
+          }
+        }
+
+        toast.error(serverMessage ?? anyErr.response?.message ?? msg ?? "Validation failed");
+      } else {
+        toast.error("Une erreur est survenue. Veuillez réessayer. " + msg);
+      }
     } finally {
       setLoading(false);
     }
@@ -351,32 +433,35 @@ export const UsersActionDialog = ({
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="matriculationNumber"
-                render={({ field }) => (
-                  <FormItem className="grid grid-cols-6 space-y-0 gap-x-4 gap-y-1">
-                    <FormLabel className="text-right col-span-2" htmlFor="user-matricule">
-                      Matricule <span className="text-destructive">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        id="user-matricule"
-                        placeholder="ex: ADM001"
-                        className="col-span-4"
-                        autoComplete="off"
-                        aria-invalid={!!form.formState.errors.matriculationNumber}
-                        aria-describedby="user-matricule-error"
-                      />
-                    </FormControl>
-                    <div className="col-span-4 col-start-3 text-xs text-muted-foreground">
-                      Utilisez votre schéma (ex: ADM001, AGT123…).
-                    </div>
-                    <FormMessage className="col-span-4 col-start-3" id="user-matricule-error" />
-                  </FormItem>
-                )}
-              />
+              {isEdit ? (
+                <FormField
+                  control={form.control}
+                  name="matriculationNumber"
+                  render={({ field }) => (
+                    <FormItem className="grid grid-cols-6 space-y-0 gap-x-4 gap-y-1">
+                      <FormLabel className="text-right col-span-2" htmlFor="user-matricule">
+                        Matricule
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          id="user-matricule"
+                          placeholder="ex: ADM001"
+                          className="col-span-4"
+                          autoComplete="off"
+                          aria-invalid={!!form.formState.errors.matriculationNumber}
+                          aria-describedby="user-matricule-error"
+                          disabled
+                        />
+                      </FormControl>
+                      <div className="col-span-4 col-start-3 text-xs text-muted-foreground">
+                        Matricule géré automatiquement. Non modifiable.
+                      </div>
+                      <FormMessage className="col-span-4 col-start-3" id="user-matricule-error" />
+                    </FormItem>
+                  )}
+                />
+              ) : null}
               <FormField
                 control={form.control}
                 name="phone"
