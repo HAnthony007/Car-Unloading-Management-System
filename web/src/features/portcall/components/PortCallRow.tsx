@@ -18,6 +18,7 @@ export const PortCallRow = ({
   onDelete: (id: number) => void;
 }) => {
   const status = getPortCallStatus(portCall);
+  const imo = portCall.vessel?.imo_no ?? null;
 
   return (
     <Card className="hover:shadow-md transition-shadow cursor-pointer">
@@ -42,25 +43,49 @@ export const PortCallRow = ({
                 </div>
                 <div className="flex items-center gap-2">
                   <Icons.file className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-muted-foreground">Port: {portCall.origin_port}</span>
+                  <span className="text-muted-foreground">Port de provenance: {portCall.origin_port}</span>
                 </div>
               </div>
 
               <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <Icons.calendar className="h-4 w-4 text-green-600" />
-                  <span className="text-sm">Arrivée: {new Date(portCall.arrival_date).toLocaleString()}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Icons.calendar className="h-4 w-4 text-red-600" />
-                  <span className="text-sm">Départ: {new Date(portCall.departure_date).toLocaleString()}</span>
-                </div>
+                {status.key === "pending" && (
+                  <div className="flex items-center gap-2">
+                    <Icons.calendar className="h-4 w-4 text-blue-600" />
+                    <span className="text-sm">Date prévue d'arrivée: {new Date(portCall.estimated_arrival).toLocaleString()}</span>
+                  </div>
+                )}
+
+                {status.key === "in_progress" && (
+                  <>
+                    <div className="flex items-center gap-2">
+                      <Icons.calendar className="h-4 w-4 text-green-600" />
+                      <span className="text-sm">Arrivée: {new Date(portCall.arrival_date).toLocaleString()}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Icons.calendar className="h-4 w-4 text-red-600" />
+                      <span className="text-sm">ETD: {new Date(portCall.estimated_departure).toLocaleString()}</span>
+                    </div>
+                  </>
+                )}
+
+                {status.key === "completed" && (
+                  <>
+                    <div className="flex items-center gap-2">
+                      <Icons.calendar className="h-4 w-4 text-green-600" />
+                      <span className="text-sm">Arrivée: {new Date(portCall.arrival_date).toLocaleString()}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Icons.calendar className="h-4 w-4 text-red-600" />
+                      <span className="text-sm">Départ: {new Date(portCall.departure_date).toLocaleString()}</span>
+                    </div>
+                  </>
+                )}
               </div>
 
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
                   <Icons.car className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm">Vessel #{portCall.vessel_id}</span>
+                  <span className="text-sm">Vessel {imo ? `IMO ${imo}` : `#${portCall.vessel_id}`}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Icons.area className="h-4 w-4 text-muted-foreground" />

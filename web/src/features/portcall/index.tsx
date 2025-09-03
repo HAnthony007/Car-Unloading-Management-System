@@ -10,6 +10,7 @@ import { PortCallFilters } from "./components/PortCallFilters";
 import { PortCallList } from "./components/PortCallList";
 import type { PortCall } from "./data/schema";
 import { usePortCalls } from "./hooks/usePortCalls";
+import { getPortCallStatus } from "./lib/utils";
 
 export default function PortCall() {
     const router = useRouter();
@@ -21,7 +22,27 @@ export default function PortCall() {
     const portCalls = useMemo<PortCall[]>(() => queryData?.data ?? [], [queryData]);
     const meta = queryData?.meta;
 
-    const handleView = (id: number) => router.push(`/dashboard/port/portcall/${id}`);
+    // Try to extract totals from meta if provided by the API (prefer server-side counts)
+    const totalFromMeta = meta?.total ?? meta?.pagination?.total ?? meta?.total_items ?? meta?.count;
+
+    // Compute counts per status from returned data as fallback (or when meta has only page data)
+    const computedCounts = (queryData?.data ?? []).reduce(
+        (acc, pc) => {
+            const s = getPortCallStatus(pc).key ?? "pending";
+            if (s === "pending") acc.pending += 1;
+            else if (s === "in_progress") acc.in_progress += 1;
+            else if (s === "completed") acc.completed += 1;
+            return acc;
+        },
+        { pending: 0, in_progress: 0, completed: 0 },
+    );
+
+    const total = totalFromMeta ?? (queryData?.meta && typeof queryData.meta.total === "number" ? queryData.meta.total : portCalls.length);
+    const inProgress = meta?.counts?.in_progress ?? meta?.counts?.running ?? computedCounts.in_progress;
+    const pendingCount = meta?.counts?.pending ?? computedCounts.pending;
+    const completed = meta?.counts?.completed ?? computedCounts.completed;
+
+    const handleView = (id: number) => router.push(`/dashboard/operation/port-call/${id}`);
     const handleEdit = (id: number) => console.log("edit", id);
     const handleDelete = (id: number) => {
         if (confirm(`Êtes-vous sûr de vouloir supprimer le Port Call #${id} ?`)) {
@@ -49,7 +70,7 @@ export default function PortCall() {
                         <div className="flex items-center gap-2">
                             <Icons.area className="h-6 w-6 text-blue-600" />
                             <div>
-                                <p className="text-2xl font-bold">{/* count could go here */}</p>
+                                <p className="text-2xl font-bold">{total ?? 0}</p>
                                 <p className="text-sm text-muted-foreground">Total Port Calls</p>
                             </div>
                         </div>
@@ -61,7 +82,7 @@ export default function PortCall() {
                         <div className="flex items-center gap-2">
                             <Icons.calendar className="h-6 w-6 text-green-600" />
                             <div>
-                                <p className="text-2xl font-bold">&nbsp;</p>
+                                <p className="text-2xl font-bold">{inProgress ?? 0}</p>
                                 <p className="text-sm text-muted-foreground">En cours</p>
                             </div>
                         </div>
@@ -73,7 +94,7 @@ export default function PortCall() {
                         <div className="flex items-center gap-2">
                             <Icons.clock className="h-6 w-6 text-blue-600" />
                             <div>
-                                <p className="text-2xl font-bold">&nbsp;</p>
+                                <p className="text-2xl font-bold">{pendingCount ?? 0}</p>
                                 <p className="text-sm text-muted-foreground">En attente</p>
                             </div>
                         </div>
@@ -85,7 +106,7 @@ export default function PortCall() {
                         <div className="flex items-center gap-2">
                             <Icons.check className="h-6 w-6 text-gray-600" />
                             <div>
-                                <p className="text-2xl font-bold">&nbsp;</p>
+                                <p className="text-2xl font-bold">{completed ?? 0}</p>
                                 <p className="text-sm text-muted-foreground">Terminés</p>
                             </div>
                         </div>
