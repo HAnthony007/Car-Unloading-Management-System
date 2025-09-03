@@ -5,7 +5,9 @@ namespace App\Application\Manifest\UseCases;
 use App\Imports\Manifest\ManifestContext;
 use App\Imports\Manifest\ManifestImport;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Application\Manifest\Exceptions\ManifestImportException;
 
 final class ImportManifestUseCase
 {
@@ -19,19 +21,43 @@ final class ImportManifestUseCase
         $import = new ManifestImport($ctx);
 
         try {
-            Excel::import($import, $file);
+            // Ensure the whole manifest import is atomic: rollback everything on any error
+            $result = DB::transaction(function () use ($import, $file, $ctx) {
+                Excel::import($import, $file);
 
-            return [
-                'vessels_created' => $ctx->importedVessels,
-                'port_calls_created' => $ctx->importedPortCalls,
-                'vehicles_created' => $ctx->importedVehicles,
-                'follow_up_files_created' => $ctx->createdFollowUpFiles,
-                'vehicles_skipped' => $ctx->skippedVehicles,
-                'errors' => $ctx->errors,
-            ];
+                // If any errors were collected during sheet processing, cancel the import
+                if (! empty($ctx->errors)) {
+                    $ex = new ManifestImportException('Import interrompu: des erreurs ont été détectées, toutes les modifications ont été annulées.');
+                    $ex->errors = $ctx->errors;
+                    $ex->stats = [
+                        'vessels_created' => $ctx->importedVessels,
+                        'port_calls_created' => $ctx->importedPortCalls,
+                        'vehicles_created' => $ctx->importedVehicles,
+                        'follow_up_files_created' => $ctx->createdFollowUpFiles,
+                        'vehicles_skipped' => $ctx->skippedVehicles,
+                    ];
+                    $ex->rolledBack = true;
+                    throw $ex;
+                }
+
+                return [
+                    'vessels_created' => $ctx->importedVessels,
+                    'port_calls_created' => $ctx->importedPortCalls,
+                    'vehicles_created' => $ctx->importedVehicles,
+                    'follow_up_files_created' => $ctx->createdFollowUpFiles,
+                    'vehicles_skipped' => $ctx->skippedVehicles,
+                    'errors' => $ctx->errors,
+                ];
+            });
+
+            return $result;
 
         } catch (\Throwable $e) {
-            throw new \RuntimeException("Erreur lors de l'importation du manifeste: ".$e->getMessage());
+            // Bubble up detailed error when available
+            if ($e instanceof ManifestImportException) {
+                throw $e;
+            }
+            throw new \RuntimeException("Erreur lors de l'importation du manifeste: ".$e->getMessage(), 0, $e);
         }
     }
 }
