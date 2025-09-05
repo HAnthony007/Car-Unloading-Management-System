@@ -1,5 +1,6 @@
 import { StyledButton } from '@/components/ui/StyledButton';
 import { StyledTextInput } from '@/components/ui/StyledTextInput';
+import { useAuth } from '@/providers/AuthProvider';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
@@ -12,13 +13,15 @@ export default function LoginScreen() {
   const [show, setShow] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { login } = useAuth();
 
   async function onSubmit() {
     setError(null);
     setLoading(true);
     try {
-      // TODO: Replace with real API call
-      await new Promise((res) => setTimeout(res, 900));
+  // TODO: Replace with real API call then set user
+  await new Promise((res) => setTimeout(res, 600));
+  await login(email, password);
       router.replace('/(tabs)');
     } catch (e) {
       setError("Impossible de se connecter. Réessayez.");
