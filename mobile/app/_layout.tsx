@@ -8,7 +8,7 @@ import 'react-native-reanimated';
 import './global.css';
 
 import { useColorScheme } from '@/components/useColorScheme';
-import { AuthProvider } from '@/providers/AuthProvider';
+import { AuthProvider } from '@/src/providers/AuthProvider';
 
 export {
   // Catch any errors thrown by the Layout component.

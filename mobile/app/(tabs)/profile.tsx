@@ -1,5 +1,6 @@
 import { StyledButton } from '@/components/ui/StyledButton';
-import { useAuth } from '@/providers/AuthProvider';
+import { useAuth } from '@/src/providers/AuthProvider';
+import { useAuthStore } from '@/src/stores/useAuthStore';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import React from 'react';
 import { Text, View } from 'react-native';
@@ -7,6 +8,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function ProfileScreen() {
   const { user, logout } = useAuth();
+  const backendUser = useAuthStore((s) => s.backendUser as any | null);
 
   return (
     <SafeAreaView className="flex-1 bg-white dark:bg-black">
@@ -27,12 +29,12 @@ export default function ProfileScreen() {
             Statistiques personnelles
           </Text>
           <View className="flex-row gap-3">
-            <StatCard label="Véhicules traités" value="128" icon="truck" />
-            <StatCard label="Taux réussite" value="98%" icon="check" />
+            <StatCard label="Matricule" value={backendUser?.matriculation_number ?? '—'} icon="id-badge" />
+            <StatCard label="Téléphone" value={backendUser?.phone ?? '—'} icon="phone" />
           </View>
           <View className="flex-row gap-3">
-            <StatCard label="Heures actives" value="42h" icon="clock-o" />
-            <StatCard label="Incidents" value="0" icon="warning" />
+            <StatCard label="Rôle" value={user?.role ?? '—'} icon="user" />
+            <StatCard label="Email vérifié" value={backendUser?.email_verified ? 'Oui' : 'Non'} icon="envelope" />
           </View>
         </View>
 
