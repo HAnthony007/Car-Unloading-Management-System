@@ -3,6 +3,7 @@
 namespace App\Infrastructure\Persistence\Repositories;
 
 use App\Domain\Discharge\ValueObjects\DischargeId;
+use App\Domain\PortCall\ValueObjects\PortCallId;
 use App\Domain\Vehicle\Entities\Vehicle as DomainVehicle;
 use App\Domain\Vehicle\Repositories\VehicleRepositoryInterface;
 use App\Domain\Vehicle\ValueObjects\VehicleId;
@@ -16,6 +17,24 @@ final class EloquentVehicleRepository implements VehicleRepositoryInterface
         $e = EloquentVehicle::find($vehicleId->getValue());
 
         return $e ? $this->toDomainEntity($e) : null;
+    }
+
+    /**
+     * @return array<int, DomainVehicle>
+     */
+    public function findByPortCallId(PortCallId $portCallId): array
+    {
+        // Vehicles for a port call are derived from FollowUpFiles linking vehicle_id and port_call_id
+        $vehicles = EloquentVehicle::query()
+            ->whereIn('vehicle_id', function ($q) use ($portCallId) {
+                $q->select('vehicle_id')
+                  ->from('follow_up_files')
+                  ->where('port_call_id', $portCallId->getValue());
+            })
+            ->orderBy('vehicle_id')
+            ->get();
+
+        return $vehicles->map(fn ($e) => $this->toDomainEntity($e))->toArray();
     }
 
     public function findByVin(Vin $vin): ?DomainVehicle

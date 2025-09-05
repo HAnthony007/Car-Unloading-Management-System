@@ -142,6 +142,10 @@ Route::prefix('port-calls')
         Route::get('/', [\App\Presentation\Http\Controllers\PortCallController::class, 'index'])->name('portcalls.index');
         Route::post('/', [\App\Presentation\Http\Controllers\PortCallController::class, 'store'])->name('portcalls.store');
         Route::get('/{id}', [\App\Presentation\Http\Controllers\PortCallController::class, 'show'])->name('portcalls.show');
+        // Vehicles for a port call (canonical)
+        Route::get('/{id}/vehicles', [\App\Presentation\Http\Controllers\PortCallController::class, 'vehicles'])->name('portcalls.vehicles');
+        // Backward compatibility (French path)
+        Route::get('/{id}/vehicules', [\App\Presentation\Http\Controllers\PortCallController::class, 'vehicles'])->name('portcalls.vehicules');
         Route::put('/{id}', [\App\Presentation\Http\Controllers\PortCallController::class, 'update'])->name('portcalls.update');
         Route::delete('/{id}', [\App\Presentation\Http\Controllers\PortCallController::class, 'destroy'])->name('portcalls.destroy');
 
