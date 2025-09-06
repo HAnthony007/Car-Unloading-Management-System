@@ -7,7 +7,7 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import type { Parking } from "../data/schema";
-import { useParkingVehicles } from "../hooks/useParkingVehicles";
+import { useParkingDischarges } from "../hooks/useParkingVehicles";
 import { ParkingsEditDialog } from "./parkings-edit-dialog";
 
 type Status = "available" | "busy" | "full";
@@ -64,13 +64,13 @@ interface ParkingsDetailSheetProps {
 export const ParkingsDetailSheet = ({ parking, open, onOpenChange }: ParkingsDetailSheetProps) => {
     const [editOpen, setEditOpen] = useState(false);
     const parkingId = parking?.id ?? null;
-    const { data, isLoading, isError } = useParkingVehicles(parkingId);
+    const { data, isLoading, isError } = useParkingDischarges(parkingId);
 
     if (!parking) return null;
 
     const capacity = parking.capacity || 0;
-    const vehicles = data?.vehicles ?? [];
-    const occupied = vehicles.length;
+    const discharges = data?.discharges ?? [];
+    const occupied = discharges.length;
     const available = Math.max(0, capacity - occupied);
     const pct = capacity > 0 ? Math.round((occupied / capacity) * 100) : 0;
     const status = getStatus(occupied, capacity);
@@ -178,58 +178,41 @@ export const ParkingsDetailSheet = ({ parking, open, onOpenChange }: ParkingsDet
 
                         <Separator />
 
-                        {/* Liste des voitures */}
+            {/* Liste des discharges */}
                         <div className="space-y-4">
                             <h3 className="font-semibold text-lg flex items-center gap-2">
-                                <Icons.vehicle className="h-5 w-5" /> Véhicules dans le parking ({isLoading ? "..." : vehicles.length})
+                <Icons.vehicle className="h-5 w-5" /> Discharges dans le parking ({isLoading ? "..." : discharges.length})
                             </h3>
 
                             {isError ? (
-                                <div className="text-destructive">Erreur lors du chargement des véhicules.</div>
+                                <div className="text-destructive">Erreur lors du chargement des discharges.</div>
                             ) : isLoading ? (
                                 <div className="flex items-center gap-2 text-muted-foreground">
-                                    <Icons.spinner className="h-4 w-4 animate-spin" /> Chargement des véhicules...
+                                    <Icons.spinner className="h-4 w-4 animate-spin" /> Chargement des discharges...
                                 </div>
-                            ) : vehicles.length > 0 ? (
+                            ) : discharges.length > 0 ? (
                                 <div className="space-y-3 max-h-60 overflow-y-auto">
-                                    {vehicles.map((v) => (
-                                        <div key={v.id} className="p-4 border rounded-lg bg-card hover:bg-accent/50 transition-colors">
+                                    {discharges.map((d) => (
+                                        <div key={d.dischargeId} className="p-4 border rounded-lg bg-card hover:bg-accent/50 transition-colors">
                                             <div className="flex items-center justify-between mb-2">
                                                 <div className="flex items-center gap-3">
                                                     <div className="p-2 bg-primary/10 rounded-lg">
                                                         <Icons.vehicle className="h-4 w-4 text-primary" />
                                                     </div>
                                                     <div>
-                                                        <div className="font-semibold text-sm">
-                                                            {v.make} {v.model}
-                                                        </div>
-                                                        <div className="text-xs text-muted-foreground">{v.vin || ""}</div>
+                                                        <div className="font-semibold text-sm">Discharge #{d.dischargeId}</div>
+                                                        <div className="text-xs text-muted-foreground">{d.dischargeDate || ""}</div>
                                                     </div>
                                                 </div>
-                                                {v.parkingNumber ? (
-                                                    <Badge variant="outline" className="text-xs">{v.parkingNumber}</Badge>
+                                                {d.parkingNumber ? (
+                                                    <Badge variant="outline" className="text-xs">{d.parkingNumber}</Badge>
                                                 ) : null}
                                             </div>
-
                                             <div className="grid grid-cols-2 gap-4 text-xs">
                                                 <div className="space-y-1">
                                                     <div className="flex items-center gap-2">
-                                                        <span className="font-medium">Couleur:</span>
-                                                        <span>{v.color}</span>
-                                                    </div>
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="font-medium">Type:</span>
-                                                        <span>{v.type}</span>
-                                                    </div>
-                                                </div>
-                                                <div className="space-y-1">
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="font-medium">Pays origine:</span>
-                                                        <span>{v.originCountry}</span>
-                                                    </div>
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="font-medium">Etat:</span>
-                                                        <span>{v.condition}</span>
+                                                        <span className="font-medium">Port Call:</span>
+                                                        <span>{d.portCallId}</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -239,7 +222,7 @@ export const ParkingsDetailSheet = ({ parking, open, onOpenChange }: ParkingsDet
                             ) : (
                                 <div className="text-center py-8 text-muted-foreground">
                                     <Icons.vehicle className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                                    <p>Aucun véhicule dans ce parking</p>
+                                    <p>Aucune discharge dans ce parking</p>
                                 </div>
                             )}
                         </div>

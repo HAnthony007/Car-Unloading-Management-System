@@ -2,14 +2,14 @@
 
 import { useQueries } from "@tanstack/react-query";
 import { useMemo } from "react";
-import { getParkingVehicles } from "../lib/parkings";
+import { getParkingDischarges } from "../lib/parkings";
 
 export function useParkingTotals(ids: string[]) {
   const queries = useQueries({
     queries: ids.map((id) => ({
-      queryKey: ["parking-vehicles-count", id],
+      queryKey: ["parking-discharges-count", id],
       queryFn: async () => {
-        const d = await getParkingVehicles(id);
+        const d = await getParkingDischarges(id);
         return d.total;
       },
       enabled: Boolean(id),

@@ -25,6 +25,9 @@ export type ParkingVehicles = {
   vehicles: (Vehicle & { parkingNumber?: string })[];
 };
 
+/**
+ * Legacy: uses /parkings/{id}/vehicles (kept temporarily). Prefer getParkingDischarges.
+ */
 export async function getParkingVehicles(id: string): Promise<ParkingVehicles> {
   const base = process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL;
   if (!base) throw new Error("Backend base URL not configured");
@@ -75,5 +78,48 @@ export async function getParkingVehicles(id: string): Promise<ParkingVehicles> {
     parkingName: String(payload?.parking_name ?? ""),
     total: Number(payload?.total ?? vehicles.length) || vehicles.length,
     vehicles: vehicles.map((v, i) => ({ ...v, parkingNumber: mapped[i]?.parkingNumber })),
+  };
+}
+
+// --- New Discharge-centric endpoint ---
+export type ParkingDischarge = {
+  dischargeId: string;
+  dischargeDate?: string | null;
+  portCallId: number;
+  parkingNumber?: string | null;
+};
+
+export type ParkingDischarges = {
+  parkingId: string;
+  parkingName: string;
+  total: number;
+  discharges: ParkingDischarge[];
+};
+
+export async function getParkingDischarges(id: string): Promise<ParkingDischarges> {
+  const base = process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL;
+  if (!base) throw new Error("Backend base URL not configured");
+  const url = new URL(`${base}/parkings/${id}/discharges`);
+
+  const res = await fetchWithCsrf(url.toString(), {
+    method: "GET",
+    headers: { Accept: "application/json" },
+    cache: "no-store",
+  });
+  if (!res.ok) throw new Error("Failed to fetch parking discharges");
+  const payload = await res.json();
+  const listRaw = Array.isArray(payload?.discharges) ? payload.discharges : [];
+  const mapped: ParkingDischarge[] = listRaw.map((d: any) => ({
+    dischargeId: String(d.discharge_id ?? d.id ?? ""),
+    dischargeDate: d.discharge_date ?? null,
+    portCallId: Number(d.port_call_id ?? 0),
+    parkingNumber: d.parking_number ?? null,
+  }));
+
+  return {
+    parkingId: String(payload?.parking_id ?? id),
+    parkingName: String(payload?.parking_name ?? ""),
+    total: Number(payload?.total ?? mapped.length) || mapped.length,
+    discharges: mapped,
   };
 }
