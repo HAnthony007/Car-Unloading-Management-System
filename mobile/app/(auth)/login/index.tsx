@@ -6,26 +6,31 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 // Conversion du StyleSheet vers des classes Tailwind (NativeWind)
 export default function LoginScreen() {
-  return (
-    <SafeAreaView className="flex-1">
-      <LinearGradient colors={["#059669", "#10B981"]} className="flex-1">
-        <View className="flex-1 justify-center p-6">
+    return (
+        <SafeAreaView className="flex-1">
+            <LinearGradient colors={["#059669", "#10B981"]} className="flex-1">
+                <View className="flex-1 justify-center p-6">
+                    <View className="items-center mb-12">
+                        <View className="w-20 h-20 rounded-full bg-white/20 items-center justify-center mb-4">
+                            <Ship color="#FFFFFF" size={48} strokeWidth={2} />
+                        </View>
+                        <Text className="text-2xl font-bold text-white mb-2">
+                            SMMC Toamasina
+                        </Text>
+                        <Text className="text-base text-white/80 text-center">
+                            Gestion Débarquement Véhicules
+                        </Text>
+                    </View>
 
-          <View className="items-center mb-12">
-            <View className="w-20 h-20 rounded-full bg-white/20 items-center justify-center mb-4">
-              <Ship color="#FFFFFF" size={48} strokeWidth={2} />
-            </View>
-            <Text className="text-2xl font-bold text-white mb-2">SMMC Toamasina</Text>
-            <Text className="text-base text-white/80 text-center">Gestion Débarquement Véhicules</Text>
-          </View>
+                    <LoginForm />
 
-          <LoginForm />
-
-          <View className="items-center mt-8">
-            <Text className="text-xs text-white/60 text-center">© 2024 SMMC Toamasina - Port Management System</Text>
-          </View>
-        </View>
-      </LinearGradient>
-    </SafeAreaView>
-  );
+                    <View className="items-center mt-8">
+                        <Text className="text-xs text-white/60 text-center">
+                            © 2024 SMMC Toamasina - Port Management System
+                        </Text>
+                    </View>
+                </View>
+            </LinearGradient>
+        </SafeAreaView>
+    );
 }
