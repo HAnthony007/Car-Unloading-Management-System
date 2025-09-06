@@ -13,12 +13,13 @@ final class SearchDocumentsUseCase
     public function execute(DocumentSearchCriteriaDTO $criteria): array
     {
         return $this->repo->search(
-            followUpFileId: $criteria->followUpFileId,
-            type: $criteria->type,
-            fromDate: $criteria->fromDate,
-            toDate: $criteria->toDate,
-            page: $criteria->page,
-            perPage: $criteria->perPage,
+            $criteria->followUpFileId,
+            $criteria->type,
+            $criteria->fromDate,
+            $criteria->toDate,
+            $criteria->portCallId,
+            $criteria->page,
+            $criteria->perPage,
         );
     }
 }

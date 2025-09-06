@@ -17,15 +17,16 @@ final class UpdateSurveyUseCase
             throw new \RuntimeException('Survey not found.');
         }
 
-        $date = $dto->getDateVOOrNull() ?? $existing->getDate();
-        $result = $dto->getResultVOOrNull() ?? $existing->getResult();
+        $surveyDate = $dto->getSurveyDateVOOrNull() ?? $existing->getSurveyDate();
+        $status = $dto->getStatusVOOrNull() ?? $existing->getOverallStatus();
+        $agent = $dto->agentId ? new \App\Domain\User\ValueObjects\UserId($dto->agentId) : $existing->getAgentId();
 
         $updated = new \App\Domain\Survey\Entities\Survey(
             surveyId: $existing->getSurveyId(),
-            date: $date,
-            result: $result,
-            userId: $existing->getUserId(),
-            followUpFileId: $existing->getFollowUpFileId(),
+            surveyDate: $surveyDate,
+            overallStatus: $status,
+            agentId: $agent,
+            dischargeId: $existing->getDischargeId(),
             createdAt: $existing->getCreatedAt(),
             updatedAt: now(),
         );

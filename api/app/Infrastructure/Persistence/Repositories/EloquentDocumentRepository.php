@@ -36,6 +36,7 @@ final class EloquentDocumentRepository implements DocumentRepositoryInterface
         $e->type = $d->getType()->getValue();
         $e->uploaded_at = $d->getUploadedAt();
         $e->follow_up_file_id = $d->getFollowUpFileId()->getValue();
+        $e->port_call_id = $d->getPortCallId();
         $e->save();
 
         return $this->toDomain($e);
@@ -51,7 +52,7 @@ final class EloquentDocumentRepository implements DocumentRepositoryInterface
         return (bool) $e->delete();
     }
 
-    public function search(?int $followUpFileId, ?string $type, ?string $fromDate, ?string $toDate, int $page, int $perPage): array
+    public function search(?int $followUpFileId, ?string $type, ?string $fromDate, ?string $toDate, ?int $portCallId, int $page, int $perPage): array
     {
         $query = EloquentDocument::query();
 
@@ -66,6 +67,9 @@ final class EloquentDocumentRepository implements DocumentRepositoryInterface
         }
         if ($toDate) {
             $query->where('uploaded_at', '<=', Carbon::parse($toDate));
+        }
+        if ($portCallId) {
+            $query->where('port_call_id', $portCallId);
         }
 
         $paginator = $query->orderByDesc('uploaded_at')->paginate($perPage, ['*'], 'page', $page);
@@ -91,6 +95,7 @@ final class EloquentDocumentRepository implements DocumentRepositoryInterface
             type: new DocumentType($e->type),
             uploadedAt: new Carbon($e->uploaded_at),
             followUpFileId: new FollowUpFileId($e->follow_up_file_id),
+            portCallId: (int) $e->port_call_id,
             createdAt: $e->created_at,
             updatedAt: $e->updated_at,
         );

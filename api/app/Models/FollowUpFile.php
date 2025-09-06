@@ -30,13 +30,6 @@ class FollowUpFile extends Model
         return $this->hasMany(Document::class, 'follow_up_file_id');
     }
 
-    public function photos(): \Illuminate\Database\Eloquent\Relations\HasMany
-    {
-        return $this->hasMany(Photo::class, 'follow_up_file_id');
-    }
-
-    public function surveys(): \Illuminate\Database\Eloquent\Relations\HasOne
-    {
-        return $this->hasOne(Survey::class, 'follow_up_file_id');
-    }
+    // Photos now relate through discharge/survey; direct relation removed
+    // Survey now belongs to discharge; remove previous hasOne
 }

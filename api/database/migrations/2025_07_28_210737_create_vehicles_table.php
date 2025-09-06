@@ -26,7 +26,6 @@ return new class extends Migration
             $table->string('origin_country');
             $table->string('ship_location')->nullable();
             $table->boolean('is_primed')->default(false);
-            $table->foreignId('discharge_id')->nullable()->constrained('discharges', 'discharge_id');
             $table->timestamps();
         });
     }

@@ -13,17 +13,17 @@ final class SearchSurveysUseCase
     {
         $items = $this->repository->findAll();
 
-        if ($criteria->result) {
-            $res = strtoupper($criteria->result);
-            $items = array_filter($items, fn ($e) => $e->getResult()->getValue() === $res);
+        if ($criteria->overallStatus) {
+            $st = strtoupper($criteria->overallStatus);
+            $items = array_filter($items, fn ($e) => $e->getOverallStatus()->getValue() === $st);
         }
-        if ($criteria->userId) {
-            $uid = $criteria->userId;
-            $items = array_filter($items, fn ($e) => $e->getUserId()->getValue() === $uid);
+        if ($criteria->agentId) {
+            $aid = $criteria->agentId;
+            $items = array_filter($items, fn ($e) => $e->getAgentId()->getValue() === $aid);
         }
-        if ($criteria->followUpFileId) {
-            $fid = $criteria->followUpFileId;
-            $items = array_filter($items, fn ($e) => $e->getFollowUpFileId()->getValue() === $fid);
+        if ($criteria->dischargeId) {
+            $did = $criteria->dischargeId;
+            $items = array_filter($items, fn ($e) => $e->getDischargeId()->getValue() === $did);
         }
 
         $items = array_values($items);

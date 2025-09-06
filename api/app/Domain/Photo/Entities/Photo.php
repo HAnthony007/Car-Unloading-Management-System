@@ -2,8 +2,9 @@
 
 namespace App\Domain\Photo\Entities;
 
-use App\Domain\FollowUpFile\ValueObjects\FollowUpFileId;
+use App\Domain\Discharge\ValueObjects\DischargeId;
 use App\Domain\Photo\ValueObjects\PhotoId;
+use App\Domain\Survey\ValueObjects\SurveyId;
 use App\Domain\SurveyCheckpoint\ValueObjects\SurveyCheckpointId;
 use Carbon\Carbon;
 
@@ -14,7 +15,8 @@ final class Photo
         private readonly string $photoPath,
         private readonly Carbon $takenAt,
         private readonly ?string $photoDescription,
-        private readonly ?FollowUpFileId $followUpFileId,
+        private readonly DischargeId $dischargeId,
+        private readonly ?SurveyId $surveyId,
         private readonly ?SurveyCheckpointId $checkpointId,
         private readonly ?Carbon $createdAt = null,
         private readonly ?Carbon $updatedAt = null,
@@ -40,9 +42,14 @@ final class Photo
         return $this->photoDescription;
     }
 
-    public function getFollowUpFileId(): ?FollowUpFileId
+    public function getDischargeId(): DischargeId
     {
-        return $this->followUpFileId;
+        return $this->dischargeId;
+    }
+
+    public function getSurveyId(): ?SurveyId
+    {
+        return $this->surveyId;
     }
 
     public function getCheckpointId(): ?SurveyCheckpointId
@@ -67,7 +74,8 @@ final class Photo
             'photo_path' => $this->photoPath,
             'taken_at' => $this->takenAt->toISOString(),
             'photo_description' => $this->photoDescription,
-            'follow_up_file_id' => $this->followUpFileId?->getValue(),
+            'discharge_id' => $this->dischargeId->getValue(),
+            'survey_id' => $this->surveyId?->getValue(),
             'checkpoint_id' => $this->checkpointId?->getValue(),
             'created_at' => $this->createdAt?->toISOString(),
             'updated_at' => $this->updatedAt?->toISOString(),

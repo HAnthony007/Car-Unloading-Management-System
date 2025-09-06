@@ -10,7 +10,7 @@ final class UserSearchCriteriaDTO
         public readonly ?array $roleIds = null,
         public readonly ?string $role = null,
         public readonly ?array $roles = null,
-    public readonly ?int $excludeUserId = null,
+        public readonly ?int $excludeUserId = null,
         public readonly ?bool $emailVerified = null,
         public readonly ?bool $isActive = null,
         public readonly ?string $searchTerm = null,

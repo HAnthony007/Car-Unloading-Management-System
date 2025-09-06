@@ -13,8 +13,11 @@ return new class extends Migration
     {
         Schema::create('discharges', function (Blueprint $table) {
             $table->id('discharge_id');
-            $table->dateTime('discharge_date');
+            $table->dateTime('discharge_timestamp');
+            $table->string('status')->default('pending');
             $table->foreignId('port_call_id')->constrained('port_calls', 'port_call_id');
+            $table->foreignId('vehicle_id')->constrained('vehicles', 'vehicle_id');
+            $table->foreignId('agent_id')->constrained('users', 'user_id');
             $table->timestamps();
         });
     }

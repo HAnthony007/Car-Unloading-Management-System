@@ -13,8 +13,8 @@ final class UpdatePortCallDTO
         public readonly ?string $estimatedDeparture = null,
         public readonly ?string $departureDate = null,
         public readonly ?int $vesselId = null,
-    public readonly ?int $dockId = null,
-    public readonly ?string $status = null,
+        public readonly ?int $dockId = null,
+        public readonly ?string $status = null,
     ) {}
 
     public static function fromArray(array $data): self

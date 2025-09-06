@@ -28,6 +28,7 @@ final class UpdateDocumentUseCase
             type: new DocumentType($dto->type ?? $existing->getType()->getValue()),
             uploadedAt: new Carbon($dto->uploadedAt ?? $existing->getUploadedAt()->toISOString()),
             followUpFileId: new FollowUpFileId($dto->followUpFileId ?? $existing->getFollowUpFileId()->getValue()),
+            portCallId: $dto->portCallId ?? $existing->getPortCallId(),
             createdAt: $existing->getCreatedAt(),
             updatedAt: $existing->getUpdatedAt(),
         );

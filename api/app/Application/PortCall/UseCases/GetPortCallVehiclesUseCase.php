@@ -7,9 +7,7 @@ use App\Domain\Vehicle\Repositories\VehicleRepositoryInterface;
 
 final class GetPortCallVehiclesUseCase
 {
-    public function __construct(private readonly VehicleRepositoryInterface $vehicleRepository)
-    {
-    }
+    public function __construct(private readonly VehicleRepositoryInterface $vehicleRepository) {}
 
     /**
      * @return array<int, \App\Domain\Vehicle\Entities\Vehicle>

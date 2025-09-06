@@ -27,7 +27,7 @@ final class UpdateUserRequest extends FormRequest
                 'email',
                 'max:255',
                 // Unique if provided; ignore current user id
-                'unique:users,email,' . $this->route('userId') . ',user_id',
+                'unique:users,email,'.$this->route('userId').',user_id',
             ],
             'avatar' => [
                 'sometimes',
@@ -42,7 +42,7 @@ final class UpdateUserRequest extends FormRequest
                 'max:20',
                 'regex:/^[0-9+\-\s\(\)]+$/',
                 // Unique if provided; ignore current user id
-                'unique:users,phone,' . $this->route('userId') . ',user_id',
+                'unique:users,phone,'.$this->route('userId').',user_id',
             ],
             'role_id' => [
                 'sometimes',

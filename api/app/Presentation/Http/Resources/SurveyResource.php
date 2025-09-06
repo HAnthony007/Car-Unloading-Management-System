@@ -13,10 +13,10 @@ final class SurveyResource extends JsonResource
 
         return [
             'survey_id' => $s->getSurveyId()?->getValue(),
-            'date' => $s->getDate()->getValue()?->toDateString(),
-            'result' => $s->getResult()->getValue(),
-            'user_id' => $s->getUserId()->getValue(),
-            'follow_up_file_id' => $s->getFollowUpFileId()->getValue(),
+            'survey_date' => $s->getSurveyDate()->getValue()?->toISOString(),
+            'overall_status' => $s->getOverallStatus()->getValue(),
+            'agent_id' => $s->getAgentId()->getValue(),
+            'discharge_id' => $s->getDischargeId()->getValue(),
             'created_at' => $s->getCreatedAt()?->toISOString(),
             'updated_at' => $s->getUpdatedAt()?->toISOString(),
         ];

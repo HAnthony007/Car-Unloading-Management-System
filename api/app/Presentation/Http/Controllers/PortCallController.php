@@ -25,7 +25,7 @@ final class PortCallController
         private readonly GetPortCallUseCase $getUseCase,
         private readonly UpdatePortCallUseCase $updateUseCase,
         private readonly DeletePortCallUseCase $deleteUseCase,
-    private readonly GetPortCallVehiclesUseCase $getVehiclesUseCase,
+        private readonly GetPortCallVehiclesUseCase $getVehiclesUseCase,
     ) {}
 
     public function index(): AnonymousResourceCollection

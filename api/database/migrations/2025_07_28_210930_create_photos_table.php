@@ -16,11 +16,9 @@ return new class extends Migration
             $table->string('photo_path');
             $table->dateTime('taken_at');
             $table->text('photo_description')->nullable();
-            $table->foreignId('follow_up_file_id')->nullable()->constrained('follow_up_files', 'follow_up_file_id');
-            $table->foreignId('checkpoint_id')
-                ->nullable()
-                ->constrained('survey_checkpoints', 'checkpoint_id')
-                ->cascadeOnDelete();
+            $table->foreignId('discharge_id')->constrained('discharges', 'discharge_id')->cascadeOnDelete();
+            $table->foreignId('survey_id')->nullable()->constrained('surveys', 'survey_id')->nullOnDelete();
+            $table->foreignId('checkpoint_id')->nullable()->constrained('survey_checkpoints', 'checkpoint_id')->nullOnDelete();
             $table->timestamps();
         });
     }

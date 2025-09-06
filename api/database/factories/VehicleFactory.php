@@ -2,7 +2,6 @@
 
 namespace Database\Factories;
 
-use App\Models\Discharge;
 use App\Models\Vehicle;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -29,7 +28,6 @@ class VehicleFactory extends Factory
             'origin_country' => fake()->country(),
             'ship_location' => fake()->optional()->word(),
             'is_primed' => fake()->boolean(20),
-            'discharge_id' => Discharge::factory(),
         ];
     }
 }

@@ -17,8 +17,9 @@ class UpdatePhotoRequest extends FormRequest
             'photo_path' => ['nullable', 'string', 'max:1024'],
             'taken_at' => ['nullable', 'date'],
             'photo_description' => ['nullable', 'string'],
-            'follow_up_file_id' => ['nullable', 'integer', 'exists:follow_up_files,follow_up_file_id', 'prohibits:checkpoint_id'],
-            'checkpoint_id' => ['nullable', 'integer', 'exists:survey_checkpoints,checkpoint_id', 'prohibits:follow_up_file_id'],
+            'discharge_id' => ['nullable', 'integer', 'exists:discharges,discharge_id'],
+            'survey_id' => ['nullable', 'integer', 'exists:surveys,survey_id'],
+            'checkpoint_id' => ['nullable', 'integer', 'exists:survey_checkpoints,checkpoint_id'],
         ];
     }
 }

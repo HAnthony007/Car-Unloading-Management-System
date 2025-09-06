@@ -19,5 +19,5 @@ interface DocumentRepositoryInterface
     /**
      * @return array{data: array<int, Document>, current_page: int, from: int, last_page: int, path: string, per_page: int, to: int, total: int}
      */
-    public function search(?int $followUpFileId, ?string $type, ?string $fromDate, ?string $toDate, int $page, int $perPage): array;
+    public function search(?int $followUpFileId, ?string $type, ?string $fromDate, ?string $toDate, ?int $portCallId, int $page, int $perPage): array;
 }

@@ -12,7 +12,8 @@ final class SearchPhotosUseCase
     public function execute(PhotoSearchCriteriaDTO $criteria): array
     {
         return $this->repo->search(
-            followUpFileId: $criteria->followUpFileId,
+            dischargeId: $criteria->dischargeId,
+            surveyId: $criteria->surveyId,
             checkpointId: $criteria->checkpointId,
             fromDate: $criteria->fromDate,
             toDate: $criteria->toDate,

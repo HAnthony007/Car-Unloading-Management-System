@@ -9,7 +9,8 @@ final class UpdatePhotoDTO
         public readonly ?string $photoPath,
         public readonly ?string $takenAt,
         public readonly ?string $photoDescription,
-        public readonly ?int $followUpFileId,
+        public readonly ?int $dischargeId,
+        public readonly ?int $surveyId,
         public readonly ?int $checkpointId,
     ) {}
 
@@ -20,7 +21,8 @@ final class UpdatePhotoDTO
             photoPath: $data['photo_path'] ?? null,
             takenAt: $data['taken_at'] ?? null,
             photoDescription: $data['photo_description'] ?? null,
-            followUpFileId: isset($data['follow_up_file_id']) ? (int) $data['follow_up_file_id'] : null,
+            dischargeId: isset($data['discharge_id']) ? (int) $data['discharge_id'] : null,
+            surveyId: isset($data['survey_id']) ? (int) $data['survey_id'] : null,
             checkpointId: isset($data['checkpoint_id']) ? (int) $data['checkpoint_id'] : null,
         );
     }

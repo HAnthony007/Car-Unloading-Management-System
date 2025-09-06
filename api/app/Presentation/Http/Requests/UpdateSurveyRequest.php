@@ -16,8 +16,9 @@ final class UpdateSurveyRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'date' => ['sometimes', 'date'],
-            'result' => ['sometimes', 'string', 'in:PASSED,FAILED,PENDING'],
+            'survey_date' => ['sometimes', 'date'],
+            'overall_status' => ['sometimes', 'string', 'in:PASSED,FAILED,PENDING'],
+            'agent_id' => ['sometimes', 'integer', 'exists:users,user_id'],
         ];
     }
 

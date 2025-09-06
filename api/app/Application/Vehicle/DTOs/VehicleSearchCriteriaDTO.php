@@ -6,15 +6,14 @@ final class VehicleSearchCriteriaDTO
 {
     public function __construct(
         public readonly ?string $vin = null,
-        public readonly ?int $dischargeId = null,
         public readonly ?string $make = null,
-    public readonly ?string $model = null,
-    public readonly ?string $ownerName = null,
-    public readonly ?string $color = null,
-    public readonly ?string $type = null,
-    public readonly ?string $originCountry = null,
-    public readonly ?string $searchTerm = null,
-    public readonly int $page = 1,
+        public readonly ?string $model = null,
+        public readonly ?string $ownerName = null,
+        public readonly ?string $color = null,
+        public readonly ?string $type = null,
+        public readonly ?string $originCountry = null,
+        public readonly ?string $searchTerm = null,
+        public readonly int $page = 1,
         public readonly int $perPage = 15,
     ) {}
 
@@ -22,7 +21,6 @@ final class VehicleSearchCriteriaDTO
     {
         return new self(
             vin: $data['vin'] ?? null,
-            dischargeId: isset($data['discharge_id']) ? (int) $data['discharge_id'] : null,
             make: $data['make'] ?? null,
             model: $data['model'] ?? null,
             ownerName: $data['owner_name'] ?? null,

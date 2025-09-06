@@ -208,6 +208,7 @@ class NavireSheetImport implements SkipsOnError, SkipsOnFailure, ToCollection, W
         if ($digits === '') {
             return null;
         }
+
         return (int) $digits;
     }
 

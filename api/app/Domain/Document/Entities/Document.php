@@ -16,6 +16,7 @@ final class Document
         private readonly DocumentType $type,
         private readonly Carbon $uploadedAt,
         private readonly FollowUpFileId $followUpFileId,
+        private readonly int $portCallId,
         private readonly ?Carbon $createdAt = null,
         private readonly ?Carbon $updatedAt = null,
     ) {}
@@ -50,6 +51,11 @@ final class Document
         return $this->followUpFileId;
     }
 
+    public function getPortCallId(): int
+    {
+        return $this->portCallId;
+    }
+
     public function getCreatedAt(): ?Carbon
     {
         return $this->createdAt;
@@ -69,6 +75,7 @@ final class Document
             'type' => $this->type,
             'uploaded_at' => $this->uploadedAt->toISOString(),
             'follow_up_file_id' => $this->followUpFileId->getValue(),
+            'port_call_id' => $this->portCallId,
             'created_at' => $this->createdAt?->toISOString(),
             'updated_at' => $this->updatedAt?->toISOString(),
         ];

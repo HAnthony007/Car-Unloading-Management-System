@@ -18,7 +18,8 @@ final class DomainDocumentResource extends JsonResource
             'document_description' => $d->getDocumentDescription(),
             'type' => $d->getType()->getValue(),
             'uploaded_at' => $d->getUploadedAt()->toISOString(),
-            'follow_up_file_id' => $d->getFollowUpFileId()->getValue(),
+            'follow_up_file_id' => $d->getFollowUpFileId()?->getValue(),
+            'port_call_id' => $d->getPortCallId(),
             'created_at' => $d->getCreatedAt()?->toISOString(),
             'updated_at' => $d->getUpdatedAt()?->toISOString(),
         ];

@@ -13,7 +13,7 @@ use App\Application\Survey\UseCases\UpdateSurveyUseCase;
 use App\Presentation\Http\Requests\CreateSurveyRequest;
 use App\Presentation\Http\Requests\SearchSurveysRequest;
 use App\Presentation\Http\Requests\UpdateSurveyRequest;
-use App\Presentation\Http\Resources\SurveyResource;
+use App\Presentation\Http\Resources\SurveyResource; // already adapted to new domain getters
 use Illuminate\Http\JsonResponse;
 
 final class SurveyController extends Controller

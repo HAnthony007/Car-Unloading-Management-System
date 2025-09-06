@@ -10,4 +10,9 @@ final class DischargeId
     {
         return $this->value;
     }
+
+    public function equals(DischargeId $other): bool
+    {
+        return $this->value === $other->value;
+    }
 }

@@ -11,6 +11,7 @@ final class UpdateDocumentDTO
         public readonly ?string $type = null,
         public readonly ?string $uploadedAt = null,
         public readonly ?int $followUpFileId = null,
+        public readonly ?int $portCallId = null,
     ) {}
 
     public static function fromArray(array $data): self
@@ -22,6 +23,7 @@ final class UpdateDocumentDTO
             type: $data['type'] ?? null,
             uploadedAt: $data['uploaded_at'] ?? null,
             followUpFileId: isset($data['follow_up_file_id']) ? (int) $data['follow_up_file_id'] : null,
+            portCallId: isset($data['port_call_id']) ? (int) $data['port_call_id'] : null,
         );
     }
 }

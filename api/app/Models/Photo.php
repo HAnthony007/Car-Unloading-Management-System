@@ -14,7 +14,7 @@ class Photo extends Model
     protected $primaryKey = 'photo_id';
 
     protected $fillable = [
-        'photo_path', 'taken_at', 'photo_description', 'follow_up_file_id', 'checkpoint_id',
+        'photo_path', 'taken_at', 'photo_description', 'discharge_id', 'survey_id', 'checkpoint_id',
     ];
 
     /**
@@ -117,9 +117,11 @@ class Photo extends Model
      */
     protected function inferStorageDirectory(): string
     {
-        // vehicle_id removed from Photo model
-        if (! empty($this->follow_up_file_id)) {
-            return 'photos/follow-up/'.$this->follow_up_file_id;
+        if (! empty($this->discharge_id)) {
+            return 'photos/discharges/'.$this->discharge_id;
+        }
+        if (! empty($this->survey_id)) {
+            return 'photos/surveys/'.$this->survey_id;
         }
         if (! empty($this->checkpoint_id)) {
             return 'photos/checkpoints/'.$this->checkpoint_id;
@@ -135,8 +137,13 @@ class Photo extends Model
 
     // vehicle() relation removed
 
-    public function followUpFile(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function discharge(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(FollowUpFile::class, 'follow_up_file_id');
+        return $this->belongsTo(Discharge::class, 'discharge_id');
+    }
+
+    public function survey(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Survey::class, 'survey_id');
     }
 }

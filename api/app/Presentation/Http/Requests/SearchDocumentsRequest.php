@@ -18,6 +18,7 @@ class SearchDocumentsRequest extends FormRequest
             'type' => ['nullable', 'string'],
             'from_date' => ['nullable', 'date'],
             'to_date' => ['nullable', 'date'],
+            'port_call_id' => ['nullable', 'integer', 'exists:port_calls,port_call_id'],
             'page' => ['nullable', 'integer', 'min:1'],
             'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
         ];

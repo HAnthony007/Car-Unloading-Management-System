@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Models\FollowUpFile;
+use App\Models\Discharge;
 use App\Models\Survey;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -17,11 +17,11 @@ class SurveyFactory extends Factory
     public function definition(): array
     {
         return [
-            'date' => fake()->date(),
-            'result' => fake()->randomElement(['OK', 'KO', 'Pending']),
-            // Prefer existing records to avoid inflating counts indirectly
-            'user_id' => fn () => User::query()->inRandomOrder()->value('user_id') ?? User::factory(),
-            'follow_up_file_id' => fn () => FollowUpFile::query()->inRandomOrder()->value('follow_up_file_id') ?? FollowUpFile::factory(),
+            'survey_date' => fake()->dateTimeBetween('-5 days', 'now'),
+            'overall_status' => fake()->randomElement(['PASSED', 'FAILED', 'PENDING']),
+            'agent_id' => fn () => User::query()->inRandomOrder()->value('user_id') ?? User::factory(),
+            // ensure uniqueness since surveys table requires unique discharge_id
+            'discharge_id' => Discharge::factory(),
         ];
     }
 }

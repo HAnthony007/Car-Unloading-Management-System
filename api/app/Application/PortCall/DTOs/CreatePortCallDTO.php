@@ -10,10 +10,10 @@ final class CreatePortCallDTO
         public readonly ?string $estimatedArrival,
         public readonly string $arrivalDate,
         public readonly ?string $estimatedDeparture,
-    public readonly ?string $departureDate,
+        public readonly ?string $departureDate,
         public readonly int $vesselId,
         public readonly int $dockId,
-    public readonly string $status = 'pending',
+        public readonly string $status = 'pending',
     ) {}
 
     public static function fromArray(array $data): self

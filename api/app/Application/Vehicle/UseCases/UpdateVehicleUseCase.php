@@ -35,7 +35,6 @@ final class UpdateVehicleUseCase
             originCountry: $dto->originCountry ?? $existing->getOriginCountry(),
             shipLocation: $dto->shipLocation ?? $existing->getShipLocation(),
             isPrimed: $dto->isPrimed ?? $existing->isPrimed(),
-            dischargeId: $existing->getDischargeId(),
             createdAt: $existing->getCreatedAt(),
             updatedAt: $existing->getUpdatedAt(),
         );

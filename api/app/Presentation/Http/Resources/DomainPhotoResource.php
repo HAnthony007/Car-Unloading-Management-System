@@ -24,8 +24,8 @@ final class DomainPhotoResource extends JsonResource
             ],
             'taken_at' => $p->getTakenAt()->toISOString(),
             'photo_description' => $p->getPhotoDescription(),
-            'follow_up_file_id' => $p->getFollowUpFileId()?->getValue(),
-            // vehicle_id removed
+            'discharge_id' => $p->getDischargeId()->getValue(),
+            'survey_id' => $p->getSurveyId()?->getValue(),
             'checkpoint_id' => $p->getCheckpointId()?->getValue(),
             'created_at' => $p->getCreatedAt()?->toISOString(),
             'updated_at' => $p->getUpdatedAt()?->toISOString(),

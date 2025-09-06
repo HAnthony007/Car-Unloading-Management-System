@@ -2,12 +2,12 @@
 
 namespace App\Application\Manifest\UseCases;
 
+use App\Application\Manifest\Exceptions\ManifestImportException;
 use App\Imports\Manifest\ManifestContext;
 use App\Imports\Manifest\ManifestImport;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Application\Manifest\Exceptions\ManifestImportException;
 
 final class ImportManifestUseCase
 {

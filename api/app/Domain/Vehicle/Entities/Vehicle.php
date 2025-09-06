@@ -2,7 +2,6 @@
 
 namespace App\Domain\Vehicle\Entities;
 
-use App\Domain\Discharge\ValueObjects\DischargeId;
 use App\Domain\Vehicle\ValueObjects\VehicleId;
 use App\Domain\Vehicle\ValueObjects\Vin;
 use Carbon\Carbon;
@@ -24,7 +23,6 @@ final class Vehicle
         private readonly string $originCountry,
         private readonly ?string $shipLocation,
         private readonly bool $isPrimed,
-        private readonly ?DischargeId $dischargeId,
         private readonly ?Carbon $createdAt = null,
         private readonly ?Carbon $updatedAt = null,
     ) {}
@@ -99,11 +97,6 @@ final class Vehicle
         return $this->isPrimed;
     }
 
-    public function getDischargeId(): ?DischargeId
-    {
-        return $this->dischargeId;
-    }
-
     public function getCreatedAt(): ?Carbon
     {
         return $this->createdAt;
@@ -131,7 +124,6 @@ final class Vehicle
             'origin_country' => $this->originCountry,
             'ship_location' => $this->shipLocation,
             'is_primed' => $this->isPrimed,
-            'discharge_id' => $this->dischargeId?->getValue(),
             'created_at' => $this->createdAt?->toISOString(),
             'updated_at' => $this->updatedAt?->toISOString(),
         ];

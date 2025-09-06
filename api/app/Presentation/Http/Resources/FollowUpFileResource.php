@@ -34,12 +34,8 @@ final class FollowUpFileResource extends JsonResource
             // ignore and keep null
         }
 
-        try {
-            $followUpFileId = $id;
-            $survey = $followUpFileId ? Survey::with(['user', 'checkpoints'])->where('follow_up_file_id', $followUpFileId)->first() : null;
-        } catch (\Throwable $e) {
-            // ignore and keep null
-        }
+        // Survey now accessed via discharge -> survey, remove direct fetch
+        $survey = null;
 
         return [
             'follow_up_file_id' => $id !== null ? (string) $id : null,
@@ -63,13 +59,7 @@ final class FollowUpFileResource extends JsonResource
                     'discharges' => $portCall->relationLoaded('discharges') && $portCall->discharges ? $portCall->discharges->toArray() : [],
                 ]
             ) : null,
-            'survey' => $survey ? array_merge(
-                $survey->toArray(),
-                [
-                    'user' => $survey->relationLoaded('user') && $survey->user ? $survey->user->toArray() : null,
-                    'checkpoints' => $survey->relationLoaded('checkpoints') && $survey->checkpoints ? $survey->checkpoints->toArray() : [],
-                ]
-            ) : null,
+            'survey' => null,
             'created_at' => $f->getCreatedAt()?->toISOString(),
             'updated_at' => $f->getUpdatedAt()?->toISOString(),
         ];

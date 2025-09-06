@@ -3,9 +3,9 @@
 namespace App\Application\Survey\UseCases;
 
 use App\Application\Survey\DTOs\CreateSurveyDTO;
-use App\Domain\FollowUpFile\ValueObjects\FollowUpFileId;
+use App\Domain\Discharge\ValueObjects\DischargeId;
 use App\Domain\Survey\Entities\Survey;
-use App\Domain\Survey\Repositories\SurveyRepositoryInterface;
+use App\Domain\Survey\Repositories\SurveyRepositoryInterface; // agent
 use App\Domain\User\ValueObjects\UserId;
 
 final class CreateSurveyUseCase
@@ -16,10 +16,10 @@ final class CreateSurveyUseCase
     {
         $entity = new Survey(
             surveyId: null,
-            date: $dto->getDateVO(),
-            result: $dto->getResultVO(),
-            userId: new UserId($dto->userId),
-            followUpFileId: new FollowUpFileId($dto->followUpFileId),
+            surveyDate: $dto->getSurveyDateVO(),
+            overallStatus: $dto->getStatusVO(),
+            agentId: new UserId($dto->agentId),
+            dischargeId: new DischargeId($dto->dischargeId),
         );
 
         return $this->repository->save($entity);

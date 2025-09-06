@@ -17,7 +17,9 @@ return new class extends Migration
             $table->string('document_description');
             $table->string('type');
             $table->dateTime('uploaded_at');
-            $table->foreignId('follow_up_file_id')->constrained('follow_up_files', 'follow_up_file_id');
+            $table->foreignId('port_call_id')->constrained('port_calls', 'port_call_id');
+            $table->foreignId('follow_up_file_id')->nullable()->constrained('follow_up_files', 'follow_up_file_id')->nullOnDelete();
+            $table->foreignId('vehicle_id')->nullable()->constrained('vehicles', 'vehicle_id')->nullOnDelete();
             $table->timestamps();
         });
     }

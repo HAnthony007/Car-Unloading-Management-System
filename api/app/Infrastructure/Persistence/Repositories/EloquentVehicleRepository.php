@@ -2,7 +2,6 @@
 
 namespace App\Infrastructure\Persistence\Repositories;
 
-use App\Domain\Discharge\ValueObjects\DischargeId;
 use App\Domain\PortCall\ValueObjects\PortCallId;
 use App\Domain\Vehicle\Entities\Vehicle as DomainVehicle;
 use App\Domain\Vehicle\Repositories\VehicleRepositoryInterface;
@@ -28,8 +27,8 @@ final class EloquentVehicleRepository implements VehicleRepositoryInterface
         $vehicles = EloquentVehicle::query()
             ->whereIn('vehicle_id', function ($q) use ($portCallId) {
                 $q->select('vehicle_id')
-                  ->from('follow_up_files')
-                  ->where('port_call_id', $portCallId->getValue());
+                    ->from('follow_up_files')
+                    ->where('port_call_id', $portCallId->getValue());
             })
             ->orderBy('vehicle_id')
             ->get();
@@ -69,7 +68,6 @@ final class EloquentVehicleRepository implements VehicleRepositoryInterface
         $e->origin_country = $vehicle->getOriginCountry();
         $e->ship_location = $vehicle->getShipLocation();
         $e->is_primed = $vehicle->isPrimed();
-        $e->discharge_id = $vehicle->getDischargeId()?->getValue();
         $e->save();
 
         return $this->toDomainEntity($e);
@@ -102,22 +100,19 @@ final class EloquentVehicleRepository implements VehicleRepositoryInterface
             originCountry: $e->origin_country,
             shipLocation: $e->ship_location,
             isPrimed: (bool) $e->is_primed,
-            dischargeId: $e->discharge_id !== null ? new DischargeId($e->discharge_id) : null,
             createdAt: $e->created_at,
             updatedAt: $e->updated_at,
         );
     }
 
-    public function search(?string $vin, ?int $dischargeId, ?string $make, ?string $model, ?string $ownerName, ?string $color, ?string $type, ?string $originCountry, ?string $searchTerm, int $page, int $perPage): array
+    public function search(?string $vin, ?string $make, ?string $model, ?string $ownerName, ?string $color, ?string $type, ?string $originCountry, ?string $searchTerm, int $page, int $perPage): array
     {
         $query = EloquentVehicle::query();
 
         if ($vin) {
             $query->where('vin', 'like', '%'.strtoupper($vin).'%');
         }
-        if ($dischargeId) {
-            $query->where('discharge_id', $dischargeId);
-        }
+        // dischargeId filter removed (relationship inverted)
         if ($make) {
             $query->where('make', 'like', '%'.$make.'%');
         }
@@ -142,12 +137,12 @@ final class EloquentVehicleRepository implements VehicleRepositoryInterface
             $t = '%'.$searchTerm.'%';
             $query->where(function ($q) use ($t) {
                 $q->where('vin', 'like', $t)
-                  ->orWhere('make', 'like', $t)
-                  ->orWhere('model', 'like', $t)
-                  ->orWhere('owner_name', 'like', $t)
-                  ->orWhere('color', 'like', $t)
-                  ->orWhere('type', 'like', $t)
-                  ->orWhere('origin_country', 'like', $t);
+                    ->orWhere('make', 'like', $t)
+                    ->orWhere('model', 'like', $t)
+                    ->orWhere('owner_name', 'like', $t)
+                    ->orWhere('color', 'like', $t)
+                    ->orWhere('type', 'like', $t)
+                    ->orWhere('origin_country', 'like', $t);
             });
         }
 

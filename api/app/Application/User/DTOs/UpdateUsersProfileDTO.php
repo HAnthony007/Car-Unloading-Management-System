@@ -9,7 +9,7 @@ final class UpdateUsersProfileDTO
     public function __construct(
         public readonly int $userId,
         public readonly ?string $fullName = null,
-    public readonly ?string $email = null,
+        public readonly ?string $email = null,
         public readonly ?string $avatar = null,
         public readonly ?string $phone = null,
         public readonly ?int $roleId = null,

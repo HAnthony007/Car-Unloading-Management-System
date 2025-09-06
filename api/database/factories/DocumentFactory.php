@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Document;
 use App\Models\FollowUpFile;
+use App\Models\PortCall;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -22,6 +23,7 @@ class DocumentFactory extends Factory
             'uploaded_at' => fake()->dateTimeBetween('-10 days', 'now'),
             // Prefer an existing FUF to avoid cascading new Vehicle creation
             'follow_up_file_id' => fn () => FollowUpFile::query()->inRandomOrder()->value('follow_up_file_id') ?? FollowUpFile::factory(),
+            'port_call_id' => fn () => PortCall::query()->inRandomOrder()->value('port_call_id') ?? PortCall::factory(),
         ];
     }
 }

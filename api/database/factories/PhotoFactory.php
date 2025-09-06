@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Models\FollowUpFile;
+use App\Models\Discharge;
 use App\Models\Photo;
 use App\Models\SurveyCheckpoint;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -20,7 +20,9 @@ class PhotoFactory extends Factory
             'photo_path' => 'photos/'.fake()->uuid().'.jpg',
             'taken_at' => fake()->dateTimeBetween('-10 days', 'now'),
             'photo_description' => fake()->optional()->sentence(),
-            'follow_up_file_id' => FollowUpFile::factory(),
+            // Updated relationship: photos now belong to a discharge (required) instead of follow_up_file
+            'discharge_id' => Discharge::factory(),
+            // checkpoint optional linkage
             'checkpoint_id' => SurveyCheckpoint::factory(),
         ];
     }

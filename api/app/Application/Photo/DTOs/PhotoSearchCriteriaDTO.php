@@ -5,7 +5,8 @@ namespace App\Application\Photo\DTOs;
 final class PhotoSearchCriteriaDTO
 {
     public function __construct(
-        public readonly ?int $followUpFileId,
+        public readonly ?int $dischargeId,
+        public readonly ?int $surveyId,
         public readonly ?int $checkpointId,
         public readonly ?string $fromDate,
         public readonly ?string $toDate,
@@ -16,7 +17,8 @@ final class PhotoSearchCriteriaDTO
     public static function fromArray(array $data): self
     {
         return new self(
-            followUpFileId: isset($data['follow_up_file_id']) ? (int) $data['follow_up_file_id'] : null,
+            dischargeId: isset($data['discharge_id']) ? (int) $data['discharge_id'] : null,
+            surveyId: isset($data['survey_id']) ? (int) $data['survey_id'] : null,
             checkpointId: isset($data['checkpoint_id']) ? (int) $data['checkpoint_id'] : null,
             fromDate: $data['from_date'] ?? null,
             toDate: $data['to_date'] ?? null,

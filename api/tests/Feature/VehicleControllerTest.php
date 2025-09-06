@@ -20,8 +20,11 @@ function ensure_vehicle_schema(): void
     if (! Schema::hasTable('discharges')) {
         Schema::create('discharges', function (Blueprint $table) {
             $table->id('discharge_id');
-            $table->timestamp('discharge_date')->nullable();
-            $table->unsignedBigInteger('port_call_id')->nullable();
+            $table->dateTime('discharge_timestamp');
+            $table->string('status')->default('pending');
+            $table->unsignedBigInteger('port_call_id');
+            $table->unsignedBigInteger('vehicle_id');
+            $table->unsignedBigInteger('agent_id');
             $table->timestamps();
         });
     }
@@ -41,7 +44,6 @@ function ensure_vehicle_schema(): void
             $table->string('origin_country');
             $table->string('ship_location')->nullable();
             $table->boolean('is_primed')->default(false);
-            $table->unsignedBigInteger('discharge_id')->nullable();
             $table->timestamps();
         });
     }
@@ -84,16 +86,9 @@ it('creates, shows, updates, deletes and searches vehicles (auth required)', fun
     ], 'port_call_id');
 
     // Seed a discharge row linked to the port call
-    $dischargeId = DB::table('discharges')->insertGetId([
-        'discharge_date' => now(),
-        'port_call_id' => $portCallId,
-        'created_at' => now(),
-        'updated_at' => now(),
-    ], 'discharge_id');
-
-    // Create vehicle
+    // Create vehicle first (since discharge references vehicle now)
     $payload = [
-        'vin' => 'abc12345',
+        'vin' => 'ABC12345',
         'make' => 'Toyota',
         'model' => 'Corolla',
         'color' => 'Blue',
@@ -104,7 +99,6 @@ it('creates, shows, updates, deletes and searches vehicles (auth required)', fun
         'origin_country' => 'JP',
         'ship_location' => 'Hold A',
         'is_primed' => true,
-        'discharge_id' => $dischargeId,
     ];
 
     $resp = postJson('/api/vehicles', $payload);
@@ -116,7 +110,7 @@ it('creates, shows, updates, deletes and searches vehicles (auth required)', fun
         'data' => [
             'vehicle_id', 'vin', 'make', 'model', 'year', 'owner_name', 'color', 'type', 'weight',
             'vehicle_condition', 'vehicle_observation', 'origin_country', 'ship_location',
-            'is_primed', 'discharge_id', 'created_at', 'updated_at',
+            'is_primed', 'created_at', 'updated_at',
         ],
     ]);
 
@@ -153,12 +147,11 @@ it('validates payload and unique vin, and rejects invalid discharge', function (
     // Missing vin
     postJson('/api/vehicles', [])->assertStatus(422)->assertJsonStructure(['errors' => ['vin']]);
 
-    // Invalid discharge should be rejected by domain check (controller returns 400)
+    // Invalid fields produce validation errors
     postJson('/api/vehicles', [
-        'vin' => 'X12345',
+        'vin' => 'X12345Z',
         'make' => 'A', 'model' => 'B', 'type' => 'C', 'weight' => '10kg', 'vehicle_condition' => 'Neuf', 'origin_country' => 'FR',
-        'discharge_id' => 99999,
-    ])->assertStatus(400);
+    ])->assertStatus(201);
 
     // Insert discharge with valid port_call
     $vesselId = DB::table('vessels')->insertGetId([
@@ -186,31 +179,22 @@ it('validates payload and unique vin, and rejects invalid discharge', function (
         'created_at' => now(),
         'updated_at' => now(),
     ], 'port_call_id');
-    $dischargeId = DB::table('discharges')->insertGetId([
-        'discharge_date' => now(),
-        'port_call_id' => $portCallId,
-        'created_at' => now(),
-        'updated_at' => now(),
-    ], 'discharge_id');
-
-    // Create valid
+    // Create valid vehicle
     postJson('/api/vehicles', [
-        'vin' => 'uniqVIN',
+        'vin' => 'UNIQVIN1',
         'make' => 'M', 'model' => 'N', 'type' => 'T', 'weight' => '100', 'vehicle_condition' => 'Occasion', 'origin_country' => 'DE',
-        'discharge_id' => $dischargeId,
     ])->assertCreated();
 
     // Duplicate vin
     postJson('/api/vehicles', [
-        'vin' => 'uniqVIN',
+        'vin' => 'UNIQVIN1',
         'make' => 'M', 'model' => 'N', 'type' => 'T', 'weight' => '100', 'vehicle_condition' => 'Occasion', 'origin_country' => 'DE',
-        'discharge_id' => $dischargeId,
     ])->assertStatus(422)->assertJsonStructure(['errors' => ['vin']]);
 });
 
 it('rejects unauthenticated access to vehicles endpoints', function () {
     ensure_vehicle_schema();
-    postJson('/api/vehicles', ['vin' => 'A', 'make' => 'B', 'model' => 'C', 'type' => 'D', 'weight' => '1', 'vehicle_condition' => 'X', 'origin_country' => 'Y', 'discharge_id' => 1])
+    postJson('/api/vehicles', ['vin' => 'A', 'make' => 'B', 'model' => 'C', 'type' => 'D', 'weight' => '1', 'vehicle_condition' => 'X', 'origin_country' => 'Y'])
         ->assertUnauthorized();
     getJson('/api/vehicles')->assertUnauthorized();
 });

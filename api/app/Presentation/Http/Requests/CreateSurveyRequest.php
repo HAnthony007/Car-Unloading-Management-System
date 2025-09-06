@@ -16,10 +16,10 @@ final class CreateSurveyRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'date' => ['required', 'date'],
-            'result' => ['required', 'string', 'in:PASSED,FAILED,PENDING'],
-            'user_id' => ['required', 'integer', 'exists:users,user_id'],
-            'follow_up_file_id' => ['required', 'integer', 'exists:follow_up_files,follow_up_file_id'],
+            'survey_date' => ['required', 'date'],
+            'overall_status' => ['required', 'string', 'in:PASSED,FAILED,PENDING'],
+            'agent_id' => ['required', 'integer', 'exists:users,user_id'],
+            'discharge_id' => ['required', 'integer', 'exists:discharges,discharge_id'],
         ];
     }
 

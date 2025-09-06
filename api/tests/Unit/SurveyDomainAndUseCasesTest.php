@@ -6,12 +6,12 @@ use App\Application\Survey\UseCases\CreateSurveyUseCase;
 use App\Application\Survey\UseCases\DeleteSurveyUseCase;
 use App\Application\Survey\UseCases\GetSurveyUseCase;
 use App\Application\Survey\UseCases\UpdateSurveyUseCase;
-use App\Domain\FollowUpFile\ValueObjects\FollowUpFileId;
+use App\Domain\Discharge\ValueObjects\DischargeId;
 use App\Domain\Survey\Entities\Survey;
 use App\Domain\Survey\Repositories\SurveyRepositoryInterface;
 use App\Domain\Survey\ValueObjects\SurveyDate;
 use App\Domain\Survey\ValueObjects\SurveyId;
-use App\Domain\Survey\ValueObjects\SurveyResult;
+use App\Domain\Survey\ValueObjects\SurveyStatus; // agent
 use App\Domain\User\ValueObjects\UserId;
 use Carbon\Carbon;
 use PHPUnit\Framework\TestCase;
@@ -20,40 +20,40 @@ class SurveyDomainAndUseCasesTest extends TestCase
 {
     public function test_value_objects_and_entity()
     {
-        $date = new SurveyDate(Carbon::parse('2025-08-01'));
-        $result = new SurveyResult('passed');
+        $date = new SurveyDate(Carbon::parse('2025-08-01T09:30:00Z'));
+        $status = new SurveyStatus('PASSED');
         $entity = new Survey(
             surveyId: new SurveyId(1),
-            date: $date,
-            result: $result,
-            userId: new UserId(10),
-            followUpFileId: new FollowUpFileId(20),
+            surveyDate: $date,
+            overallStatus: $status,
+            agentId: new UserId(10),
+            dischargeId: new DischargeId(55),
             createdAt: Carbon::now(),
             updatedAt: Carbon::now(),
         );
 
-        $this->assertSame('PASSED', $entity->getResult()->getValue());
-        $this->assertSame('2025-08-01', $entity->getDate()->getValue()->toDateString());
-        $this->assertSame(10, $entity->getUserId()->getValue());
-        $this->assertSame(20, $entity->getFollowUpFileId()->getValue());
+        $this->assertSame('PASSED', $entity->getOverallStatus()->getValue());
+        $this->assertSame('2025-08-01', $entity->getSurveyDate()->getValue()->toDateString());
+        $this->assertSame(10, $entity->getAgentId()->getValue());
+        $this->assertSame(55, $entity->getDischargeId()->getValue());
         $this->assertIsArray($entity->toArray());
     }
 
     public function test_create_survey_use_case()
     {
         $dto = new CreateSurveyDTO(
-            date: '2025-08-01',
-            result: 'PENDING',
-            userId: 10,
-            followUpFileId: 20,
+            surveyDate: '2025-08-01 00:00:00',
+            overallStatus: 'PENDING',
+            agentId: 10,
+            dischargeId: 55,
         );
 
         $expected = new Survey(
             surveyId: new SurveyId(1),
-            date: $dto->getDateVO(),
-            result: $dto->getResultVO(),
-            userId: new UserId(10),
-            followUpFileId: new FollowUpFileId(20),
+            surveyDate: $dto->getSurveyDateVO(),
+            overallStatus: $dto->getStatusVO(),
+            agentId: new UserId(10),
+            dischargeId: new DischargeId(55),
         );
 
         $repo = $this->createMock(SurveyRepositoryInterface::class);
@@ -71,10 +71,10 @@ class SurveyDomainAndUseCasesTest extends TestCase
             if ($id instanceof SurveyId && $id->getValue() === 1) {
                 return new Survey(
                     surveyId: new SurveyId(1),
-                    date: new SurveyDate(Carbon::parse('2025-08-01')),
-                    result: new SurveyResult('PENDING'),
-                    userId: new UserId(10),
-                    followUpFileId: new FollowUpFileId(20),
+                    surveyDate: new SurveyDate(Carbon::parse('2025-08-01')),
+                    overallStatus: new SurveyStatus('PENDING'),
+                    agentId: new UserId(10),
+                    dischargeId: new DischargeId(55),
                 );
             }
 
@@ -93,18 +93,18 @@ class SurveyDomainAndUseCasesTest extends TestCase
     {
         $existing = new Survey(
             surveyId: new SurveyId(1),
-            date: new SurveyDate(Carbon::parse('2025-08-01')),
-            result: new SurveyResult('PENDING'),
-            userId: new UserId(10),
-            followUpFileId: new FollowUpFileId(20),
+            surveyDate: new SurveyDate(Carbon::parse('2025-08-01')),
+            overallStatus: new SurveyStatus('PENDING'),
+            agentId: new UserId(10),
+            dischargeId: new DischargeId(55),
         );
 
         $updated = new Survey(
             surveyId: new SurveyId(1),
-            date: new SurveyDate(Carbon::parse('2025-08-02')),
-            result: new SurveyResult('PASSED'),
-            userId: new UserId(10),
-            followUpFileId: new FollowUpFileId(20),
+            surveyDate: new SurveyDate(Carbon::parse('2025-08-02')),
+            overallStatus: new SurveyStatus('PASSED'),
+            agentId: new UserId(10),
+            dischargeId: new DischargeId(55),
         );
 
         $repo = $this->createMock(SurveyRepositoryInterface::class);
@@ -121,10 +121,10 @@ class SurveyDomainAndUseCasesTest extends TestCase
         $repo = $this->createMock(SurveyRepositoryInterface::class);
         $repo->method('findById')->willReturn(new Survey(
             surveyId: new SurveyId(1),
-            date: new SurveyDate(Carbon::parse('2025-08-01')),
-            result: new SurveyResult('PENDING'),
-            userId: new UserId(10),
-            followUpFileId: new FollowUpFileId(20),
+            surveyDate: new SurveyDate(Carbon::parse('2025-08-01')),
+            overallStatus: new SurveyStatus('PENDING'),
+            agentId: new UserId(10),
+            dischargeId: new DischargeId(55),
         ));
         $repo->method('delete')->willReturn(true);
 

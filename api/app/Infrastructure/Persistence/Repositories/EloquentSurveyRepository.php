@@ -2,12 +2,12 @@
 
 namespace App\Infrastructure\Persistence\Repositories;
 
-use App\Domain\FollowUpFile\ValueObjects\FollowUpFileId;
+use App\Domain\Discharge\ValueObjects\DischargeId;
 use App\Domain\Survey\Entities\Survey as DomainSurvey;
 use App\Domain\Survey\Repositories\SurveyRepositoryInterface;
 use App\Domain\Survey\ValueObjects\SurveyDate;
 use App\Domain\Survey\ValueObjects\SurveyId;
-use App\Domain\Survey\ValueObjects\SurveyResult;
+use App\Domain\Survey\ValueObjects\SurveyStatus;
 use App\Domain\User\ValueObjects\UserId;
 use App\Models\Survey as EloquentSurvey;
 use Carbon\Carbon;
@@ -30,14 +30,14 @@ final class EloquentSurveyRepository implements SurveyRepositoryInterface
 
     public function findByUserId(UserId $userId): array
     {
-        return EloquentSurvey::where('user_id', $userId->getValue())->get()
+        return EloquentSurvey::where('agent_id', $userId->getValue())->get()
             ->map(fn ($e) => $this->toDomainEntity($e))
             ->toArray();
     }
 
-    public function findByFollowUpFileId(FollowUpFileId $followUpFileId): array
+    public function findByDischargeId(DischargeId $dischargeId): array
     {
-        return EloquentSurvey::where('follow_up_file_id', $followUpFileId->getValue())->get()
+        return EloquentSurvey::where('discharge_id', $dischargeId->getValue())->get()
             ->map(fn ($e) => $this->toDomainEntity($e))
             ->toArray();
     }
@@ -52,10 +52,10 @@ final class EloquentSurveyRepository implements SurveyRepositoryInterface
             $eloquent = new EloquentSurvey;
         }
 
-        $eloquent->date = $survey->getDate()->getValue()?->toDateString();
-        $eloquent->result = $survey->getResult()->getValue();
-        $eloquent->user_id = $survey->getUserId()->getValue();
-        $eloquent->follow_up_file_id = $survey->getFollowUpFileId()->getValue();
+        $eloquent->survey_date = $survey->getSurveyDate()->getValue()?->toDateTimeString();
+        $eloquent->overall_status = $survey->getOverallStatus()->getValue();
+        $eloquent->agent_id = $survey->getAgentId()->getValue();
+        $eloquent->discharge_id = $survey->getDischargeId()->getValue();
         $eloquent->save();
 
         return $this->toDomainEntity($eloquent);
@@ -68,13 +68,12 @@ final class EloquentSurveyRepository implements SurveyRepositoryInterface
 
     private function toDomainEntity(EloquentSurvey $e): DomainSurvey
     {
-        $normalizedResult = $this->normalizeResult($e->result);
         return new DomainSurvey(
             surveyId: new SurveyId($e->survey_id),
-            date: new SurveyDate($e->date ? Carbon::parse($e->date) : null),
-            result: new SurveyResult($normalizedResult),
-            userId: new UserId($e->user_id),
-            followUpFileId: new FollowUpFileId($e->follow_up_file_id),
+            surveyDate: new SurveyDate($e->survey_date ? Carbon::parse($e->survey_date) : null),
+            overallStatus: new SurveyStatus($this->normalizeStatus($e->overall_status)),
+            agentId: new UserId($e->agent_id),
+            dischargeId: new DischargeId($e->discharge_id),
             createdAt: $e->created_at,
             updatedAt: $e->updated_at,
         );
@@ -83,7 +82,7 @@ final class EloquentSurveyRepository implements SurveyRepositoryInterface
     /**
      * Coerce arbitrary DB values into allowed SurveyResult enum values.
      */
-    private function normalizeResult(mixed $value): string
+    private function normalizeStatus(mixed $value): string
     {
         if ($value === null) {
             return 'PENDING';
@@ -103,7 +102,7 @@ final class EloquentSurveyRepository implements SurveyRepositoryInterface
         }
 
         // Direct allowed values
-        if (in_array($str, SurveyResult::ALLOWED, true)) {
+        if (in_array($str, SurveyStatus::ALLOWED, true)) {
             return $str;
         }
 

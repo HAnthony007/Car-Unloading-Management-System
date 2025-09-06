@@ -20,7 +20,6 @@ final class CreateVehicleDTO
         public readonly string $originCountry,
         public readonly ?string $shipLocation,
         public readonly bool $isPrimed,
-        public readonly ?int $dischargeId,
     ) {}
 
     public static function fromArray(array $data): self
@@ -39,7 +38,6 @@ final class CreateVehicleDTO
             originCountry: $data['origin_country'] ?? '',
             shipLocation: $data['ship_location'] ?? null,
             isPrimed: (bool) ($data['is_primed'] ?? false),
-            dischargeId: isset($data['discharge_id']) ? (int) $data['discharge_id'] : null,
         );
     }
 

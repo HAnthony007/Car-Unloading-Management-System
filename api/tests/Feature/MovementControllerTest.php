@@ -20,8 +20,11 @@ function ensure_movement_schema(): void
     if (! Schema::hasTable('discharges')) {
         Schema::create('discharges', function (Blueprint $table) {
             $table->id('discharge_id');
-            $table->timestamp('discharge_date')->nullable();
-            $table->unsignedBigInteger('port_call_id')->nullable();
+            $table->dateTime('discharge_timestamp');
+            $table->string('status')->default('pending');
+            $table->unsignedBigInteger('port_call_id');
+            $table->unsignedBigInteger('vehicle_id');
+            $table->unsignedBigInteger('agent_id');
             $table->timestamps();
         });
     }
@@ -55,7 +58,6 @@ function ensure_movement_schema(): void
             $table->string('origin_country');
             $table->string('ship_location')->nullable();
             $table->boolean('is_primed')->default(false);
-            $table->unsignedBigInteger('discharge_id')->nullable();
             $table->timestamps();
         });
     }
@@ -111,17 +113,9 @@ it('creates, shows, updates, deletes and lists movements (auth required)', funct
 
     // Seed a vehicle
     // Seed discharge to satisfy NOT NULL FK from vehicles migration when using RefreshDatabase
-    $dischargeId = DB::table('discharges')->insertGetId([
-        'discharge_date' => now(),
-        'port_call_id' => $portCallId,
-        'created_at' => now(),
-        'updated_at' => now(),
-    ], 'discharge_id');
-
     $vehicleId = DB::table('vehicles')->insertGetId([
         'vin' => 'MOVVIN1', 'make' => 'Make', 'model' => 'Model', 'type' => 'Type', 'weight' => '1000',
         'vehicle_condition' => 'OK', 'origin_country' => 'FR', 'is_primed' => false,
-        'discharge_id' => $dischargeId,
         'created_at' => now(), 'updated_at' => now(),
     ], 'vehicle_id');
 

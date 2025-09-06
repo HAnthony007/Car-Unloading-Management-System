@@ -10,7 +10,8 @@ final class CreatePhotoDTO
         public readonly string $photoPath,
         public readonly string $takenAt,
         public readonly ?string $photoDescription,
-        public readonly ?int $followUpFileId,
+        public readonly int $dischargeId,
+        public readonly ?int $surveyId,
         public readonly ?int $checkpointId,
     ) {}
 
@@ -20,7 +21,8 @@ final class CreatePhotoDTO
             photoPath: $data['photo_path'] ?? '',
             takenAt: $data['taken_at'] ?? Carbon::now()->toISOString(),
             photoDescription: $data['photo_description'] ?? null,
-            followUpFileId: isset($data['follow_up_file_id']) ? (int) $data['follow_up_file_id'] : null,
+            dischargeId: (int) $data['discharge_id'],
+            surveyId: isset($data['survey_id']) ? (int) $data['survey_id'] : null,
             checkpointId: isset($data['checkpoint_id']) ? (int) $data['checkpoint_id'] : null,
         );
     }

@@ -47,7 +47,7 @@ function ensurePortCallRelatedTables(): void
             $table->dateTime('departure_date')->nullable();
             $table->foreignId('vessel_id')->constrained('vessels', 'vessel_id');
             $table->foreignId('dock_id')->constrained('docks', 'dock_id');
-                $table->enum('status', ['pending','in_progress','completed'])->default('pending');
+            $table->enum('status', ['pending', 'in_progress', 'completed'])->default('pending');
             $table->timestamps();
         });
     }

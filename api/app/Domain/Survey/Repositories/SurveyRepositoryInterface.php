@@ -2,7 +2,7 @@
 
 namespace App\Domain\Survey\Repositories;
 
-use App\Domain\FollowUpFile\ValueObjects\FollowUpFileId;
+use App\Domain\Discharge\ValueObjects\DischargeId;
 use App\Domain\Survey\Entities\Survey;
 use App\Domain\Survey\ValueObjects\SurveyId;
 use App\Domain\User\ValueObjects\UserId;
@@ -18,7 +18,7 @@ interface SurveyRepositoryInterface
     public function findByUserId(UserId $userId): array;
 
     /** @return array<int, Survey> */
-    public function findByFollowUpFileId(FollowUpFileId $followUpFileId): array;
+    public function findByDischargeId(DischargeId $dischargeId): array;
 
     public function save(Survey $survey): Survey;
 

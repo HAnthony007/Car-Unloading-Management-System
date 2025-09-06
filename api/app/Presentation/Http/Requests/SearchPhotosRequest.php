@@ -14,8 +14,9 @@ class SearchPhotosRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'follow_up_file_id' => ['nullable', 'integer'],
-            'checkpoint_id' => ['nullable', 'integer'],
+            'discharge_id' => ['nullable', 'integer', 'exists:discharges,discharge_id'],
+            'survey_id' => ['nullable', 'integer', 'exists:surveys,survey_id'],
+            'checkpoint_id' => ['nullable', 'integer', 'exists:survey_checkpoints,checkpoint_id'],
             'from_date' => ['nullable', 'date'],
             'to_date' => ['nullable', 'date'],
             'page' => ['nullable', 'integer', 'min:1'],

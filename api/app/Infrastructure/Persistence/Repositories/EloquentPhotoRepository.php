@@ -2,10 +2,11 @@
 
 namespace App\Infrastructure\Persistence\Repositories;
 
-use App\Domain\FollowUpFile\ValueObjects\FollowUpFileId;
+use App\Domain\Discharge\ValueObjects\DischargeId;
 use App\Domain\Photo\Entities\Photo as DomainPhoto;
 use App\Domain\Photo\Repositories\PhotoRepositoryInterface;
 use App\Domain\Photo\ValueObjects\PhotoId;
+use App\Domain\Survey\ValueObjects\SurveyId;
 use App\Domain\SurveyCheckpoint\ValueObjects\SurveyCheckpointId;
 use App\Models\Photo as EloquentPhoto;
 use Carbon\Carbon;
@@ -37,7 +38,8 @@ final class EloquentPhotoRepository implements PhotoRepositoryInterface
         $e->photo_path = $p->getPhotoPath();
         $e->taken_at = $p->getTakenAt();
         $e->photo_description = $p->getPhotoDescription();
-        $e->follow_up_file_id = $p->getFollowUpFileId()?->getValue();
+        $e->discharge_id = $p->getDischargeId()->getValue();
+        $e->survey_id = $p->getSurveyId()?->getValue();
         $e->checkpoint_id = $p->getCheckpointId()?->getValue();
         $e->save();
 
@@ -54,12 +56,14 @@ final class EloquentPhotoRepository implements PhotoRepositoryInterface
         return (bool) $e->delete();
     }
 
-    public function search(?int $followUpFileId, ?int $checkpointId, ?string $fromDate, ?string $toDate, int $page, int $perPage): array
+    public function search(?int $dischargeId, ?int $surveyId, ?int $checkpointId, ?string $fromDate, ?string $toDate, int $page, int $perPage): array
     {
         $query = EloquentPhoto::query();
-
-        if ($followUpFileId) {
-            $query->where('follow_up_file_id', $followUpFileId);
+        if ($dischargeId) {
+            $query->where('discharge_id', $dischargeId);
+        }
+        if ($surveyId) {
+            $query->where('survey_id', $surveyId);
         }
         if ($checkpointId) {
             $query->where('checkpoint_id', $checkpointId);
@@ -92,7 +96,8 @@ final class EloquentPhotoRepository implements PhotoRepositoryInterface
             photoPath: $e->photo_path,
             takenAt: new Carbon($e->taken_at),
             photoDescription: $e->photo_description,
-            followUpFileId: $e->follow_up_file_id ? new FollowUpFileId($e->follow_up_file_id) : null,
+            dischargeId: new DischargeId($e->discharge_id),
+            surveyId: $e->survey_id ? new SurveyId($e->survey_id) : null,
             checkpointId: $e->checkpoint_id ? new SurveyCheckpointId($e->checkpoint_id) : null,
             createdAt: $e->created_at,
             updatedAt: $e->updated_at,

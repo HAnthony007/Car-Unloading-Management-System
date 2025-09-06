@@ -22,9 +22,9 @@ class PortCallServiceProvider extends ServiceProvider
         $this->app->bind(UpdatePortCallUseCase::class, fn ($app) => new UpdatePortCallUseCase($app->make(PortCallRepositoryInterface::class)));
         $this->app->bind(GetPortCallUseCase::class, fn ($app) => new GetPortCallUseCase($app->make(PortCallRepositoryInterface::class)));
         $this->app->bind(GetPortCallsUseCase::class, fn ($app) => new GetPortCallsUseCase($app->make(PortCallRepositoryInterface::class)));
-    $this->app->bind(DeletePortCallUseCase::class, fn ($app) => new DeletePortCallUseCase($app->make(PortCallRepositoryInterface::class)));
-    // Vehicles by port call depends on VehicleRepositoryInterface (bound in VehicleServiceProvider)
-    $this->app->bind(GetPortCallVehiclesUseCase::class, fn ($app) => new GetPortCallVehiclesUseCase($app->make(\App\Domain\Vehicle\Repositories\VehicleRepositoryInterface::class)));
+        $this->app->bind(DeletePortCallUseCase::class, fn ($app) => new DeletePortCallUseCase($app->make(PortCallRepositoryInterface::class)));
+        // Vehicles by port call depends on VehicleRepositoryInterface (bound in VehicleServiceProvider)
+        $this->app->bind(GetPortCallVehiclesUseCase::class, fn ($app) => new GetPortCallVehiclesUseCase($app->make(\App\Domain\Vehicle\Repositories\VehicleRepositoryInterface::class)));
     }
 
     public function boot(): void {}

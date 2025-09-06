@@ -11,9 +11,9 @@ final class SearchVehiclesUseCase
 
     public function execute(VehicleSearchCriteriaDTO $criteria): array
     {
+        // Discharge filtering removed after relationship inversion (discharge now owns vehicle_id)
         return $this->repository->search(
             vin: $criteria->vin,
-            dischargeId: $criteria->dischargeId,
             make: $criteria->make,
             model: $criteria->model,
             ownerName: $criteria->ownerName,

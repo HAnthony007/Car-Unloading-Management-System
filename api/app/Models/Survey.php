@@ -12,17 +12,17 @@ class Survey extends Model
     protected $primaryKey = 'survey_id';
 
     protected $fillable = [
-        'date', 'result', 'user_id', 'follow_up_file_id',
+        'survey_date', 'overall_status', 'agent_id', 'discharge_id',
     ];
 
-    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function agent(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class, 'agent_id');
     }
 
-    public function followUpFile(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function discharge(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(FollowUpFile::class, 'follow_up_file_id');
+        return $this->belongsTo(Discharge::class, 'discharge_id');
     }
 
     public function checkpoints(): \Illuminate\Database\Eloquent\Relations\HasMany

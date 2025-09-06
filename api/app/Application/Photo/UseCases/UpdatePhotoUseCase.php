@@ -3,10 +3,11 @@
 namespace App\Application\Photo\UseCases;
 
 use App\Application\Photo\DTOs\UpdatePhotoDTO;
-use App\Domain\FollowUpFile\ValueObjects\FollowUpFileId;
+use App\Domain\Discharge\ValueObjects\DischargeId;
 use App\Domain\Photo\Entities\Photo;
 use App\Domain\Photo\Repositories\PhotoRepositoryInterface;
 use App\Domain\Photo\ValueObjects\PhotoId;
+use App\Domain\Survey\ValueObjects\SurveyId;
 use App\Domain\SurveyCheckpoint\ValueObjects\SurveyCheckpointId;
 use Carbon\Carbon;
 
@@ -21,24 +22,23 @@ final class UpdatePhotoUseCase
             throw new \RuntimeException('Photo not found.');
         }
 
-        $followUpFileId = isset($dto->followUpFileId)
-            ? ($dto->followUpFileId ? new FollowUpFileId($dto->followUpFileId) : null)
-            : $existing->getFollowUpFileId();
+        $dischargeId = isset($dto->dischargeId)
+            ? ($dto->dischargeId ? new DischargeId($dto->dischargeId) : $existing->getDischargeId())
+            : $existing->getDischargeId();
+        $surveyId = isset($dto->surveyId)
+            ? ($dto->surveyId ? new SurveyId($dto->surveyId) : null)
+            : $existing->getSurveyId();
         $checkpointId = isset($dto->checkpointId)
             ? ($dto->checkpointId ? new SurveyCheckpointId($dto->checkpointId) : null)
             : $existing->getCheckpointId();
-
-        // Enforce XOR at update time too if both provided
-        if (! is_null($followUpFileId) && ! is_null($checkpointId)) {
-            throw new \InvalidArgumentException('Provide either follow_up_file_id or checkpoint_id, not both.');
-        }
 
         $photo = new Photo(
             photoId: new PhotoId($dto->photoId),
             photoPath: $dto->photoPath ?? $existing->getPhotoPath(),
             takenAt: new Carbon($dto->takenAt ?? $existing->getTakenAt()->toISOString()),
             photoDescription: $dto->photoDescription ?? $existing->getPhotoDescription(),
-            followUpFileId: $followUpFileId,
+            dischargeId: $dischargeId,
+            surveyId: $surveyId,
             checkpointId: $checkpointId,
             createdAt: $existing->getCreatedAt(),
             updatedAt: $existing->getUpdatedAt(),

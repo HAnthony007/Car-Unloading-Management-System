@@ -19,5 +19,5 @@ interface PhotoRepositoryInterface
     /**
      * @return array{data: array<int, Photo>, current_page: int, from: int, last_page: int, path: string, per_page: int, to: int, total: int}
      */
-    public function search(?int $followUpFileId, ?int $checkpointId, ?string $fromDate, ?string $toDate, int $page, int $perPage): array;
+    public function search(?int $dischargeId, ?int $surveyId, ?int $checkpointId, ?string $fromDate, ?string $toDate, int $page, int $perPage): array;
 }

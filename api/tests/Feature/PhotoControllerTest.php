@@ -4,17 +4,16 @@ namespace Tests\Feature;
 
 use App\Models\Discharge;
 use App\Models\Dock;
-use App\Models\FollowUpFile;
 use App\Models\Photo as EloquentPhoto;
 use App\Models\PortCall;
 use App\Models\Role;
 use App\Models\Survey;
 use App\Models\SurveyCheckpoint;
 use App\Models\User as EloquentUser;
+use App\Models\Vehicle;
 use App\Models\Vessel;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
@@ -32,12 +31,10 @@ class PhotoControllerTest extends TestCase
             'vessel_name' => 'Test Vessel',
             'flag' => 'FR',
         ]);
-
         $dock = Dock::query()->create([
             'dock_name' => 'Dock A',
             'location' => 'Zone 1',
         ]);
-
         $pc = PortCall::query()->create([
             'vessel_agent' => 'Agent X',
             'origin_port' => 'Origin',
@@ -46,13 +43,7 @@ class PhotoControllerTest extends TestCase
             'vessel_id' => $vessel->vessel_id,
             'dock_id' => $dock->dock_id,
         ]);
-
-        $discharge = Discharge::query()->create([
-            'discharge_date' => now(),
-            'port_call_id' => $pc->port_call_id,
-        ]);
-
-        $vehicleId = DB::table('vehicles')->insertGetId([
+        $vehicle = Vehicle::query()->create([
             'vin' => 'VIN'.random_int(10000, 99999),
             'make' => 'Make',
             'model' => 'Model',
@@ -61,32 +52,27 @@ class PhotoControllerTest extends TestCase
             'vehicle_condition' => 'NEW',
             'origin_country' => 'FR',
             'is_primed' => 0,
-            'discharge_id' => $discharge->discharge_id,
-            'created_at' => now(),
-            'updated_at' => now(),
         ]);
-
-        $fuf = FollowUpFile::query()->create([
-            'bill_of_lading' => 'BOL'.random_int(1000, 9999),
-            'status' => 'OPEN',
-            'vehicle_id' => $vehicleId,
+        $discharge = Discharge::query()->create([
+            'discharge_timestamp' => now(),
+            'status' => 'pending',
             'port_call_id' => $pc->port_call_id,
+            'vehicle_id' => $vehicle->vehicle_id,
+            'agent_id' => $this->user->user_id,
         ]);
-
         $survey = Survey::query()->create([
-            'date' => now()->toDateString(),
-            'result' => 'PENDING',
-            'user_id' => $this->user->user_id,
-            'follow_up_file_id' => $fuf->follow_up_file_id,
+            'survey_date' => now(),
+            'overall_status' => 'PENDING',
+            'agent_id' => $this->user->user_id,
+            'discharge_id' => $discharge->discharge_id,
         ]);
-
         $checkpoint = SurveyCheckpoint::query()->create([
             'title' => 'Checkpoint',
             'comment' => 'Ok',
             'survey_id' => $survey->survey_id,
         ]);
 
-        return [$fuf->follow_up_file_id, $vehicleId, $checkpoint->checkpoint_id];
+        return [$discharge->discharge_id, $survey->survey_id, $checkpoint->checkpoint_id];
     }
 
     protected function setUp(): void
@@ -105,21 +91,21 @@ class PhotoControllerTest extends TestCase
 
     public function test_lists_photos_with_filters(): void
     {
-        [$fufId, $vehicleId, $checkpointId] = $this->seedGraphForPhoto();
+        [$dischargeId, $surveyId, $checkpointId] = $this->seedGraphForPhoto();
 
         EloquentPhoto::query()->create([
             'photo_path' => 'path/a.jpg',
             'taken_at' => now()->subDay(),
             'photo_description' => 'Front',
-            'follow_up_file_id' => $fufId,
+            'discharge_id' => $dischargeId,
+            'survey_id' => $surveyId,
             'checkpoint_id' => null,
         ]);
-        // Vehicle filter removed; filter by follow_up_file_id instead
-        $response = $this->getJson('/api/photos?follow_up_file_id='.$fufId.'&per_page=1&page=1');
+        $response = $this->getJson('/api/photos?discharge_id='.$dischargeId.'&per_page=1&page=1');
         $response->assertOk()
             ->assertJsonStructure([
                 'data' => [[
-                    'photo_id', 'photo_path', 'taken_at', 'photo_description', 'follow_up_file_id', 'checkpoint_id',
+                    'photo_id', 'photo_path', 'taken_at', 'photo_description', 'discharge_id', 'survey_id', 'checkpoint_id',
                 ]],
                 'meta' => ['current_page', 'from', 'last_page', 'path', 'per_page', 'to', 'total'],
             ]);
@@ -127,13 +113,13 @@ class PhotoControllerTest extends TestCase
 
     public function test_creates_a_photo(): void
     {
-        [$fufId, $vehicleId, $checkpointId] = $this->seedGraphForPhoto();
+        [$dischargeId, $surveyId, $checkpointId] = $this->seedGraphForPhoto();
         $payload = [
             'photo_path' => 'path/b.jpg',
             'taken_at' => now()->toDateTimeString(),
             'photo_description' => 'Back',
-            'follow_up_file_id' => $fufId,
-            // Only one of follow_up_file_id or checkpoint_id
+            'discharge_id' => $dischargeId,
+            'survey_id' => $surveyId,
         ];
 
         $res = $this->postJson('/api/photos', $payload);
@@ -141,7 +127,8 @@ class PhotoControllerTest extends TestCase
 
         $this->assertDatabaseHas('photos', [
             'photo_path' => 'path/b.jpg',
-            'follow_up_file_id' => $fufId,
+            'discharge_id' => $dischargeId,
+            'survey_id' => $surveyId,
             'checkpoint_id' => null,
         ]);
     }
@@ -150,18 +137,18 @@ class PhotoControllerTest extends TestCase
     {
         $res = $this->postJson('/api/photos', []);
         $res->assertStatus(422)
-            ->assertJsonValidationErrors(['taken_at', 'follow_up_file_id', 'checkpoint_id']);
+            ->assertJsonValidationErrors(['taken_at', 'discharge_id']);
     }
 
     public function test_creates_photo_without_photo_path_then_uploads(): void
     {
-        [$fufId, $vehicleId, $checkpointId] = $this->seedGraphForPhoto();
+        [$dischargeId, $surveyId, $checkpointId] = $this->seedGraphForPhoto();
         $payload = [
             // 'photo_path' omitted on purpose
             'taken_at' => now()->toDateTimeString(),
             'photo_description' => 'Front no path yet',
-            'follow_up_file_id' => $fufId,
-            // Only one of follow_up_file_id or checkpoint_id
+            'discharge_id' => $dischargeId,
+            'survey_id' => $surveyId,
         ];
 
         $res = $this->postJson('/api/photos', $payload);
@@ -177,7 +164,7 @@ class PhotoControllerTest extends TestCase
         $file = UploadedFile::fake()->image('later.jpg', 120, 120);
         $upload = $this->postJson("/api/photos/{$photoId}/upload", [
             'file' => $file,
-            'directory' => 'photos/follow-up/'.$fufId,
+            'directory' => 'photos/discharges/'.$dischargeId,
         ]);
         $upload->assertCreated();
 
@@ -187,12 +174,13 @@ class PhotoControllerTest extends TestCase
 
     public function test_shows_a_photo(): void
     {
-        [$fufId, $vehicleId, $checkpointId] = $this->seedGraphForPhoto();
+        [$dischargeId, $surveyId, $checkpointId] = $this->seedGraphForPhoto();
         $id = EloquentPhoto::query()->insertGetId([
             'photo_path' => 'path/c.jpg',
             'taken_at' => now(),
             'photo_description' => 'Side',
-            'follow_up_file_id' => $fufId,
+            'discharge_id' => $dischargeId,
+            'survey_id' => $surveyId,
             'checkpoint_id' => $checkpointId,
             'created_at' => now(),
             'updated_at' => now(),
@@ -204,12 +192,13 @@ class PhotoControllerTest extends TestCase
 
     public function test_updates_a_photo(): void
     {
-        [$fufId, $vehicleId, $checkpointId] = $this->seedGraphForPhoto();
+        [$dischargeId, $surveyId, $checkpointId] = $this->seedGraphForPhoto();
         $id = EloquentPhoto::query()->insertGetId([
             'photo_path' => 'path/d.jpg',
             'taken_at' => now(),
             'photo_description' => 'Old',
-            'follow_up_file_id' => $fufId,
+            'discharge_id' => $dischargeId,
+            'survey_id' => $surveyId,
             'checkpoint_id' => null,
             'created_at' => now(),
             'updated_at' => now(),
@@ -226,12 +215,13 @@ class PhotoControllerTest extends TestCase
 
     public function test_deletes_a_photo(): void
     {
-        [$fufId, $vehicleId, $checkpointId] = $this->seedGraphForPhoto();
+        [$dischargeId, $surveyId, $checkpointId] = $this->seedGraphForPhoto();
         $id = EloquentPhoto::query()->insertGetId([
             'photo_path' => 'path/e.jpg',
             'taken_at' => now(),
             'photo_description' => 'Tmp',
-            'follow_up_file_id' => $fufId,
+            'discharge_id' => $dischargeId,
+            'survey_id' => $surveyId,
             'checkpoint_id' => $checkpointId,
             'created_at' => now(),
             'updated_at' => now(),
@@ -255,12 +245,13 @@ class PhotoControllerTest extends TestCase
 
     public function test_uploads_photo_file_to_r2_and_returns_url(): void
     {
-        [$fufId, $vehicleId, $checkpointId] = $this->seedGraphForPhoto();
+        [$dischargeId, $surveyId, $checkpointId] = $this->seedGraphForPhoto();
         $photo = EloquentPhoto::query()->create([
             'photo_path' => 'photos/misc/placeholder.jpg',
             'taken_at' => now(),
             'photo_description' => 'Tmp',
-            'follow_up_file_id' => $fufId,
+            'discharge_id' => $dischargeId,
+            'survey_id' => $surveyId,
             'checkpoint_id' => $checkpointId,
         ]);
 
@@ -269,7 +260,7 @@ class PhotoControllerTest extends TestCase
         $file = UploadedFile::fake()->image('x.jpg', 100, 100);
         $res = $this->postJson('/api/photos/'.$photo->photo_id.'/upload', [
             'file' => $file,
-            'directory' => 'photos/follow-up/'.$fufId,
+            'directory' => 'photos/discharges/'.$dischargeId,
             'visibility' => 'public',
         ]);
 
@@ -282,12 +273,13 @@ class PhotoControllerTest extends TestCase
 
     public function test_gets_temporary_url_for_photo(): void
     {
-        [$fufId, $vehicleId, $checkpointId] = $this->seedGraphForPhoto();
+        [$dischargeId, $surveyId, $checkpointId] = $this->seedGraphForPhoto();
         $photo = EloquentPhoto::query()->create([
-            'photo_path' => 'photos/follow-up/'.$fufId.'/a.jpg',
+            'photo_path' => 'photos/discharges/'.$dischargeId.'/a.jpg',
             'taken_at' => now(),
             'photo_description' => 'Tmp',
-            'follow_up_file_id' => $fufId,
+            'discharge_id' => $dischargeId,
+            'survey_id' => $surveyId,
             'checkpoint_id' => $checkpointId,
         ]);
 
@@ -299,32 +291,5 @@ class PhotoControllerTest extends TestCase
         $this->assertSame(600, $res->json('data.expires_in'));
     }
 
-    public function test_upload_photo_nested_under_follow_up_file(): void
-    {
-        [$fufId, $vehicleId, $checkpointId] = $this->seedGraphForPhoto();
-
-        Storage::fake('r2');
-        $file = UploadedFile::fake()->image('nested.jpg', 128, 128);
-
-        $res = $this->postJson("/api/follow-up-files/{$fufId}/photos", [
-            'file' => $file,
-            'taken_at' => now()->toDateTimeString(),
-            'photo_description' => 'Nested upload',
-            'checkpoint_id' => $checkpointId,
-            'visibility' => 'public',
-        ]);
-
-        $res->assertCreated()->assertJsonStructure(['data' => ['photo_id', 'photo_path', 'url', 'follow_up_file_id', 'checkpoint_id']]);
-
-        $photoId = $res->json('data.photo_id');
-        $path = $res->json('data.photo_path');
-        $this->assertNotEmpty($photoId);
-        $this->assertTrue(Storage::disk('r2')->exists($path));
-
-        $this->assertDatabaseHas('photos', [
-            'photo_id' => $photoId,
-            'follow_up_file_id' => $fufId,
-            'checkpoint_id' => $checkpointId,
-        ]);
-    }
+    // Removed nested follow-up-file photo upload test (feature dropped in new schema)
 }

@@ -7,15 +7,14 @@ use App\Domain\Role\Repositories\RoleRepositoryInterface;
 use App\Domain\Role\ValueObjects\RoleId;
 use App\Domain\User\Entities\User;
 use App\Domain\User\Repositories\UserRepositoryInterface;
-use Illuminate\Support\Facades\Hash;
 use App\Domain\User\Services\MatriculationNumberGeneratorService;
+use Illuminate\Support\Facades\Hash;
 
 final class CreateUserUseCase
 {
     public function __construct(
         private readonly UserRepositoryInterface $userRepository,
-        private readonly RoleRepositoryInterface $roleRepository
-    , private readonly MatriculationNumberGeneratorService $matriculationGenerator
+        private readonly RoleRepositoryInterface $roleRepository, private readonly MatriculationNumberGeneratorService $matriculationGenerator
     ) {}
 
     public function execute(CreateUserDTO $dto): User

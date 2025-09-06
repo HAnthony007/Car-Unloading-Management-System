@@ -20,6 +20,7 @@ class StoreDocumentRequest extends FormRequest
             'type' => ['required', 'string', 'max:255'],
             'uploaded_at' => ['required', 'date'],
             'follow_up_file_id' => ['required', 'integer', 'exists:follow_up_files,follow_up_file_id'],
+            'port_call_id' => ['required', 'integer', 'exists:port_calls,port_call_id'],
         ];
     }
 }

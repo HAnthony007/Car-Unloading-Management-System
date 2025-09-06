@@ -7,6 +7,13 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
 
+use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\assertDatabaseMissing;
+use function Pest\Laravel\deleteJson;
+use function Pest\Laravel\getJson;
+use function Pest\Laravel\postJson;
+use function Pest\Laravel\putJson;
+
 uses(RefreshDatabase::class);
 
 function seedPortCall(): PortCall
@@ -41,18 +48,15 @@ function seedPortCall(): PortCall
 }
 
 beforeEach(function () {
-    $this->role = Role::factory()->create([
-        'role_id' => 1,
+    $GLOBALS['__role'] = Role::factory()->create([
         'role_name' => 'User',
         'role_description' => 'Regular user',
     ]);
-
-    $this->user = EloquentUser::factory()->create([
-        'role_id' => $this->role->role_id,
+    $GLOBALS['__user'] = EloquentUser::factory()->create([
+        'role_id' => $GLOBALS['__role']->role_id,
         'email_verified_at' => now(),
     ]);
-
-    Sanctum::actingAs($this->user);
+    Sanctum::actingAs($GLOBALS['__user']);
 });
 
 describe('Follow Up File API Endpoints', function () {
@@ -70,12 +74,6 @@ describe('Follow Up File API Endpoints', function () {
             'origin_country' => 'JP',
             'ship_location' => null,
             'is_primed' => 0,
-            'discharge_id' => DB::table('discharges')->insertGetId([
-                'discharge_date' => now(),
-                'port_call_id' => $portCall->port_call_id,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]),
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -89,7 +87,7 @@ describe('Follow Up File API Endpoints', function () {
             'updated_at' => now(),
         ]);
 
-        $response = $this->getJson('/api/follow-up-files?bill_of_lading=BOL-ABC');
+        $response = getJson('/api/follow-up-files?bill_of_lading=BOL-ABC');
 
         $response->assertStatus(200)
             ->assertJsonStructure([
@@ -103,16 +101,10 @@ describe('Follow Up File API Endpoints', function () {
 
     it('creates a follow up file', function () {
         $portCall = seedPortCall();
-        $dischargeId = DB::table('discharges')->insertGetId([
-            'discharge_date' => now(),
-            'port_call_id' => $portCall->port_call_id,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
         $vehicleId = DB::table('vehicles')->insertGetId([
             'vin' => 'VIN002', 'make' => 'Honda', 'model' => 'Civic', 'color' => 'Red', 'type' => 'Sedan',
             'weight' => '1250', 'vehicle_condition' => 'USED', 'vehicle_observation' => null, 'origin_country' => 'JP',
-            'ship_location' => null, 'is_primed' => 0, 'discharge_id' => $dischargeId,
+            'ship_location' => null, 'is_primed' => 0,
             'created_at' => now(), 'updated_at' => now(),
         ]);
 
@@ -123,13 +115,13 @@ describe('Follow Up File API Endpoints', function () {
             'port_call_id' => $portCall->port_call_id,
         ];
 
-        $response = $this->postJson('/api/follow-up-files', $payload);
+        $response = postJson('/api/follow-up-files', $payload);
 
         $response->assertStatus(201)
             ->assertJsonPath('data.bill_of_lading', 'BOL-XYZ-001')
             ->assertJsonPath('data.status', 'IN_PROGRESS');
 
-        $this->assertDatabaseHas('follow_up_files', [
+        assertDatabaseHas('follow_up_files', [
             'bill_of_lading' => 'BOL-XYZ-001',
             'status' => 'IN_PROGRESS',
             'vehicle_id' => $vehicleId,
@@ -138,23 +130,17 @@ describe('Follow Up File API Endpoints', function () {
     });
 
     it('validates request when creating', function () {
-        $response = $this->postJson('/api/follow-up-files', []);
+        $response = postJson('/api/follow-up-files', []);
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['bill_of_lading', 'status', 'vehicle_id', 'port_call_id']);
     });
 
     it('shows a follow up file', function () {
         $portCall = seedPortCall();
-        $dischargeId = DB::table('discharges')->insertGetId([
-            'discharge_date' => now(),
-            'port_call_id' => $portCall->port_call_id,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
         $vehicleId = DB::table('vehicles')->insertGetId([
             'vin' => 'VIN003', 'make' => 'Ford', 'model' => 'Focus', 'color' => 'Blue', 'type' => 'Hatch',
             'weight' => '1300', 'vehicle_condition' => 'NEW', 'vehicle_observation' => null, 'origin_country' => 'US',
-            'ship_location' => null, 'is_primed' => 0, 'discharge_id' => $dischargeId,
+            'ship_location' => null, 'is_primed' => 0,
             'created_at' => now(), 'updated_at' => now(),
         ]);
         $fufId = DB::table('follow_up_files')->insertGetId([
@@ -166,7 +152,7 @@ describe('Follow Up File API Endpoints', function () {
             'updated_at' => now(),
         ]);
 
-        $response = $this->getJson('/api/follow-up-files/'.$fufId);
+        $response = getJson('/api/follow-up-files/'.$fufId);
         $response->assertStatus(200)
             ->assertJsonPath('data.follow_up_file_id', (string) $fufId)
             ->assertJsonPath('data.bill_of_lading', 'BOL-FOO-123');
@@ -174,16 +160,10 @@ describe('Follow Up File API Endpoints', function () {
 
     it('updates a follow up file', function () {
         $portCall = seedPortCall();
-        $dischargeId = DB::table('discharges')->insertGetId([
-            'discharge_date' => now(),
-            'port_call_id' => $portCall->port_call_id,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
         $vehicleId = DB::table('vehicles')->insertGetId([
             'vin' => 'VIN004', 'make' => 'Nissan', 'model' => 'Leaf', 'color' => 'Green', 'type' => 'Hatch',
             'weight' => '1400', 'vehicle_condition' => 'USED', 'vehicle_observation' => null, 'origin_country' => 'JP',
-            'ship_location' => null, 'is_primed' => 0, 'discharge_id' => $dischargeId,
+            'ship_location' => null, 'is_primed' => 0,
             'created_at' => now(), 'updated_at' => now(),
         ]);
         $fufId = DB::table('follow_up_files')->insertGetId([
@@ -195,13 +175,13 @@ describe('Follow Up File API Endpoints', function () {
             'updated_at' => now(),
         ]);
 
-        $response = $this->putJson('/api/follow-up-files/'.$fufId, [
+        $response = putJson('/api/follow-up-files/'.$fufId, [
             'status' => 'CLOSED',
         ]);
         $response->assertStatus(200)
             ->assertJsonPath('data.status', 'CLOSED');
 
-        $this->assertDatabaseHas('follow_up_files', [
+        assertDatabaseHas('follow_up_files', [
             'follow_up_file_id' => $fufId,
             'status' => 'CLOSED',
         ]);
@@ -209,16 +189,10 @@ describe('Follow Up File API Endpoints', function () {
 
     it('deletes a follow up file', function () {
         $portCall = seedPortCall();
-        $dischargeId = DB::table('discharges')->insertGetId([
-            'discharge_date' => now(),
-            'port_call_id' => $portCall->port_call_id,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
         $vehicleId = DB::table('vehicles')->insertGetId([
             'vin' => 'VIN005', 'make' => 'BMW', 'model' => 'X5', 'color' => 'Black', 'type' => 'SUV',
             'weight' => '2200', 'vehicle_condition' => 'NEW', 'vehicle_observation' => null, 'origin_country' => 'DE',
-            'ship_location' => null, 'is_primed' => 0, 'discharge_id' => $dischargeId,
+            'ship_location' => null, 'is_primed' => 0,
             'created_at' => now(), 'updated_at' => now(),
         ]);
         $fufId = DB::table('follow_up_files')->insertGetId([
@@ -230,22 +204,22 @@ describe('Follow Up File API Endpoints', function () {
             'updated_at' => now(),
         ]);
 
-        $response = $this->deleteJson('/api/follow-up-files/'.$fufId);
+        $response = deleteJson('/api/follow-up-files/'.$fufId);
         $response->assertStatus(200)
             ->assertJson(['message' => 'FollowUpFile deleted successfully.']);
 
-        $this->assertDatabaseMissing('follow_up_files', [
+        assertDatabaseMissing('follow_up_files', [
             'follow_up_file_id' => $fufId,
         ]);
     });
 
     it('requires authentication on endpoints', function () {
-        $this->app->make('auth')->forgetGuards();
+        app('auth')->forgetGuards();
 
-        $this->getJson('/api/follow-up-files')->assertStatus(401);
-        $this->postJson('/api/follow-up-files', [])->assertStatus(401);
-        $this->getJson('/api/follow-up-files/1')->assertStatus(401);
-        $this->putJson('/api/follow-up-files/1', [])->assertStatus(401);
-        $this->deleteJson('/api/follow-up-files/1')->assertStatus(401);
+        getJson('/api/follow-up-files')->assertStatus(401);
+        postJson('/api/follow-up-files', [])->assertStatus(401);
+        getJson('/api/follow-up-files/1')->assertStatus(401);
+        putJson('/api/follow-up-files/1', [])->assertStatus(401);
+        deleteJson('/api/follow-up-files/1')->assertStatus(401);
     });
 });

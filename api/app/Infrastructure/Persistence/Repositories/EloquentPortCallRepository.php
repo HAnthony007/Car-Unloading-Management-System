@@ -41,7 +41,7 @@ final class EloquentPortCallRepository implements PortCallRepositoryInterface
         $eloquent->estimated_departure = $portCall->getEstimatedDeparture()->getValue();
         $eloquent->departure_date = $portCall->getDepartureDate()->getValue();
         $eloquent->vessel_id = $portCall->getVesselId()->getValue();
-    $eloquent->dock_id = $portCall->getDockId()?->getValue();
+        $eloquent->dock_id = $portCall->getDockId()?->getValue();
         $eloquent->save();
 
         return $this->toDomainEntity($eloquent);

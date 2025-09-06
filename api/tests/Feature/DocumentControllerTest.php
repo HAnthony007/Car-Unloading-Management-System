@@ -21,7 +21,7 @@ class DocumentControllerTest extends TestCase
 
     protected EloquentUser $user;
 
-    private function seedGraphForDocument(): int
+    private function seedGraphForDocument(): array
     {
         $vessel = Vessel::query()->create([
             'imo_no' => 'IMO'.random_int(10000, 99999),
@@ -43,9 +43,24 @@ class DocumentControllerTest extends TestCase
             'dock_id' => $dock->dock_id,
         ]);
 
+        $vehicleIdForDischarge = DB::table('vehicles')->insertGetId([
+            'vin' => 'VIN'.random_int(10000, 99999),
+            'make' => 'MakeX',
+            'model' => 'ModelX',
+            'type' => 'TypeX',
+            'weight' => '1000',
+            'vehicle_condition' => 'NEW',
+            'origin_country' => 'FR',
+            'is_primed' => 0,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
         $discharge = Discharge::query()->create([
-            'discharge_date' => now(),
+            'discharge_timestamp' => now(),
+            'status' => 'pending',
             'port_call_id' => $pc->port_call_id,
+            'vehicle_id' => $vehicleIdForDischarge,
+            'agent_id' => $this->user->user_id,
         ]);
 
         $vehicleId = DB::table('vehicles')->insertGetId([
@@ -57,7 +72,6 @@ class DocumentControllerTest extends TestCase
             'vehicle_condition' => 'NEW',
             'origin_country' => 'FR',
             'is_primed' => 0,
-            'discharge_id' => $discharge->discharge_id,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -69,7 +83,7 @@ class DocumentControllerTest extends TestCase
             'port_call_id' => $pc->port_call_id,
         ]);
 
-        return $fuf->follow_up_file_id;
+        return [$fuf->follow_up_file_id, $pc->port_call_id];
     }
 
     protected function setUp(): void
@@ -88,7 +102,7 @@ class DocumentControllerTest extends TestCase
 
     public function test_lists_documents_with_filters(): void
     {
-        $fufId = $this->seedGraphForDocument();
+        [$fufId, $portCallId] = $this->seedGraphForDocument();
 
         EloquentDocument::query()->create([
             'document_path' => 'docs/a.pdf',
@@ -96,13 +110,14 @@ class DocumentControllerTest extends TestCase
             'type' => 'invoice',
             'uploaded_at' => now()->subDay(),
             'follow_up_file_id' => $fufId,
+            'port_call_id' => $portCallId,
         ]);
 
         $response = $this->getJson('/api/documents?follow_up_file_id='.$fufId.'&per_page=1&page=1');
         $response->assertOk()
             ->assertJsonStructure([
                 'data' => [[
-                    'document_id', 'document_path', 'document_description', 'type', 'uploaded_at', 'follow_up_file_id',
+                    'document_id', 'document_path', 'document_description', 'type', 'uploaded_at', 'follow_up_file_id', 'port_call_id',
                 ]],
                 'meta' => ['current_page', 'from', 'last_page', 'path', 'per_page', 'to', 'total'],
             ]);
@@ -110,13 +125,14 @@ class DocumentControllerTest extends TestCase
 
     public function test_creates_a_document(): void
     {
-        $fufId = $this->seedGraphForDocument();
+        [$fufId, $portCallId] = $this->seedGraphForDocument();
         $payload = [
             'document_path' => 'docs/b.pdf',
             'document_description' => 'Packing List',
             'type' => 'packing_list',
             'uploaded_at' => now()->toDateTimeString(),
             'follow_up_file_id' => $fufId,
+            'port_call_id' => $portCallId,
         ];
 
         $res = $this->postJson('/api/documents', $payload);
@@ -138,13 +154,14 @@ class DocumentControllerTest extends TestCase
 
     public function test_shows_a_document(): void
     {
-        $fufId = $this->seedGraphForDocument();
+        [$fufId, $portCallId] = $this->seedGraphForDocument();
         $id = EloquentDocument::query()->insertGetId([
             'document_path' => 'docs/c.pdf',
             'document_description' => 'BL',
             'type' => 'bl',
             'uploaded_at' => now(),
             'follow_up_file_id' => $fufId,
+            'port_call_id' => $portCallId,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -155,13 +172,14 @@ class DocumentControllerTest extends TestCase
 
     public function test_updates_a_document(): void
     {
-        $fufId = $this->seedGraphForDocument();
+        [$fufId, $portCallId] = $this->seedGraphForDocument();
         $id = EloquentDocument::query()->insertGetId([
             'document_path' => 'docs/d.pdf',
             'document_description' => 'Old',
             'type' => 'other',
             'uploaded_at' => now(),
             'follow_up_file_id' => $fufId,
+            'port_call_id' => $portCallId,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -177,13 +195,14 @@ class DocumentControllerTest extends TestCase
 
     public function test_deletes_a_document(): void
     {
-        $fufId = $this->seedGraphForDocument();
+        [$fufId, $portCallId] = $this->seedGraphForDocument();
         $id = EloquentDocument::query()->insertGetId([
             'document_path' => 'docs/e.pdf',
             'document_description' => 'Tmp',
             'type' => 'tmp',
             'uploaded_at' => now(),
             'follow_up_file_id' => $fufId,
+            'port_call_id' => $portCallId,
             'created_at' => now(),
             'updated_at' => now(),
         ]);

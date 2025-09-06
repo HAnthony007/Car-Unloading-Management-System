@@ -2,10 +2,10 @@
 
 namespace App\Domain\Survey\Entities;
 
-use App\Domain\FollowUpFile\ValueObjects\FollowUpFileId;
+use App\Domain\Discharge\ValueObjects\DischargeId; // now represents survey_date (datetime)
 use App\Domain\Survey\ValueObjects\SurveyDate;
-use App\Domain\Survey\ValueObjects\SurveyId;
-use App\Domain\Survey\ValueObjects\SurveyResult;
+use App\Domain\Survey\ValueObjects\SurveyId; // agent_id
+use App\Domain\Survey\ValueObjects\SurveyStatus;
 use App\Domain\User\ValueObjects\UserId;
 use Carbon\Carbon;
 
@@ -13,10 +13,10 @@ final class Survey
 {
     public function __construct(
         private readonly ?SurveyId $surveyId,
-        private readonly SurveyDate $date,
-        private readonly SurveyResult $result,
-        private readonly UserId $userId,
-        private readonly FollowUpFileId $followUpFileId,
+        private readonly SurveyDate $surveyDate,
+        private readonly SurveyStatus $overallStatus,
+        private readonly UserId $agentId,
+        private readonly DischargeId $dischargeId,
         private readonly ?Carbon $createdAt = null,
         private readonly ?Carbon $updatedAt = null,
     ) {}
@@ -26,24 +26,24 @@ final class Survey
         return $this->surveyId;
     }
 
-    public function getDate(): SurveyDate
+    public function getSurveyDate(): SurveyDate
     {
-        return $this->date;
+        return $this->surveyDate;
     }
 
-    public function getResult(): SurveyResult
+    public function getOverallStatus(): SurveyStatus
     {
-        return $this->result;
+        return $this->overallStatus;
     }
 
-    public function getUserId(): UserId
+    public function getAgentId(): UserId
     {
-        return $this->userId;
+        return $this->agentId;
     }
 
-    public function getFollowUpFileId(): FollowUpFileId
+    public function getDischargeId(): DischargeId
     {
-        return $this->followUpFileId;
+        return $this->dischargeId;
     }
 
     public function getCreatedAt(): ?Carbon
@@ -60,10 +60,10 @@ final class Survey
     {
         return [
             'survey_id' => $this->surveyId?->getValue(),
-            'date' => $this->date->getValue()?->toDateString(),
-            'result' => $this->result->getValue(),
-            'user_id' => $this->userId->getValue(),
-            'follow_up_file_id' => $this->followUpFileId->getValue(),
+            'survey_date' => $this->surveyDate->getValue()?->toISOString(),
+            'overall_status' => $this->overallStatus->getValue(),
+            'agent_id' => $this->agentId->getValue(),
+            'discharge_id' => $this->dischargeId->getValue(),
             'created_at' => $this->createdAt?->toISOString(),
             'updated_at' => $this->updatedAt?->toISOString(),
         ];

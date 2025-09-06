@@ -29,7 +29,6 @@ final class StoreVehicleRequest extends FormRequest
             'origin_country' => ['required', 'string', 'max:255'],
             'ship_location' => ['nullable', 'string', 'max:255'],
             'is_primed' => ['boolean'],
-            'discharge_id' => ['nullable', 'integer'],
         ];
     }
 

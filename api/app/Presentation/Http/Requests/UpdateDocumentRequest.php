@@ -20,6 +20,7 @@ class UpdateDocumentRequest extends FormRequest
             'type' => ['nullable', 'string', 'max:255'],
             'uploaded_at' => ['nullable', 'date'],
             'follow_up_file_id' => ['nullable', 'integer', 'exists:follow_up_files,follow_up_file_id'],
+            'port_call_id' => ['nullable', 'integer', 'exists:port_calls,port_call_id'],
         ];
     }
 }

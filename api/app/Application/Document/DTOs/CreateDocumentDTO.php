@@ -12,6 +12,7 @@ final class CreateDocumentDTO
         public readonly string $type,
         public readonly string $uploadedAt,
         public readonly int $followUpFileId,
+        public readonly int $portCallId,
     ) {}
 
     public static function fromArray(array $data): self
@@ -22,6 +23,7 @@ final class CreateDocumentDTO
             type: $data['type'] ?? 'generic',
             uploadedAt: $data['uploaded_at'] ?? Carbon::now()->toISOString(),
             followUpFileId: (int) ($data['follow_up_file_id'] ?? 0),
+            portCallId: (int) ($data['port_call_id'] ?? 0),
         );
     }
 }

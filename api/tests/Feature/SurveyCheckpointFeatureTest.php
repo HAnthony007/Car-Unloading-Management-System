@@ -4,7 +4,6 @@ namespace Tests\Feature;
 
 use App\Models\Discharge;
 use App\Models\Dock;
-use App\Models\FollowUpFile;
 use App\Models\Photo;
 use App\Models\PortCall;
 use App\Models\Role;
@@ -39,7 +38,7 @@ class SurveyCheckpointFeatureTest extends TestCase
         ]);
     }
 
-    private function makeSupportGraph(): array
+    private function makeSupportGraph(User $agent): array
     {
         $vessel = new Vessel;
         $vessel->imo_no = 'IMO'.random_int(10000, 99999);
@@ -61,11 +60,6 @@ class SurveyCheckpointFeatureTest extends TestCase
         $pc->dock_id = $dock->dock_id;
         $pc->save();
 
-        $discharge = new Discharge;
-        $discharge->discharge_date = now();
-        $discharge->port_call_id = $pc->port_call_id;
-        $discharge->save();
-
         $vehicle = new Vehicle;
         $vehicle->vin = 'VIN'.random_int(10000, 99999);
         $vehicle->make = 'Make';
@@ -74,17 +68,16 @@ class SurveyCheckpointFeatureTest extends TestCase
         $vehicle->weight = '1000kg';
         $vehicle->vehicle_condition = 'Neuf';
         $vehicle->origin_country = 'FR';
-        $vehicle->discharge_id = $discharge->discharge_id;
         $vehicle->save();
+        $discharge = new Discharge;
+        $discharge->discharge_timestamp = now();
+        $discharge->status = 'pending';
+        $discharge->port_call_id = $pc->port_call_id;
+        $discharge->vehicle_id = $vehicle->vehicle_id;
+        $discharge->agent_id = $agent->user_id;
+        $discharge->save();
 
-        $fuf = new FollowUpFile;
-        $fuf->bill_of_lading = 'BOL'.random_int(1000, 9999);
-        $fuf->status = 'OPEN';
-        $fuf->vehicle_id = $vehicle->vehicle_id;
-        $fuf->port_call_id = $pc->port_call_id;
-        $fuf->save();
-
-        return [$fuf, $vehicle];
+        return [$discharge, $vehicle, $pc];
     }
 
     public function test_crud_flow(): void
@@ -92,12 +85,13 @@ class SurveyCheckpointFeatureTest extends TestCase
         $this->withoutExceptionHandling();
         $user = $this->actingUser();
         $this->actingAs($user, 'sanctum');
-        [$fuf, $vehicle] = $this->makeSupportGraph();
+        [$discharge, $vehicle] = $this->makeSupportGraph($user);
+
         $survey = Survey::query()->create([
-            'date' => now()->toDateString(),
-            'result' => 'PENDING',
-            'user_id' => $user->user_id,
-            'follow_up_file_id' => $fuf->follow_up_file_id,
+            'survey_date' => now(),
+            'overall_status' => 'PENDING',
+            'agent_id' => $user->user_id,
+            'discharge_id' => $discharge->discharge_id,
         ]);
 
         $create = $this->postJson('/api/survey-checkpoints', [
@@ -124,8 +118,7 @@ class SurveyCheckpointFeatureTest extends TestCase
             'photo_path' => 'path.jpg',
             'taken_at' => now(),
             'photo_description' => 'desc',
-            'follow_up_file_id' => $fuf->follow_up_file_id,
-            'vehicle_id' => $vehicle->vehicle_id,
+            'discharge_id' => $discharge->discharge_id,
             'checkpoint_id' => $id,
         ]);
 

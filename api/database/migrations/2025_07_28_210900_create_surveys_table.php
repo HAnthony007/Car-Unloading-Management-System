@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('surveys', function (Blueprint $table) {
             $table->id('survey_id');
-            $table->date('date');
-            $table->string('result');
-            $table->foreignId('user_id')->constrained('users', 'user_id');
-            $table->foreignId('follow_up_file_id')->constrained('follow_up_files', 'follow_up_file_id');
+            $table->dateTime('survey_date');
+            $table->string('overall_status');
+            $table->foreignId('agent_id')->constrained('users', 'user_id');
+            $table->foreignId('discharge_id')->unique()->constrained('discharges', 'discharge_id')->cascadeOnDelete();
             $table->timestamps();
         });
     }

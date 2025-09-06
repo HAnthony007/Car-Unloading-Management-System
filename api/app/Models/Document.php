@@ -16,7 +16,9 @@ class Document extends Model
         'document_description',
         'type',
         'uploaded_at',
+        'port_call_id',
         'follow_up_file_id',
+        'vehicle_id',
     ];
 
     protected $casts = [
@@ -26,5 +28,15 @@ class Document extends Model
     public function followUpFile(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(FollowUpFile::class, 'follow_up_file_id');
+    }
+
+    public function portCall(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(PortCall::class, 'port_call_id');
+    }
+
+    public function vehicle(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Vehicle::class, 'vehicle_id');
     }
 }

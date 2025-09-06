@@ -16,9 +16,9 @@ final class SearchSurveysRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'result' => ['sometimes', 'nullable', 'string', 'in:PASSED,FAILED,PENDING'],
-            'user_id' => ['sometimes', 'nullable', 'integer', 'exists:users,user_id'],
-            'follow_up_file_id' => ['sometimes', 'nullable', 'integer', 'exists:follow_up_files,follow_up_file_id'],
+            'overall_status' => ['sometimes', 'nullable', 'string', 'in:PASSED,FAILED,PENDING'],
+            'agent_id' => ['sometimes', 'nullable', 'integer', 'exists:users,user_id'],
+            'discharge_id' => ['sometimes', 'nullable', 'integer', 'exists:discharges,discharge_id'],
             'page' => ['sometimes', 'integer', 'min:1'],
             'per_page' => ['sometimes', 'integer', 'min:1', 'max:100'],
         ];

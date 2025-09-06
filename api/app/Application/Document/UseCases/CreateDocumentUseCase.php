@@ -22,6 +22,7 @@ final class CreateDocumentUseCase
             type: new DocumentType($dto->type),
             uploadedAt: new Carbon($dto->uploadedAt),
             followUpFileId: new FollowUpFileId($dto->followUpFileId),
+            portCallId: $dto->portCallId,
         );
 
         return $this->repo->save($entity);
