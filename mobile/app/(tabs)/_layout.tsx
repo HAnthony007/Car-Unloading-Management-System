@@ -3,7 +3,7 @@ import { Tabs } from "expo-router";
 import React from "react";
 
 import { useColorScheme } from "@/components/useColorScheme";
-import { BarChart3, ScanLine, User } from "lucide-react-native";
+import { Anchor, BarChart3, Car, ScanLine, User } from "lucide-react-native";
 
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 function TabBarIcon(props: {
@@ -48,11 +48,11 @@ export default function TabLayout() {
             />
 
             <Tabs.Screen
-                name="two"
+                name="portcalls"
                 options={{
-                    title: "Tab Two",
-                    tabBarIcon: ({ color }) => (
-                        <TabBarIcon name="code" color={color} />
+                    title: "Escales",
+                    tabBarIcon: ({ size, color }) => (
+                        <Anchor size={size} color={color} />
                     ),
                 }}
             />
@@ -63,6 +63,16 @@ export default function TabLayout() {
                     title: "Scanner",
                     tabBarIcon: ({ size, color }) => (
                         <ScanLine size={size} color={color} />
+                    ),
+                }}
+            />
+
+            <Tabs.Screen
+                name="vehicles"
+                options={{
+                    title: "Véhicules",
+                    tabBarIcon: ({ size, color }) => (
+                        <Car size={size} color={color} />
                     ),
                 }}
             />
