@@ -6,9 +6,9 @@ use App\Application\Parking\DTOs\CreateParkingDTO;
 use App\Application\Parking\DTOs\UpdateParkingDTO;
 use App\Application\Parking\UseCases\CreateParkingUseCase;
 use App\Application\Parking\UseCases\DeleteParkingUseCase;
+use App\Application\Parking\UseCases\GetParkingDischargesUseCase;
 use App\Application\Parking\UseCases\GetParkingsUseCase;
 use App\Application\Parking\UseCases\GetParkingUseCase;
-use App\Application\Parking\UseCases\GetParkingVehiclesUseCase;
 use App\Application\Parking\UseCases\UpdateParkingUseCase;
 use App\Presentation\Http\Requests\StoreParkingRequest;
 use App\Presentation\Http\Requests\UpdateParkingRequest;
@@ -24,7 +24,7 @@ final class ParkingController
         private readonly GetParkingUseCase $getParkingUseCase,
         private readonly UpdateParkingUseCase $updateParkingUseCase,
         private readonly DeleteParkingUseCase $deleteParkingUseCase,
-        private readonly GetParkingVehiclesUseCase $getParkingVehiclesUseCase,
+        private readonly GetParkingDischargesUseCase $getParkingDischargesUseCase,
     ) {}
 
     public function index(): AnonymousResourceCollection
@@ -104,31 +104,20 @@ final class ParkingController
         }
     }
 
-    public function vehicles(int $parkingId): JsonResponse
+    public function discharges(int $parkingId): JsonResponse
     {
         try {
-            $result = $this->getParkingVehiclesUseCase->execute($parkingId);
-
-            // Inline parking_number into each vehicle item
-            $map = $result['parking_numbers'];
-            $vehicles = array_map(function ($v) use ($map) {
-                $resource = new \App\Presentation\Http\Resources\VehicleResource($v);
-                $data = $resource->toArray(request());
-                $vehicleId = $data['vehicle_id'] ?? null;
-                $data['parking_number'] = $vehicleId !== null ? ($map[$vehicleId] ?? null) : null;
-
-                return $data;
-            }, $result['vehicles']);
+            $result = $this->getParkingDischargesUseCase->execute($parkingId);
 
             return response()->json([
                 'parking_id' => $result['parking_id'],
                 'parking_name' => $result['parking_name'],
                 'total' => $result['total'],
-                'vehicles' => $vehicles,
+                'discharges' => $result['discharges'],
             ]);
         } catch (\Throwable $e) {
             return response()->json([
-                'message' => 'Failed to fetch parking vehicles.',
+                'message' => 'Failed to fetch parking discharges.',
                 'error' => $e->getMessage(),
             ], 404);
         }

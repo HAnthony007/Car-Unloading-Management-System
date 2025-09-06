@@ -1,6 +1,7 @@
 ## Parking Vehicles Endpoint
 
-- GET /api/parkings/{id}/vehicles — retourne le nombre total et la liste des véhicules présents (basé sur le dernier mouvement)
+- GET /api/parkings/{id}/vehicles — (DEPRECATED) ancienne vue véhicules basée sur le dernier mouvement
+- GET /api/parkings/{id}/discharges — nouvelle vue basée sur les discharges (mouvements désormais liés aux discharges)
 
 # Guide d'utilisation de l'API
 

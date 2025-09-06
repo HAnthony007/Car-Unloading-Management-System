@@ -10,7 +10,7 @@ final class CreateMovementDTO
         public readonly ?string $from,
         public readonly ?string $to,
         public readonly ?string $parkingNumber,
-        public readonly int $vehicleId,
+        public readonly int $dischargeId,
         public readonly int $userId,
     ) {}
 
@@ -22,7 +22,7 @@ final class CreateMovementDTO
             from: $data['from'] ?? null,
             to: $data['to'] ?? null,
             parkingNumber: $data['parking_number'] ?? null,
-            vehicleId: (int) ($data['vehicle_id'] ?? 0),
+            dischargeId: (int) ($data['discharge_id'] ?? 0),
             userId: (int) ($data['user_id'] ?? 0),
         );
     }

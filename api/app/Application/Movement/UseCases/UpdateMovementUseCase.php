@@ -31,9 +31,9 @@ final class UpdateMovementUseCase
             $parking = $this->parkingRepository->findByName($newTo);
             if ($parking) {
                 $capacity = $parking->getCapacity()->getValue();
-                $currentVehicleIds = $this->repository->findVehicleIdsAtLocation($newTo);
-                $currentCount = count($currentVehicleIds);
-                $effectiveAfter = $currentCount + 1; // this vehicle moves into this parking
+                $currentDischargeIds = $this->repository->findDischargeIdsAtLocation($newTo);
+                $currentCount = count($currentDischargeIds);
+                $effectiveAfter = $currentCount + 1; // this discharge moves into this parking
                 if ($effectiveAfter > $capacity) {
                     throw new \RuntimeException('Parking capacity exceeded for '.$newTo.'.');
                 }
@@ -49,7 +49,7 @@ final class UpdateMovementUseCase
             timestamp: $dto->timestamp ? Carbon::parse($dto->timestamp) : $existing->getTimestamp(),
             from: $dto->from !== null ? new VehicleLocation($dto->from) : $existing->getFrom(),
             to: $dto->to !== null ? new VehicleLocation($dto->to) : $existing->getTo(),
-            vehicleId: $existing->getVehicleId(),
+            dischargeId: $existing->getDischargeId(),
             userId: $existing->getUserId(),
             parkingNumber: $newParkingNumber,
             createdAt: $existing->getCreatedAt(),

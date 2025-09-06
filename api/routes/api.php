@@ -96,8 +96,14 @@ Route::prefix('vehicles')
         Route::put('/{id}', [\App\Presentation\Http\Controllers\VehicleController::class, 'update'])->name('vehicles.update');
         Route::delete('/{id}', [\App\Presentation\Http\Controllers\VehicleController::class, 'destroy'])->name('vehicles.destroy');
 
-        // Nested: list movements for a specific vehicle
-        Route::get('/{id}/movements', [\App\Presentation\Http\Controllers\MovementController::class, 'byVehicle'])->name('vehicles.movements');
+        // (Legacy) route removed: movements are now associated to discharges, not vehicles.
+    });
+
+// Discharge Movements Nested Route
+Route::prefix('discharges')
+    ->middleware('auth:sanctum')
+    ->group(function (): void {
+        Route::get('/{id}/movements', [\App\Presentation\Http\Controllers\MovementController::class, 'byDischarge'])->name('discharges.movements');
     });
 
 // Parking Management Routes
@@ -107,8 +113,8 @@ Route::prefix('parkings')
         Route::get('/', [\App\Presentation\Http\Controllers\ParkingController::class, 'index'])->name('parkings.index');
         Route::post('/', [\App\Presentation\Http\Controllers\ParkingController::class, 'store'])->name('parkings.store');
         Route::get('/{id}', [\App\Presentation\Http\Controllers\ParkingController::class, 'show'])->name('parkings.show');
-        // Vehicles currently in this parking (based on latest movement destination)
-        Route::get('/{id}/vehicles', [\App\Presentation\Http\Controllers\ParkingController::class, 'vehicles'])->name('parkings.vehicles');
+        // Discharges currently in this parking
+        Route::get('/{id}/discharges', [\App\Presentation\Http\Controllers\ParkingController::class, 'discharges'])->name('parkings.discharges');
         Route::put('/{id}', [\App\Presentation\Http\Controllers\ParkingController::class, 'update'])->name('parkings.update');
         Route::delete('/{id}', [\App\Presentation\Http\Controllers\ParkingController::class, 'destroy'])->name('parkings.destroy');
     });

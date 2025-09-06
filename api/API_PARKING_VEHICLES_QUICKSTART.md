@@ -1,6 +1,18 @@
 # Quick Start: Vehicles in a Parking
 
-Endpoint: GET /api/parkings/{id}/vehicles
+Endpoint (DEPRECATED): GET /api/parkings/{id}/vehicles
+
+Remplacé par: GET /api/parkings/{id}/discharges
+
+Réponse discharges (exemple):
+{
+  "parking_id": 1,
+  "parking_name": "Mahasarika",
+  "total": 3,
+  "discharges": [
+    {"discharge_id": 10, "discharge_date": "2025-09-06T10:10:00Z", "port_call_id": 5, "parking_number": "P001"}
+  ]
+}
 
 Headers:
 

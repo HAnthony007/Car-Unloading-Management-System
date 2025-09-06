@@ -70,7 +70,7 @@ function ensure_movement_schema(): void
             $table->string('from')->nullable();
             $table->string('to')->nullable();
             $table->string('parking_number', 50)->nullable();
-            $table->unsignedBigInteger('vehicle_id');
+            $table->unsignedBigInteger('discharge_id');
             $table->unsignedBigInteger('user_id');
             $table->timestamps();
         });
@@ -111,13 +111,21 @@ it('creates, shows, updates, deletes and lists movements (auth required)', funct
         'updated_at' => now(),
     ], 'port_call_id');
 
-    // Seed a vehicle
-    // Seed discharge to satisfy NOT NULL FK from vehicles migration when using RefreshDatabase
+    // Seed a vehicle and related discharge
     $vehicleId = DB::table('vehicles')->insertGetId([
         'vin' => 'MOVVIN1', 'make' => 'Make', 'model' => 'Model', 'type' => 'Type', 'weight' => '1000',
         'vehicle_condition' => 'OK', 'origin_country' => 'FR', 'is_primed' => false,
         'created_at' => now(), 'updated_at' => now(),
     ], 'vehicle_id');
+    $dischargeId = DB::table('discharges')->insertGetId([
+        'discharge_timestamp' => now(),
+        'status' => 'completed',
+        'port_call_id' => $portCallId,
+        'vehicle_id' => $vehicleId,
+        'agent_id' => $user->user_id,
+        'created_at' => now(),
+        'updated_at' => now(),
+    ], 'discharge_id');
 
     // Create movement
     $payload = [
@@ -125,14 +133,14 @@ it('creates, shows, updates, deletes and lists movements (auth required)', funct
         'timestamp' => now()->toDateTimeString(),
         'from' => 'Yard A',
         'to' => 'Yard B',
-        'vehicle_id' => $vehicleId,
+        'discharge_id' => $dischargeId,
         'user_id' => $user->user_id,
     ];
     $resp = postJson('/api/movements', $payload);
     if ($resp->status() !== 201) {
         $resp->dump();
     }
-    $resp->assertCreated()->assertJsonStructure(['message', 'data' => ['movement_id', 'timestamp', 'vehicle_id', 'user_id']]);
+    $resp->assertCreated()->assertJsonStructure(['message', 'data' => ['movement_id', 'timestamp', 'discharge_id', 'user_id']]);
     $movementId = $resp->json('data.movement_id');
 
     // Show
@@ -145,8 +153,8 @@ it('creates, shows, updates, deletes and lists movements (auth required)', funct
     // Index (search)
     getJson('/api/movements?page=1&per_page=5')->assertSuccessful()->assertJsonStructure(['data', 'meta' => ['current_page', 'per_page', 'total']]);
 
-    // Nested by vehicle
-    getJson("/api/vehicles/{$vehicleId}/movements")
+    // Nested by discharge
+    getJson("/api/discharges/{$dischargeId}/movements")
         ->assertSuccessful()
         ->assertJsonStructure(['data', 'meta' => ['current_page', 'per_page', 'total']]);
 

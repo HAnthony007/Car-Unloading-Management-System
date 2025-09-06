@@ -45,10 +45,10 @@ final class MovementController
         ]);
     }
 
-    public function byVehicle(int $id, SearchMovementsRequest $request): JsonResponse
+    public function byDischarge(int $id, SearchMovementsRequest $request): JsonResponse
     {
         $data = $request->validated();
-        $data['vehicle_id'] = $id;
+        $data['discharge_id'] = $id;
         $criteria = MovementSearchCriteriaDTO::fromArray($data);
         $result = $this->searchUseCase->execute($criteria);
 

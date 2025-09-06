@@ -2,10 +2,10 @@
 
 namespace App\Domain\Movement\Entities;
 
+use App\Domain\Discharge\ValueObjects\DischargeId;
 use App\Domain\Movement\ValueObjects\MovementId;
 use App\Domain\Movement\ValueObjects\VehicleLocation;
 use App\Domain\User\ValueObjects\UserId;
-use App\Domain\Vehicle\ValueObjects\VehicleId;
 use Carbon\Carbon;
 
 final class Movement
@@ -16,7 +16,7 @@ final class Movement
         private readonly Carbon $timestamp,
         private readonly VehicleLocation $from,
         private readonly VehicleLocation $to,
-        private readonly VehicleId $vehicleId,
+        private readonly DischargeId $dischargeId,
         private readonly UserId $userId,
         private readonly ?string $parkingNumber = null,
         private readonly ?Carbon $createdAt = null,
@@ -48,9 +48,9 @@ final class Movement
         return $this->to;
     }
 
-    public function getVehicleId(): VehicleId
+    public function getDischargeId(): DischargeId
     {
-        return $this->vehicleId;
+        return $this->dischargeId;
     }
 
     public function getUserId(): UserId
@@ -81,7 +81,7 @@ final class Movement
             'timestamp' => $this->timestamp->toISOString(),
             'from' => $this->from->getValue(),
             'to' => $this->to->getValue(),
-            'vehicle_id' => $this->vehicleId->getValue(),
+            'discharge_id' => $this->dischargeId->getValue(),
             'user_id' => $this->userId->getValue(),
             'parking_number' => $this->parkingNumber,
             'created_at' => $this->createdAt?->toISOString(),

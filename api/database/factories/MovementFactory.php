@@ -2,9 +2,9 @@
 
 namespace Database\Factories;
 
+use App\Models\Discharge;
 use App\Models\Movement;
 use App\Models\User;
-use App\Models\Vehicle;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -27,8 +27,8 @@ class MovementFactory extends Factory
             'from' => $from,
             'to' => $to,
             'parking_number' => $parkingNumber,
-            // Prefer existing to avoid inflating counts during seeding
-            'vehicle_id' => fn () => Vehicle::query()->inRandomOrder()->value('vehicle_id') ?? Vehicle::factory(),
+            // Prefer existing discharge to avoid inflating counts during seeding
+            'discharge_id' => fn () => Discharge::query()->inRandomOrder()->value('discharge_id') ?? Discharge::factory(),
             'user_id' => fn () => User::query()->inRandomOrder()->value('user_id') ?? User::factory(),
         ];
     }

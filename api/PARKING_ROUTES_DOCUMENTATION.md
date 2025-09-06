@@ -12,7 +12,8 @@ Base: /api/parkings
 
 Nouveau:
 
-- GET /api/parkings/{id}/vehicles — véhicules actuellement dans ce parking (basé sur la dernière destination de mouvement)
+- GET /api/parkings/{id}/vehicles — (DEPRECATED) véhicules selon dernier mouvement
+- GET /api/parkings/{id}/discharges — discharges actuellement positionnées dans ce parking
 
 Réponse:
 

@@ -14,7 +14,7 @@ final class SearchMovementsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'vehicle_id' => ['nullable', 'integer'],
+            'discharge_id' => ['nullable', 'integer'],
             'user_id' => ['nullable', 'integer'],
             'from' => ['nullable', 'string', 'max:255'],
             'to' => ['nullable', 'string', 'max:255'],

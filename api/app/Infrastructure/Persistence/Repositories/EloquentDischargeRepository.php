@@ -21,13 +21,14 @@ final class EloquentDischargeRepository implements DischargeRepositoryInterface
 
     public function findAll(): array
     {
-        return EloquentDischarge::orderByDesc('discharge_date')->get()->map(fn ($e) => $this->toDomainEntity($e))->toArray();
+        // DB column is 'discharge_timestamp' (migration); map it to domain dischargeDate
+        return EloquentDischarge::orderByDesc('discharge_timestamp')->get()->map(fn ($e) => $this->toDomainEntity($e))->toArray();
     }
 
     public function findByPortCallId(PortCallId $portCallId): array
     {
         return EloquentDischarge::where('port_call_id', $portCallId->getValue())
-            ->orderByDesc('discharge_date')
+            ->orderByDesc('discharge_timestamp')
             ->get()
             ->map(fn ($e) => $this->toDomainEntity($e))
             ->toArray();
@@ -40,7 +41,7 @@ final class EloquentDischargeRepository implements DischargeRepositoryInterface
             $eloquent = new EloquentDischarge;
         }
 
-        $eloquent->discharge_date = $discharge->getDischargeDate()->getValue();
+        $eloquent->discharge_timestamp = $discharge->getDischargeDate()->getValue();
         $eloquent->port_call_id = $discharge->getPortCallId()->getValue();
         $eloquent->save();
 
@@ -61,7 +62,7 @@ final class EloquentDischargeRepository implements DischargeRepositoryInterface
     {
         return new DomainDischarge(
             dischargeId: new DischargeId($e->discharge_id),
-            dischargeDate: new DateTimeValue($e->discharge_date ? Carbon::parse($e->discharge_date) : null),
+            dischargeDate: new DateTimeValue($e->discharge_timestamp ? Carbon::parse($e->discharge_timestamp) : null),
             portCallId: new PortCallId($e->port_call_id),
             createdAt: $e->created_at,
             updatedAt: $e->updated_at,

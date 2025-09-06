@@ -5,7 +5,7 @@ namespace App\Application\Movement\DTOs;
 final class MovementSearchCriteriaDTO
 {
     public function __construct(
-        public readonly ?int $vehicleId,
+        public readonly ?int $dischargeId,
         public readonly ?int $userId,
         public readonly ?string $from,
         public readonly ?string $to,
@@ -17,7 +17,7 @@ final class MovementSearchCriteriaDTO
     public static function fromArray(array $data): self
     {
         return new self(
-            vehicleId: isset($data['vehicle_id']) ? (int) $data['vehicle_id'] : null,
+            dischargeId: isset($data['discharge_id']) ? (int) $data['discharge_id'] : null,
             userId: isset($data['user_id']) ? (int) $data['user_id'] : null,
             from: $data['from'] ?? null,
             to: $data['to'] ?? null,

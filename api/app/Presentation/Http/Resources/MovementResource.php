@@ -17,7 +17,7 @@ final class MovementResource extends JsonResource
             'timestamp' => $m->getTimestamp()->toISOString(),
             'from' => $m->getFrom()->getValue(),
             'to' => $m->getTo()->getValue(),
-            'vehicle_id' => $m->getVehicleId()->getValue(),
+            'discharge_id' => $m->getDischargeId()->getValue(),
             'user_id' => $m->getUserId()->getValue(),
             'parking_number' => $m->getParkingNumber(),
             'created_at' => $m->getCreatedAt()?->toISOString(),

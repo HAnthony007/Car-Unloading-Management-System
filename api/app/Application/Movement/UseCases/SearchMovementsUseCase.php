@@ -12,7 +12,7 @@ final class SearchMovementsUseCase
     public function execute(MovementSearchCriteriaDTO $criteria): array
     {
         return $this->repository->search(
-            vehicleId: $criteria->vehicleId,
+            dischargeId: $criteria->dischargeId,
             userId: $criteria->userId,
             from: $criteria->from,
             to: $criteria->to,

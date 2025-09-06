@@ -7,10 +7,10 @@ use App\Application\Movement\UseCases\DeleteMovementUseCase;
 use App\Application\Movement\UseCases\GetMovementUseCase;
 use App\Application\Movement\UseCases\SearchMovementsUseCase;
 use App\Application\Movement\UseCases\UpdateMovementUseCase;
+use App\Domain\Discharge\Repositories\DischargeRepositoryInterface;
 use App\Domain\Movement\Repositories\MovementRepositoryInterface;
 use App\Domain\Parking\Repositories\ParkingRepositoryInterface;
 use App\Domain\User\Repositories\UserRepositoryInterface;
-use App\Domain\Vehicle\Repositories\VehicleRepositoryInterface;
 use App\Infrastructure\Persistence\Repositories\EloquentMovementRepository;
 use Illuminate\Support\ServiceProvider;
 
@@ -22,7 +22,7 @@ class MovementServiceProvider extends ServiceProvider
 
         $this->app->bind(CreateMovementUseCase::class, fn ($app) => new CreateMovementUseCase(
             $app->make(MovementRepositoryInterface::class),
-            $app->make(VehicleRepositoryInterface::class),
+            $app->make(DischargeRepositoryInterface::class),
             $app->make(UserRepositoryInterface::class),
             $app->make(ParkingRepositoryInterface::class),
         ));

@@ -20,9 +20,9 @@ final class StoreMovementRequest extends FormRequest
             'timestamp' => ['required', 'date'],
             'from' => ['nullable', 'string', 'max:255'],
             'to' => ['nullable', 'string', 'max:255'],
-            // parking_number is per-vehicle slot; required when destination is Mahasarika
+            // parking_number is per-discharge slot; required when destination is Mahasarika
             'parking_number' => ['nullable', 'string', 'max:50', 'required_if:to,Mahasarika'],
-            'vehicle_id' => ['required', 'integer'],
+            'discharge_id' => ['required', 'integer'],
             'user_id' => ['required', 'integer'],
         ];
     }

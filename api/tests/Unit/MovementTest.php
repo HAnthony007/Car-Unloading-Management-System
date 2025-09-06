@@ -9,10 +9,10 @@ it('uses movement_id as primary key', function () {
     expect($model->getKeyName())->toBe('movement_id');
 });
 
-it('defines vehicle relationship', function () {
+it('defines discharge relationship', function () {
     $model = new Movement;
 
-    expect($model->vehicle())->toBeInstanceOf(BelongsTo::class);
+    expect($model->discharge())->toBeInstanceOf(BelongsTo::class);
 });
 
 it('defines user relationship', function () {

@@ -2,12 +2,12 @@
 
 namespace App\Infrastructure\Persistence\Repositories;
 
+use App\Domain\Discharge\ValueObjects\DischargeId;
 use App\Domain\Movement\Entities\Movement as DomainMovement;
 use App\Domain\Movement\Repositories\MovementRepositoryInterface;
 use App\Domain\Movement\ValueObjects\MovementId;
 use App\Domain\Movement\ValueObjects\VehicleLocation;
 use App\Domain\User\ValueObjects\UserId;
-use App\Domain\Vehicle\ValueObjects\VehicleId;
 use App\Models\Movement as EloquentMovement;
 use Carbon\Carbon;
 
@@ -20,9 +20,9 @@ final class EloquentMovementRepository implements MovementRepositoryInterface
         return $e ? $this->toDomain($e) : null;
     }
 
-    public function findByVehicle(VehicleId $vehicleId): array
+    public function findByDischarge(DischargeId $dischargeId): array
     {
-        return EloquentMovement::where('vehicle_id', $vehicleId->getValue())
+        return EloquentMovement::where('discharge_id', $dischargeId->getValue())
             ->orderByDesc('timestamp')
             ->get()
             ->map(fn ($e) => $this->toDomain($e))
@@ -57,7 +57,7 @@ final class EloquentMovementRepository implements MovementRepositoryInterface
         $e->timestamp = $movement->getTimestamp();
         $e->from = $movement->getFrom()->getValue();
         $e->to = $movement->getTo()->getValue();
-        $e->vehicle_id = $movement->getVehicleId()->getValue();
+        $e->discharge_id = $movement->getDischargeId()->getValue();
         $e->user_id = $movement->getUserId()->getValue();
         $e->parking_number = $movement->getParkingNumber();
         $e->save();
@@ -75,12 +75,12 @@ final class EloquentMovementRepository implements MovementRepositoryInterface
         return (bool) $e->delete();
     }
 
-    public function search(?int $vehicleId, ?int $userId, ?string $from, ?string $to, ?string $note, int $page, int $perPage): array
+    public function search(?int $dischargeId, ?int $userId, ?string $from, ?string $to, ?string $note, int $page, int $perPage): array
     {
         $query = EloquentMovement::query();
 
-        if ($vehicleId) {
-            $query->where('vehicle_id', $vehicleId);
+        if ($dischargeId) {
+            $query->where('discharge_id', $dischargeId);
         }
         if ($userId) {
             $query->where('user_id', $userId);
@@ -111,41 +111,41 @@ final class EloquentMovementRepository implements MovementRepositoryInterface
         ];
     }
 
-    public function findVehicleIdsAtLocation(string $locationName): array
+    public function findDischargeIdsAtLocation(string $locationName): array
     {
-        // Subquery to get latest movement timestamp per vehicle
-        $sub = EloquentMovement::selectRaw('vehicle_id, MAX(timestamp) as latest_ts')
-            ->groupBy('vehicle_id');
+        // Subquery to get latest movement timestamp per discharge
+        $sub = EloquentMovement::selectRaw('discharge_id, MAX(timestamp) as latest_ts')
+            ->groupBy('discharge_id');
 
-        // Join to get the row(s) representing the latest movement per vehicle
+        // Join to get the row(s) representing the latest movement per discharge
         $rows = EloquentMovement::joinSub($sub, 'latest', function ($join) {
-            $join->on('movements.vehicle_id', '=', 'latest.vehicle_id')
+            $join->on('movements.discharge_id', '=', 'latest.discharge_id')
                 ->on('movements.timestamp', '=', 'latest.latest_ts');
         })
             ->where('movements.to', $locationName)
             ->distinct()
-            ->pluck('movements.vehicle_id')
+            ->pluck('movements.discharge_id')
             ->all();
 
         return array_map('intval', $rows);
     }
 
-    public function findLatestParkingNumbersForVehiclesAtLocation(string $locationName): array
+    public function findLatestParkingNumbersForDischargesAtLocation(string $locationName): array
     {
-        $sub = EloquentMovement::selectRaw('vehicle_id, MAX(timestamp) as latest_ts')
-            ->groupBy('vehicle_id');
+        $sub = EloquentMovement::selectRaw('discharge_id, MAX(timestamp) as latest_ts')
+            ->groupBy('discharge_id');
 
-        // Map vehicle_id => parking_number for latest movement at location
+        // Map discharge_id => parking_number for latest movement at location
         $rows = EloquentMovement::joinSub($sub, 'latest', function ($join) {
-            $join->on('movements.vehicle_id', '=', 'latest.vehicle_id')
+            $join->on('movements.discharge_id', '=', 'latest.discharge_id')
                 ->on('movements.timestamp', '=', 'latest.latest_ts');
         })
             ->where('movements.to', $locationName)
-            ->get(['movements.vehicle_id', 'movements.parking_number']);
+            ->get(['movements.discharge_id', 'movements.parking_number']);
 
         $map = [];
         foreach ($rows as $row) {
-            $map[(int) $row->vehicle_id] = $row->parking_number; // may be null
+            $map[(int) $row->discharge_id] = $row->parking_number; // may be null
         }
 
         return $map;
@@ -159,7 +159,7 @@ final class EloquentMovementRepository implements MovementRepositoryInterface
             timestamp: Carbon::parse($e->timestamp),
             from: new VehicleLocation($e->from),
             to: new VehicleLocation($e->to),
-            vehicleId: new VehicleId($e->vehicle_id),
+            dischargeId: new DischargeId($e->discharge_id),
             userId: new UserId($e->user_id),
             parkingNumber: $e->parking_number,
             createdAt: $e->created_at,

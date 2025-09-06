@@ -13,9 +13,9 @@ class Movement extends Model
 
     protected $guarded = ['movement_id'];
 
-    public function vehicle(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function discharge(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(Vehicle::class, 'vehicle_id');
+        return $this->belongsTo(Discharge::class, 'discharge_id');
     }
 
     public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
