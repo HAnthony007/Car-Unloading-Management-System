@@ -1,4 +1,6 @@
+import { useScannerStore } from "@/lib/store";
 import { CameraType, CameraView, useCameraPermissions } from "expo-camera";
+import { useRouter } from "expo-router";
 import {
     Camera,
     CircleCheck as CheckCircle,
@@ -9,10 +11,18 @@ import {
     X,
 } from "lucide-react-native";
 import { useState } from "react";
-import { Alert, Modal, Text, TouchableOpacity, View } from "react-native";
+import {
+    Alert,
+    Modal,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ScannerScreen() {
+    const router = useRouter();
     const [facing, setFacing] = useState<CameraType>("back");
     const [permission, requestPermission] = useCameraPermissions();
     const [scanned, setScanned] = useState(false);
@@ -20,6 +30,34 @@ export default function ScannerScreen() {
     const [scannerActive, setScannerActive] = useState(false);
     const [scannedData, setScannedData] = useState<string>("");
     const [showResult, setShowResult] = useState(false);
+    const [showManualEntry, setShowManualEntry] = useState(false);
+    const [manualVin, setManualVin] = useState("");
+    const [manualError, setManualError] = useState<string | null>(null);
+    const setVinGlobal = useScannerStore(
+        (s: { setVin: (v: string | null) => void }) => s.setVin
+    );
+
+    const validateVin = (vin: string) =>
+        /^[A-HJ-NPR-Z0-9]{17}$/i.test(vin.trim());
+
+    const openManualEntry = () => {
+        setShowManualEntry(true);
+        setScannerActive(false);
+        setManualVin("");
+        setManualError(null);
+    };
+
+    const handleManualSubmit = () => {
+        const vin = manualVin.toUpperCase();
+        if (!validateVin(vin)) {
+            setManualError("VIN invalide (17 caractères, exclut I, O, Q)");
+            return;
+        }
+        setManualError(null);
+        setShowManualEntry(false);
+        setVinGlobal(vin);
+        router.push("/(vehicles)");
+    };
 
     const handleBarCodeScanned = ({
         type,
@@ -229,7 +267,11 @@ export default function ScannerScreen() {
                     Actions rapides
                 </Text>
                 <View className="flex-row gap-3">
-                    <TouchableOpacity className="flex-1 bg-white p-3 rounded-lg items-center">
+                    <TouchableOpacity
+                        className="flex-1 bg-white p-3 rounded-lg items-center border border-emerald-100"
+                        onPress={openManualEntry}
+                        activeOpacity={0.85}
+                    >
                         <Text className="text-sm font-medium text-emerald-600">
                             Saisie manuelle
                         </Text>
@@ -288,6 +330,92 @@ export default function ScannerScreen() {
             </View>
 
             {/* Success Modal */}
+            {/* Manual VIN Entry Modal */}
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={showManualEntry}
+                onRequestClose={() => setShowManualEntry(false)}
+            >
+                <View className="flex-1 bg-black/40 justify-end">
+                    <View className="bg-white rounded-t-3xl p-6 shadow-xl">
+                        <View className="flex-row justify-between items-center mb-4">
+                            <Text className="text-lg font-semibold text-gray-900">
+                                Saisie manuelle VIN
+                            </Text>
+                            <TouchableOpacity
+                                className="w-9 h-9 rounded-full bg-gray-100 items-center justify-center"
+                                onPress={() => setShowManualEntry(false)}
+                            >
+                                <X color="#374151" size={20} />
+                            </TouchableOpacity>
+                        </View>
+
+                        <Text className="text-sm text-gray-500 mb-4 leading-5">
+                            Entrez le numéro VIN à 17 caractères du véhicule
+                            pour valider manuellement.
+                        </Text>
+
+                        <View className="mb-3">
+                            <Text className="text-xs font-medium text-gray-600 mb-2">
+                                Numéro VIN
+                            </Text>
+                            <TextInput
+                                value={manualVin}
+                                onChangeText={(t) => {
+                                    setManualVin(t.toUpperCase());
+                                    if (manualError) setManualError(null);
+                                }}
+                                placeholder="Ex: JTDBR32E820123456"
+                                placeholderTextColor="#9CA3AF"
+                                autoCapitalize="characters"
+                                maxLength={17}
+                                className="border border-gray-300 rounded-xl px-4 py-3 text-base tracking-widest font-semibold text-gray-900 bg-gray-50"
+                                style={{ fontFamily: "monospace" }}
+                            />
+                            <View className="flex-row justify-between mt-1">
+                                <Text
+                                    className={`text-[11px] ${manualVin.length === 17 ? "text-emerald-600" : "text-gray-400"}`}
+                                >
+                                    {manualVin.length}/17
+                                </Text>
+                                {manualError && (
+                                    <Text className="text-[11px] text-red-500">
+                                        {manualError}
+                                    </Text>
+                                )}
+                            </View>
+                        </View>
+
+                        <TouchableOpacity
+                            disabled={manualVin.length !== 17}
+                            className={`mt-2 rounded-xl px-5 py-4 items-center flex-row justify-center ${
+                                manualVin.length === 17
+                                    ? "bg-emerald-600"
+                                    : "bg-gray-200"
+                            }`}
+                            onPress={handleManualSubmit}
+                            activeOpacity={0.9}
+                        >
+                            <Text
+                                className={`text-base font-semibold ${manualVin.length === 17 ? "text-white" : "text-gray-500"}`}
+                            >
+                                Valider le VIN
+                            </Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                            className="mt-4 py-3 items-center"
+                            onPress={() => setShowManualEntry(false)}
+                        >
+                            <Text className="text-sm font-medium text-gray-500">
+                                Annuler
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
+
             <Modal
                 animationType="fade"
                 transparent={true}
