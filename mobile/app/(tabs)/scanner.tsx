@@ -10,15 +10,8 @@ import {
     ScanLine,
     X,
 } from "lucide-react-native";
-import { useState } from "react";
-import {
-    Alert,
-    Modal,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
-} from "react-native";
+import { useEffect, useState } from "react";
+import { Modal, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ScannerScreen() {
@@ -33,6 +26,11 @@ export default function ScannerScreen() {
     const [showManualEntry, setShowManualEntry] = useState(false);
     const [manualVin, setManualVin] = useState("");
     const [manualError, setManualError] = useState<string | null>(null);
+    const [feedback, setFeedback] = useState<
+        | { type: "valid"; code: string }
+        | { type: "invalid"; code: string }
+        | null
+    >(null);
     const setVinGlobal = useScannerStore(
         (s: { setVin: (v: string | null) => void }) => s.setVin
     );
@@ -56,7 +54,7 @@ export default function ScannerScreen() {
         setManualError(null);
         setShowManualEntry(false);
         setVinGlobal(vin);
-        router.push("/(vehicles)");
+        router.push("/(vehicles)" as any);
     };
 
     const handleBarCodeScanned = ({
@@ -67,19 +65,35 @@ export default function ScannerScreen() {
         data: string;
     }) => {
         if (scanned) return;
-
+        const raw = data.trim().toUpperCase();
         setScanned(true);
-        setScannedData(data);
-        setShowResult(true);
-        setScannerActive(false);
 
-        // Simulation du traitement du code scanné
-        setTimeout(() => {
-            Alert.alert("Code scanné avec succès!", `Données: ${data}`, [
-                { text: "OK", onPress: () => setScanned(false) },
-            ]);
-        }, 1000);
+        if (validateVin(raw)) {
+            setFeedback({ type: "valid", code: raw });
+            setVinGlobal(raw);
+            // léger délai pour que l'utilisateur voie la confirmation
+            setTimeout(() => {
+                setFeedback(null);
+                setScannerActive(false);
+                router.push("/(vehicles)" as any);
+                setTimeout(() => setScanned(false), 400);
+            }, 650);
+        } else {
+            setFeedback({ type: "invalid", code: raw });
+            setScannedData(raw);
+            // réactiver la possibilité de rescanner après message
+            setTimeout(() => {
+                setFeedback(null);
+                setScanned(false);
+            }, 1200);
+        }
     };
+
+    // Reset feedback when leaving manual modal
+    useEffect(() => {
+        if (!scannerActive) return;
+        if (!feedback) return;
+    }, [scannerActive, feedback]);
 
     const startScanning = () => {
         if (!permission?.granted) {
@@ -241,10 +255,35 @@ export default function ScannerScreen() {
                                         style={{ bottom: 0, right: 0 }}
                                     />
                                 </View>
-                                <Text className="text-white text-base text-center mt-6">
-                                    Placez le code QR ou code-barres dans le
-                                    cadre
-                                </Text>
+                                {!feedback && (
+                                    <Text className="text-white text-base text-center mt-6">
+                                        Placez le code dans le cadre
+                                    </Text>
+                                )}
+                                {feedback && (
+                                    <View
+                                        className={`mt-6 px-4 py-3 rounded-xl flex-row items-center ${feedback.type === "valid" ? "bg-emerald-600" : "bg-red-600"}`}
+                                    >
+                                        {feedback.type === "valid" ? (
+                                            <CheckCircle
+                                                color="#fff"
+                                                size={22}
+                                            />
+                                        ) : (
+                                            <X color="#fff" size={22} />
+                                        )}
+                                        <View className="ml-3">
+                                            <Text className="text-white text-sm font-semibold">
+                                                {feedback.type === "valid"
+                                                    ? "VIN valide"
+                                                    : "Code invalide"}
+                                            </Text>
+                                            <Text className="text-white/80 text-[11px] tracking-widest">
+                                                {feedback.code}
+                                            </Text>
+                                        </View>
+                                    </View>
+                                )}
                             </View>
 
                             {/* Bottom controls */}
@@ -308,7 +347,7 @@ export default function ScannerScreen() {
                     ].map((scan) => (
                         <View
                             key={scan.id}
-                            className="flex-row items-center py-2 border-b border-gray-100"
+                            className="flex-row items-center py-2 border-b border-gray-100 last:border-b-0"
                         >
                             <View className="w-10 h-10 rounded-full bg-emerald-50 items-center justify-center mr-3">
                                 <CheckCircle color="#059669" size={20} />
@@ -317,12 +356,16 @@ export default function ScannerScreen() {
                                 <Text className="text-sm font-semibold text-gray-900">
                                     {scan.vehicle}
                                 </Text>
-                                <Text className="text-xs text-gray-500">
-                                    {scan.data}
-                                </Text>
-                                <Text className="text-xs text-gray-500">
-                                    {scan.time} - {scan.type}
-                                </Text>
+                                <View className="flex-row items-center gap-2 mt-0.5">
+                                    <Text
+                                        className={`text-[11px] tracking-widest ${validateVin(scan.data) ? "text-emerald-600" : "text-gray-500"}`}
+                                    >
+                                        {scan.data}
+                                    </Text>
+                                    <Text className="text-[11px] text-gray-400">
+                                        • {scan.time} - {scan.type}
+                                    </Text>
+                                </View>
                             </View>
                         </View>
                     ))}
@@ -363,19 +406,20 @@ export default function ScannerScreen() {
                             <TextInput
                                 value={manualVin}
                                 onChangeText={(t) => {
-                                    setManualVin(t.toUpperCase());
+                                    const v = t.toUpperCase();
+                                    setManualVin(v);
                                     if (manualError) setManualError(null);
                                 }}
                                 placeholder="Ex: JTDBR32E820123456"
                                 placeholderTextColor="#9CA3AF"
                                 autoCapitalize="characters"
                                 maxLength={17}
-                                className="border border-gray-300 rounded-xl px-4 py-3 text-base tracking-widest font-semibold text-gray-900 bg-gray-50"
+                                className={`rounded-xl px-4 py-3 text-base tracking-widest font-semibold bg-gray-50 ${manualVin.length === 0 ? "border border-gray-300 text-gray-900" : validateVin(manualVin) ? "border-emerald-500 bg-emerald-50/30 text-emerald-700" : "border-red-500 bg-red-50/40 text-red-700"}`}
                                 style={{ fontFamily: "monospace" }}
                             />
                             <View className="flex-row justify-between mt-1">
                                 <Text
-                                    className={`text-[11px] ${manualVin.length === 17 ? "text-emerald-600" : "text-gray-400"}`}
+                                    className={`text-[11px] ${validateVin(manualVin) ? "text-emerald-600" : manualVin.length > 0 ? "text-red-500" : "text-gray-400"}`}
                                 >
                                     {manualVin.length}/17
                                 </Text>
@@ -388,19 +432,17 @@ export default function ScannerScreen() {
                         </View>
 
                         <TouchableOpacity
-                            disabled={manualVin.length !== 17}
-                            className={`mt-2 rounded-xl px-5 py-4 items-center flex-row justify-center ${
-                                manualVin.length === 17
-                                    ? "bg-emerald-600"
-                                    : "bg-gray-200"
-                            }`}
+                            disabled={!validateVin(manualVin)}
+                            className={`mt-2 rounded-xl px-5 py-4 items-center flex-row justify-center ${validateVin(manualVin) ? "bg-emerald-600" : "bg-gray-200"}`}
                             onPress={handleManualSubmit}
                             activeOpacity={0.9}
                         >
                             <Text
-                                className={`text-base font-semibold ${manualVin.length === 17 ? "text-white" : "text-gray-500"}`}
+                                className={`text-base font-semibold ${validateVin(manualVin) ? "text-white" : "text-gray-500"}`}
                             >
-                                Valider le VIN
+                                {validateVin(manualVin)
+                                    ? "VIN valide - Continuer"
+                                    : "Valider le VIN"}
                             </Text>
                         </TouchableOpacity>
 
