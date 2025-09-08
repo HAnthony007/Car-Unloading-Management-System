@@ -1,4 +1,4 @@
-import { LoginForm } from "@/features/auth/components/login-form";
+import { LoginForm } from "@/modules/auth/components/login-form";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ship } from "lucide-react-native";
 import { Text, View } from "react-native";

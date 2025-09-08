@@ -1,8 +1,8 @@
 import { Card } from "@/components/ui/Card";
-import { VehicleCard } from "@/features/vehicles/components/VehicleCard";
-import { VehicleDetailsModal } from "@/features/vehicles/components/VehicleDetailsModal";
-import { useVehicles } from "@/features/vehicles/hooks/useVehicles";
-import { Vehicle } from "@/features/vehicles/types";
+import { VehicleCard } from "@/modules/vehicles/components/VehicleCard";
+import { VehicleDetailsModal } from "@/modules/vehicles/components/VehicleDetailsModal";
+import { useVehicles } from "@/modules/vehicles/hooks/useVehicles";
+import { Vehicle } from "@/modules/vehicles/types";
 import { Filter, Plus, Search } from "lucide-react-native";
 import { useState } from "react";
 import {

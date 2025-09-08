@@ -1,7 +1,7 @@
-import { MovementItem } from "@/features/vehicles/movements/components/MovementItem";
-import { NewMovementModal } from "@/features/vehicles/movements/components/NewMovementModal";
-import { ParkingsModal } from "@/features/vehicles/movements/components/ParkingsModal";
-import { useMovements } from "@/features/vehicles/movements/hooks/useMovements";
+import { MovementItem } from "@/modules/vehicles/movements/components/MovementItem";
+import { NewMovementModal } from "@/modules/vehicles/movements/components/NewMovementModal";
+import { ParkingsModal } from "@/modules/vehicles/movements/components/ParkingsModal";
+import { useMovements } from "@/modules/vehicles/movements/hooks/useMovements";
 import { List, Plus } from "lucide-react-native";
 import { useState } from "react";
 import { FlatList, Text, TouchableOpacity, View } from "react-native";

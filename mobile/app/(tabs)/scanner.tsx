@@ -6,17 +6,17 @@ import { Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 // Feature modules
-import { CameraOverlay } from "@/features/scanner/components/CameraOverlay";
-import { IdleState } from "@/features/scanner/components/IdleState";
-import { ManualVinModal } from "@/features/scanner/components/ManualVinModal";
-import { QuickActions } from "@/features/scanner/components/QuickActions";
-import { RecentScans } from "@/features/scanner/components/RecentScans";
-import { ScanHeader } from "@/features/scanner/components/ScanHeader";
-import { ScanResultModal } from "@/features/scanner/components/ScanResultModal";
-import { mockRecentScans } from "@/features/scanner/data/mock-recent-scans";
-import { useVin } from "@/features/scanner/hooks/useVin";
-import { isValidVin } from "@/features/scanner/lib/validation";
-import { ScanFeedback } from "@/features/scanner/types";
+import { CameraOverlay } from "@/modules/scanner/components/CameraOverlay";
+import { IdleState } from "@/modules/scanner/components/IdleState";
+import { ManualVinModal } from "@/modules/scanner/components/ManualVinModal";
+import { QuickActions } from "@/modules/scanner/components/QuickActions";
+import { RecentScans } from "@/modules/scanner/components/RecentScans";
+import { ScanHeader } from "@/modules/scanner/components/ScanHeader";
+import { ScanResultModal } from "@/modules/scanner/components/ScanResultModal";
+import { mockRecentScans } from "@/modules/scanner/data/mock-recent-scans";
+import { useVin } from "@/modules/scanner/hooks/useVin";
+import { isValidVin } from "@/modules/scanner/lib/validation";
+import { ScanFeedback } from "@/modules/scanner/types";
 
 export default function ScannerScreen() {
     const router = useRouter();

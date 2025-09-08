@@ -1,11 +1,11 @@
+import { useScannerStore } from "@/lib/store";
 import {
     HalfField,
     InfoField,
-} from "@/features/vehicles/inspection/components/InfoField";
-import { InspectionAccordion } from "@/features/vehicles/inspection/components/InspectionAccordion";
-import { StatusChip } from "@/features/vehicles/inspection/components/StatusChip";
-import { useInspection } from "@/features/vehicles/inspection/hooks/useInspection";
-import { useScannerStore } from "@/lib/store";
+} from "@/modules/vehicles/inspection/components/InfoField";
+import { InspectionAccordion } from "@/modules/vehicles/inspection/components/InspectionAccordion";
+import { StatusChip } from "@/modules/vehicles/inspection/components/StatusChip";
+import { useInspection } from "@/modules/vehicles/inspection/hooks/useInspection";
 import {
     AlertTriangle,
     Camera,

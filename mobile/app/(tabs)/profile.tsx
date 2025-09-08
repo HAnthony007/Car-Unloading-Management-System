@@ -1,6 +1,6 @@
-import { LogoutButton } from "@/features/profile/components/logout-button";
-import { StatisticsCard } from "@/features/profile/components/statistics-card";
-import { UserInfo } from "@/features/profile/components/user-info";
+import { LogoutButton } from "@/modules/profile/components/logout-button";
+import { StatisticsCard } from "@/modules/profile/components/statistics-card";
+import { UserInfo } from "@/modules/profile/components/user-info";
 import {
     Bell,
     ChevronRight,
