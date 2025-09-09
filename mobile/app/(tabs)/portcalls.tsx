@@ -16,7 +16,6 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-// -------------------- Screen --------------------
 export default function PortCallsScreen() {
     const [showDetails, setShowDetails] = useState(false);
     const [selectedPortCall, setSelectedPortCall] = useState<PortCall | null>(
