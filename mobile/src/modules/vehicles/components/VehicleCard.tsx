@@ -7,6 +7,7 @@ import {
     MoveVertical as MoreVertical,
     Trash2,
 } from "lucide-react-native";
+import { memo, useMemo } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import {
     getCustomsStatusColor,
@@ -23,12 +24,23 @@ interface Props {
     onPressDelete: (id: string) => void;
 }
 
-export const VehicleCard = ({
+const VehicleCardComponent = ({
     item,
     onPressView,
     onPressEdit,
     onPressDelete,
 }: Props) => {
+    const arrivalDateStr = useMemo(
+        () => new Date(item.arrivalDate).toLocaleDateString("fr-FR"),
+        [item.arrivalDate]
+    );
+    const progress = (() => {
+        const raw = item.inspectionProgress;
+        if (raw === undefined || raw === null) return undefined;
+        // Accept values either 0-1 or 0-100; normalize to 0-1
+        if (raw > 1) return Math.min(raw / 100, 1);
+        return Math.min(Math.max(raw, 0), 1);
+    })();
     return (
         <Card className="mb-3">
             <View className="flex-row justify-between items-center mb-3">
@@ -51,6 +63,25 @@ export const VehicleCard = ({
                     </TouchableOpacity>
                 </View>
             </View>
+
+            {progress !== undefined && (
+                <View className="mb-4">
+                    <View className="flex-row justify-between mb-1">
+                        <Text className="text-xs font-medium text-slate-600">
+                            Inspection
+                        </Text>
+                        <Text className="text-xs font-semibold text-emerald-600">
+                            {Math.round(progress * 100)}%
+                        </Text>
+                    </View>
+                    <View className="h-2 rounded-full bg-slate-200 overflow-hidden">
+                        <View
+                            className="h-full bg-emerald-500"
+                            style={{ width: `${progress * 100}%` }}
+                        />
+                    </View>
+                </View>
+            )}
 
             <View className="mb-4">
                 <View className="flex-row mb-2">
@@ -109,9 +140,7 @@ export const VehicleCard = ({
                             Arrivée
                         </Text>
                         <Text className="text-sm font-medium text-slate-900">
-                            {new Date(item.arrivalDate).toLocaleDateString(
-                                "fr-FR"
-                            )}
+                            {arrivalDateStr}
                         </Text>
                     </View>
                 </View>
@@ -146,3 +175,14 @@ export const VehicleCard = ({
         </Card>
     );
 };
+
+export const VehicleCard = memo(
+    VehicleCardComponent,
+    (prev, next) =>
+        prev.item === next.item &&
+        prev.onPressView === next.onPressView &&
+        prev.onPressEdit === next.onPressEdit &&
+        prev.onPressDelete === next.onPressDelete
+);
+
+VehicleCard.displayName = "VehicleCard";
