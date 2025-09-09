@@ -9,59 +9,80 @@ import {
     TouchableOpacity,
     View,
 } from "react-native";
-import { PortCallItem } from "./PortCallSelector";
 
-interface ScanHeaderProps {
-    portCalls?: PortCallItem[];
+export interface PortCallItem {
+    id: string;
+    vessel: string;
+    eta: string; // ISO date
+    terminal: string;
+    reference?: string;
 }
 
-export function ScanHeader({ portCalls = [] }: ScanHeaderProps) {
+const formatDate = (iso: string) => {
+    try {
+        const d = new Date(iso);
+        return d.toLocaleDateString(undefined, {
+            day: "2-digit",
+            month: "short",
+        });
+    } catch {
+        return iso;
+    }
+};
+
+interface Props {
+    items: PortCallItem[];
+}
+
+export function PortCallSelector({ items }: Props) {
     const selected = useScannerStore((s) => s.selectedPortCall);
     const setSelected = useScannerStore((s) => s.setSelectedPortCall);
     const [open, setOpen] = useState(false);
-    const active = portCalls.find((p) => p.id === selected) || null;
+
+    const active = items.find((i) => i.id === selected) || null;
 
     return (
-        <View className="bg-white border-b border-gray-200">
-            <View className="px-4 pt-4 pb-3">
-                <Text className="text-lg font-semibold text-gray-900 mb-1">
-                    Scanner QR/Code-barres
-                </Text>
-                <Text className="text-sm text-gray-500">
-                    Scannez les documents véhicules
-                </Text>
-            </View>
-            <View className="px-4 pb-4">
-                <Pressable
-                    onPress={() => setOpen(true)}
-                    className={`flex-row items-center rounded-xl px-4 py-3 border ${active ? "border-emerald-300 bg-emerald-50/60" : "border-gray-300 bg-gray-50"}`}
-                >
-                    <View className="w-9 h-9 rounded-lg bg-emerald-500 items-center justify-center mr-3">
+        <View className="px-4 pt-3 pb-2 bg-white border-b border-gray-200">
+            <Text className="text-[11px] font-medium text-gray-500 uppercase tracking-wider mb-2">
+                Port Call
+            </Text>
+            <Pressable
+                onPress={() => setOpen(true)}
+                className={`flex-row items-center justify-between rounded-xl px-4 py-3 border ${active ? "border-emerald-300 bg-emerald-50/40" : "border-gray-300 bg-gray-50"} active:opacity-80`}
+            >
+                <View className="flex-row items-center flex-1 pr-3">
+                    <View className="w-9 h-9 rounded-lg bg-emerald-600 items-center justify-center mr-3">
                         <Ship size={18} color="#fff" />
                     </View>
-                    <View className="flex-1">
-                        <Text
-                            className="text-[13px] font-semibold text-gray-900"
-                            numberOfLines={1}
-                        >
-                            {active
-                                ? active.vessel
-                                : "Sélectionner un port call"}
-                        </Text>
-                        <Text
-                            className="text-[11px] text-gray-500"
-                            numberOfLines={1}
-                        >
-                            {active
-                                ? `${active.terminal} • ETA ${new Date(active.eta).toLocaleDateString(undefined, { day: "2-digit", month: "short" })}`
-                                : "Filtrer vos scans par escale"}
-                        </Text>
-                    </View>
-                    <ChevronDown size={18} color="#374151" />
-                </Pressable>
-            </View>
+                    {active ? (
+                        <View className="flex-1">
+                            <Text
+                                className="text-[13px] font-semibold text-gray-900"
+                                numberOfLines={1}
+                            >
+                                {active.vessel}
+                            </Text>
+                            <Text
+                                className="text-[11px] text-gray-500"
+                                numberOfLines={1}
+                            >
+                                {active.terminal} • ETA {formatDate(active.eta)}
+                            </Text>
+                        </View>
+                    ) : (
+                        <View className="flex-1">
+                            <Text className="text-[13px] font-medium text-gray-700">
+                                Sélectionner un port call
+                            </Text>
+                            <Text className="text-[11px] text-gray-400">
+                                Filtrer les scans par escale
+                            </Text>
+                        </View>
+                    )}
+                </View>
+                <ChevronDown size={18} color="#374151" />
+            </Pressable>
 
-            {/* Modal sélection port call */}
             <Modal
                 visible={open}
                 transparent
@@ -85,7 +106,7 @@ export function ScanHeader({ portCalls = [] }: ScanHeaderProps) {
                             className="-mx-1"
                             contentContainerStyle={{ paddingBottom: 20 }}
                         >
-                            {portCalls.map((pc) => {
+                            {items.map((pc) => {
                                 const isActive = pc.id === selected;
                                 return (
                                     <TouchableOpacity
@@ -98,7 +119,7 @@ export function ScanHeader({ portCalls = [] }: ScanHeaderProps) {
                                         activeOpacity={0.85}
                                     >
                                         <View className="flex-row items-center">
-                                            <View className="w-10 h-10 rounded-lg bg-emerald-500 items-center justify-center mr-3">
+                                            <View className="w-10 h-10 rounded-lg bg-emerald-600 items-center justify-center mr-3">
                                                 <Ship size={20} color="#fff" />
                                             </View>
                                             <View className="flex-1">
@@ -113,15 +134,7 @@ export function ScanHeader({ portCalls = [] }: ScanHeaderProps) {
                                                     numberOfLines={1}
                                                 >
                                                     {pc.terminal} • ETA{" "}
-                                                    {new Date(
-                                                        pc.eta
-                                                    ).toLocaleDateString(
-                                                        undefined,
-                                                        {
-                                                            day: "2-digit",
-                                                            month: "short",
-                                                        }
-                                                    )}
+                                                    {formatDate(pc.eta)}
                                                 </Text>
                                                 {pc.reference && (
                                                     <Text
@@ -136,7 +149,7 @@ export function ScanHeader({ portCalls = [] }: ScanHeaderProps) {
                                     </TouchableOpacity>
                                 );
                             })}
-                            {portCalls.length === 0 && (
+                            {items.length === 0 && (
                                 <View className="px-4 py-6 items-center">
                                     <Text className="text-sm text-gray-500">
                                         Aucune escale disponible

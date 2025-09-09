@@ -63,7 +63,7 @@ export default function PortCallsScreen() {
             <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}
-                className="px-4 pb-4"
+                className="px-4 pb-4 mb-4"
             >
                 {[
                     { key: "all", label: "Tous" },
@@ -79,6 +79,7 @@ export default function PortCallsScreen() {
                                 ? "bg-emerald-600 border-emerald-600"
                                 : "bg-white border-gray-200"
                         }`}
+                        activeOpacity={0.8}
                     >
                         <Text
                             className={`${

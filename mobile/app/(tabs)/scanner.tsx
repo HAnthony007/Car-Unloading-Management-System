@@ -6,13 +6,13 @@ import { Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 // Feature modules
-import { CameraOverlay } from "@/modules/scanner/components/CameraOverlay";
-import { IdleState } from "@/modules/scanner/components/IdleState";
 import { ManualVinModal } from "@/modules/scanner/components/ManualVinModal";
 import { QuickActions } from "@/modules/scanner/components/QuickActions";
 import { RecentScans } from "@/modules/scanner/components/RecentScans";
 import { ScanHeader } from "@/modules/scanner/components/ScanHeader";
+import { ScannerInterface } from "@/modules/scanner/components/ScannerInterface";
 import { ScanResultModal } from "@/modules/scanner/components/ScanResultModal";
+import { mockPortCalls } from "@/modules/scanner/data/mock-port-calls";
 import { mockRecentScans } from "@/modules/scanner/data/mock-recent-scans";
 import { useVin } from "@/modules/scanner/hooks/useVin";
 import { isValidVin } from "@/modules/scanner/lib/validation";
@@ -124,23 +124,21 @@ export default function ScannerScreen() {
 
     return (
         <SafeAreaView className="flex-1 bg-gray-50">
-            <ScanHeader />
+            <ScanHeader portCalls={mockPortCalls} />
 
             {/* Scanner Interface */}
-            {!scannerActive ? (
-                <IdleState onStart={startScanning} />
-            ) : (
-                <CameraOverlay
-                    facing={facing}
-                    flashOn={flashOn}
-                    scanned={scanned}
-                    feedback={feedback}
-                    onBarcodeScanned={handleBarCodeScanned}
-                    onStop={stopScanning}
-                    onToggleFlash={toggleFlash}
-                    onToggleFacing={toggleCameraFacing}
-                />
-            )}
+            <ScannerInterface
+                scannerActive={scannerActive}
+                onStart={startScanning}
+                facing={facing}
+                flashOn={flashOn}
+                scanned={scanned}
+                feedback={feedback}
+                onBarcodeScanned={handleBarCodeScanned}
+                onStop={stopScanning}
+                onToggleFlash={toggleFlash}
+                onToggleFacing={toggleCameraFacing}
+            />
 
             <QuickActions onManual={openManualEntry} />
 
