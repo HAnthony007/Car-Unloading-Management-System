@@ -115,7 +115,7 @@ export default function ProfileScreen() {
                 {/* Header */}
                 <View className="px-4 py-4 bg-white border-b border-gray-200">
                     <Text className="text-xl font-semibold text-gray-900">
-                        Profil
+                        Profile
                     </Text>
                 </View>
 

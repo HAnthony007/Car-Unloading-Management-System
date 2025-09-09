@@ -1,8 +1,3 @@
-import {
-    DarkTheme,
-    DefaultTheme,
-    ThemeProvider,
-} from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -11,6 +6,7 @@ import "react-native-reanimated";
 import "./global.css";
 
 import { useColorScheme } from "@/components/useColorScheme";
+import Providers from "@/providers/providers";
 import {
     Inter_400Regular,
     Inter_500Medium,
@@ -62,9 +58,7 @@ function RootLayoutNav() {
     const colorScheme = useColorScheme();
 
     return (
-        <ThemeProvider
-            value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
-        >
+        <Providers>
             <Stack
                 screenOptions={{
                     headerShown: false,
@@ -75,6 +69,6 @@ function RootLayoutNav() {
                 <Stack.Screen name="(auth)" options={{ headerShown: false }} />
             </Stack>
             <StatusBar style="auto" />
-        </ThemeProvider>
+        </Providers>
     );
 }

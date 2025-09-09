@@ -1,19 +1,21 @@
-import { LogOut } from "lucide-react-native"
-import { Text, TouchableOpacity, View } from "react-native"
-import { handleLogout } from "../lib/logout"
+import StyledButton from "@/components/ui/styled-button";
+import { useAuth } from "@/modules/auth/hooks/useAuth";
+import { LogOut } from "lucide-react-native";
+import { View } from "react-native";
 
 export const LogoutButton = () => {
+    const { logout, isLoggingOut } = useAuth();
     return (
-
         <View className="mx-4 mb-4">
-          <TouchableOpacity
-            className="flex-row items-center justify-center bg-white p-4 rounded-xl border border-red-100"
-            onPress={handleLogout}
-            activeOpacity={0.7}
-          >
-            <LogOut color="#DC2626" size={20} />
-            <Text className="text-base font-semibold text-red-600 ml-2">Se déconnecter</Text>
-          </TouchableOpacity>
+            <StyledButton
+                className="flex-row items-center justify-center bg-white p-4 rounded-xl border border-red-100"
+                textClassName="text-red-600 ml-2"
+                leftIcon={<LogOut color="#DC2626" size={20} />}
+                variant="secondary"
+                title={isLoggingOut ? "Déconnexion..." : "Se déconnecter"}
+                onPress={() => logout()}
+                loading={isLoggingOut}
+            />
         </View>
-    )
-}
+    );
+};

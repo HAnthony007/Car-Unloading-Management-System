@@ -12,9 +12,9 @@ export const loginSchema = z.object({
         }),
 });
 
-export type LoginSchema = z.infer<typeof loginSchema>;
+export type LoginFormValues = z.infer<typeof loginSchema>;
 
-export const loginDefaultValues: LoginSchema = {
+export const loginDefaultValues: LoginFormValues = {
     email: "",
     password: "",
 };

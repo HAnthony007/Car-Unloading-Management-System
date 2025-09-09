@@ -6,14 +6,20 @@ import { Eye, EyeOff, Lock, Mail } from "lucide-react-native";
 import { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
-import { loginDefaultValues, loginSchema } from "../data/login-schemas";
+import {
+    loginDefaultValues,
+    LoginFormValues,
+    loginSchema,
+} from "../data/login-schemas";
+import { useAuth } from "../hooks/useAuth";
 
 export const LoginForm = () => {
     const emailRef = useRef<TextInput>(null);
     const passwordRef = useRef<TextInput>(null);
     const [showPassword, setShowPassword] = useState(false);
-    const [loading, setLoading] = useState(false);
     const router = useRouter();
+
+    const { login, isLoggingIn, loginError } = useAuth();
 
     const {
         control,
@@ -21,7 +27,7 @@ export const LoginForm = () => {
         formState: { errors, isValid, submitCount },
         setError,
         clearErrors,
-    } = useForm({
+    } = useForm<LoginFormValues>({
         resolver: zodResolver(loginSchema),
         defaultValues: loginDefaultValues,
         mode: "onChange",
@@ -35,12 +41,20 @@ export const LoginForm = () => {
         }
     }, [errors.email, errors.password, submitCount]);
 
-    const onSubmit = async () => {
-        setLoading(true);
-        setTimeout(() => {
-            setLoading(false);
-            router.replace("/(tabs)");
-        }, 1500);
+    const onSubmit = async ({ email, password }: LoginFormValues) => {
+        clearErrors();
+        try {
+            await login({ email, password });
+        } catch (err: any) {
+            console.log("Login error:", err);
+            if (err?.message.includes("email")) {
+                setError("email", { message: err.message });
+                emailRef.current?.focus();
+            } else if (err?.message.includes("password")) {
+                setError("password", { message: err.message });
+                passwordRef.current?.focus();
+            }
+        }
     };
 
     return (
@@ -111,14 +125,17 @@ export const LoginForm = () => {
 
             {/* Login button */}
             <StyledButton
-                title={loading ? "Connexion..." : "Se connecter"}
+                title={isLoggingIn ? "Connexion..." : "Se connecter"}
                 onPress={handleSubmit(onSubmit)}
-                disabled={!isValid || loading}
-                loading={loading}
+                disabled={!isValid || isLoggingIn}
+                loading={isLoggingIn}
             />
 
             {/* Forgot password */}
-            <TouchableOpacity className="items-center mt-4" disabled={loading}>
+            <TouchableOpacity
+                className="items-center mt-4"
+                disabled={isLoggingIn}
+            >
                 <Text className="text-emerald-600 text-sm font-medium">
                     Mot de passe oublié ?
                 </Text>

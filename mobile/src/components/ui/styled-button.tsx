@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import React from "react";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
 
@@ -9,6 +10,8 @@ type Props = {
     rightIcon?: React.ReactNode;
     loading?: boolean;
     variant?: "primary" | "secondary";
+    className?: string;
+    textClassName?: string;
 };
 
 export const StyledButton: React.FC<Props> = ({
@@ -19,6 +22,8 @@ export const StyledButton: React.FC<Props> = ({
     rightIcon,
     loading,
     variant = "primary",
+    className,
+    textClassName,
 }) => {
     const base =
         "w-full items-center justify-center rounded-xl px-4 py-3 active:opacity-90";
@@ -31,7 +36,7 @@ export const StyledButton: React.FC<Props> = ({
         <Pressable
             onPress={onPress}
             disabled={disabled || loading}
-            className={`${base} ${variantCls}`}
+            className={cn(base, variantCls, className)}
             accessibilityRole="button"
         >
             <View className="flex-row items-center">
@@ -41,11 +46,12 @@ export const StyledButton: React.FC<Props> = ({
                     <View className="mr-2">{leftIcon}</View>
                 ) : null}
                 <Text
-                    className={
+                    className={cn(
                         variant === "primary"
                             ? "text-white font-semibold"
-                            : "text-gray-900 dark:text-gray-100 font-semibold"
-                    }
+                            : "text-gray-900 dark:text-gray-100 font-semibold",
+                        textClassName
+                    )}
                 >
                     {title}
                 </Text>
