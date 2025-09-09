@@ -167,6 +167,3 @@ export default function PortCallsScreen() {
         </SafeAreaView>
     );
 }
-
-// Small reusable field line
-// FieldLine moved to feature components (FieldLine.tsx)
