@@ -7,11 +7,7 @@ export type VehicleStatus =
     | "parked" // stationné dans une zone
     | "completed" // processus global terminé
     | "quarantined" // isolé (anomalie)
-    | "rejected" // refusé / sorti du flux
-    | "arrived" // (ancien) arrivé
-    | "stored" // (ancien) stocké
-    | "delivered" // (ancien) livré
-    | "in_transit"; // (ancien) en transit
+    | "rejected"; // refusé / sorti du flux
 export type CustomsStatus = "pending" | "cleared" | "hold";
 
 // Statut d'inspection spécifique
