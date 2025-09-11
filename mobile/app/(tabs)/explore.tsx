@@ -1,13 +1,13 @@
 import { Image } from "expo-image";
 import { Platform, StyleSheet } from "react-native";
 
-import { Fonts } from "@/src/constants/theme";
 import { ExternalLink } from "@/src/components/external-link";
 import ParallaxScrollView from "@/src/components/parallax-scroll-view";
 import { ThemedText } from "@/src/components/themed-text";
 import { ThemedView } from "@/src/components/themed-view";
 import { Collapsible } from "@/src/components/ui/collapsible";
 import { IconSymbol } from "@/src/components/ui/icon-symbol";
+import { Fonts } from "@/src/constants/theme";
 
 export default function TabTwoScreen() {
     return (
@@ -22,7 +22,7 @@ export default function TabTwoScreen() {
                 />
             }
         >
-            <ThemedView style={styles.titleContainer}>
+            <ThemedView className="flex-row gap-2">
                 <ThemedText
                     type="title"
                     style={{
@@ -132,9 +132,5 @@ const styles = StyleSheet.create({
         bottom: -90,
         left: -35,
         position: "absolute",
-    },
-    titleContainer: {
-        flexDirection: "row",
-        gap: 8,
     },
 });
