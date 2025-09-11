@@ -1,3 +1,8 @@
+import {
+    Discharge,
+    Vehicle,
+    VehicleVinCheckResponse,
+} from "@/src/types/domain";
 import { create } from "zustand";
 
 const uid = () =>
@@ -73,7 +78,9 @@ interface VehicleWorkflowState {
     documents: DocumentItem[];
     notes: AgentNote[];
     selectedPortCall: string | null;
-    vinCheckResult?: any | null;
+    vinCheckResult?: VehicleVinCheckResponse | null;
+    vehicle?: Vehicle | null;
+    discharge?: Discharge | null;
     setVin: (vin: string | null) => void;
     setInspection: (data: InspectionData) => void;
     addMovement: (mv: Omit<MovementRecord, "id" | "at">) => void;
@@ -81,7 +88,9 @@ interface VehicleWorkflowState {
     addDocument: (doc: Omit<DocumentItem, "id" | "uploadedAt">) => void;
     addNote: (note: Omit<AgentNote, "id" | "createdAt">) => void;
     setSelectedPortCall: (portCall: string | null) => void;
-    setVinCheckResult: (res: any | null) => void;
+    setVinCheckResult: (res: VehicleVinCheckResponse | null) => void;
+    setVehicle: (v: Vehicle | null) => void;
+    setDischarge: (d: Discharge | null) => void;
     resetWorkflow: () => void;
 }
 export const useScannerStore = create<VehicleWorkflowState>((set, get) => ({
@@ -93,6 +102,8 @@ export const useScannerStore = create<VehicleWorkflowState>((set, get) => ({
     notes: [],
     selectedPortCall: null,
     vinCheckResult: null,
+    vehicle: null,
+    discharge: null,
     setVin: (vin) =>
         set({
             vin,
@@ -160,7 +171,14 @@ export const useScannerStore = create<VehicleWorkflowState>((set, get) => ({
             ],
         })),
     setSelectedPortCall: (portCall) => set({ selectedPortCall: portCall }),
-    setVinCheckResult: (res) => set({ vinCheckResult: res }),
+    setVinCheckResult: (res) =>
+        set({
+            vinCheckResult: res,
+            vehicle: res?.vehicle || null,
+            discharge: res?.discharge || null,
+        }),
+    setVehicle: (v) => set({ vehicle: v }),
+    setDischarge: (d) => set({ discharge: d }),
     resetWorkflow: () =>
         set({
             vin: null,

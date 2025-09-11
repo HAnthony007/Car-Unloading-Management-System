@@ -25,6 +25,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export default function VehicleScreen() {
     const {
         vin,
+        vehicle, // (debug usage below)
+        discharge, // (debug usage below)
         inspection,
         saveInspection,
         movements,
@@ -84,30 +86,37 @@ export default function VehicleScreen() {
                     </Text>
                     <View className="bg-white -mx-1">
                         <InfoRow label="VIN" value={vin} monospace highlight />
+
                         {/* Two-column layout for marque / modèle / année / couleur on React Native */}
                         <View className="flex-row flex-wrap -mx-1">
                             <View className="w-1/2 px-1">
                                 <InfoRow
                                     label="Marque"
-                                    value={metadata?.identification.make}
+                                    value={discharge.vehicle?.make ?? undefined}
                                 />
                             </View>
                             <View className="w-1/2 px-1">
                                 <InfoRow
                                     label="Modèle"
-                                    value={metadata?.identification.model}
+                                    value={
+                                        discharge.vehicle?.model ?? undefined
+                                    }
                                 />
                             </View>
                             <View className="w-1/2 px-1">
                                 <InfoRow
                                     label="Année"
-                                    value={metadata?.identification.year}
+                                    value={String(
+                                        discharge.vehicle?.year ?? undefined
+                                    )}
                                 />
                             </View>
                             <View className="w-1/2 px-1">
                                 <InfoRow
                                     label="Couleur"
-                                    value={metadata?.identification.color}
+                                    value={
+                                        discharge.vehicle?.color ?? undefined
+                                    }
                                 />
                             </View>
                         </View>
@@ -154,7 +163,10 @@ export default function VehicleScreen() {
                             <View className="w-1/2 px-1">
                                 <InfoRow
                                     label="Poids"
-                                    value={metadata?.specs.weight}
+                                    value={
+                                        String(discharge.vehicle?.weight) ??
+                                        undefined
+                                    }
                                 />
                             </View>
                         </View>
@@ -167,27 +179,31 @@ export default function VehicleScreen() {
                         <ArrivalRow
                             icon={MapPin}
                             label="Port"
-                            value={metadata?.arrival.port}
+                            value="Toamasina I"
                         />
                         <ArrivalRow
                             icon={Ship}
                             label="Navire"
-                            value={metadata?.arrival.vessel}
+                            value={
+                                discharge.port_call?.vessel?.vessel_name || "—"
+                            }
                         />
                         <ArrivalRow
                             icon={Calendar}
                             label="Arrivée"
-                            value={metadata?.arrival.arrivalDate}
+                            value={
+                                String(discharge.port_call?.arrival_date) || "—"
+                            }
                         />
                         <ArrivalRow
                             icon={Car}
                             label="Agent"
-                            value={metadata?.arrival.agent}
+                            value={discharge.agent?.full_name || "—"}
                         />
                         <ArrivalRow
                             icon={MapPin}
                             label="Origine"
-                            value={metadata?.arrival.origin}
+                            value={discharge.port_call?.origin_port || "—"}
                             subtle
                         />
                     </View>

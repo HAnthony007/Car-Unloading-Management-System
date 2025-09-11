@@ -27,9 +27,29 @@ export interface Discharge {
     port_call_id: number | null;
     vehicle_id: number | null;
     agent_id: number | null;
-    port_call?: any | null; // Could be refined later with a PortCall interface
-    vehicle?: Vehicle | null;
-    agent?: any | null; // refine if agent resource available
+    port_call?: {
+        port_call_id: number;
+        origin_port?: string | null;
+        arrival_date?: string | null; // ISO
+        departure_date?: string | null; // ISO
+        status?: string | null;
+        // relations
+        vessel?: {
+            vessel_id: number;
+            vessel_name: string;
+            imo_no?: string;
+            flag?: string | null;
+        } | null;
+        dock?: { dock_id?: number; name?: string } | null;
+    } | null;
+    vehicle: Vehicle | null;
+    agent?: {
+        user_id?: number | string;
+        matriculation_no: string;
+        full_name: string;
+        email: string;
+        phone?: string;
+    } | null;
     created_at?: string | null;
     updated_at?: string | null;
 }

@@ -1,5 +1,6 @@
 import { api } from "@/src/lib/axios-instance";
 import { Storage } from "@/src/lib/storage";
+import { Discharge } from "@/src/types/domain";
 
 export interface CreateDischargePayload {
     discharge_date: string; // ISO string
@@ -8,14 +9,18 @@ export interface CreateDischargePayload {
     agent_id: number | string | null;
 }
 
-export async function getDischarge(dischargeId: number | string) {
+export async function getDischarge(
+    dischargeId: number | string
+): Promise<Discharge> {
     const { data } = await api.get(`/discharges/${dischargeId}`);
-    return data;
+    return data.data as Discharge; // backend retourne l'objet discharge complet
 }
 
-export async function createDischarge(payload: CreateDischargePayload) {
+export async function createDischarge(
+    payload: CreateDischargePayload
+): Promise<Discharge> {
     const { data } = await api.post(`/discharges`, payload);
-    return data;
+    return data.data as Discharge; // idem
 }
 
 /**

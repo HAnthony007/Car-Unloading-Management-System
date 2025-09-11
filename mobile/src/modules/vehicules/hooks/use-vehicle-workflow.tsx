@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { Discharge } from "@/src/types/domain";
+import { useEffect, useState } from "react";
 import { useScannerStore } from "../../scanner/stores/scanner-store";
 
 export const useVehicleWorkflow = () => {
@@ -8,6 +9,8 @@ export const useVehicleWorkflow = () => {
     const movements = useScannerStore((s) => s.movements);
     const addMovement = useScannerStore((s) => s.addMovement);
     const metadata = useScannerStore((s) => s.metadata);
+    const vehicle = useScannerStore((s) => (s as any).vehicle);
+    const discharge: Discharge = useScannerStore((s) => (s as any).discharge);
     const setMetadata = useScannerStore((s) => s.setMetadata);
     const documents = useScannerStore((s) => s.documents);
     const addDocument = useScannerStore((s) => s.addDocument);
@@ -26,31 +29,45 @@ export const useVehicleWorkflow = () => {
     useEffect(() => {
         // Prefill metadata
         if (!metadata) {
-            setMetadata({
-                identification: {
-                    make: "Toyota",
-                    model: "Corolla",
-                    year: "2023",
-                    color: "Blanc Perle",
-                },
-                specs: {
-                    engine: "1.8L Hybrid",
-                    transmission: "CVT",
-                    fuel: "Hybride Essence",
-                    doors: "4",
-                    seats: "5",
-                    weight: "1350 kg",
-                },
-                arrival: {
-                    port: "Port de Dakar",
-                    vessel: "MV Atlantic Star",
-                    arrivalDate: new Date(Date.now() - 86400000)
-                        .toISOString()
-                        .slice(0, 10),
-                    agent: "Bolloré",
-                    origin: "Anvers",
-                },
-            });
+            // Build from real API objects if available
+            if (vehicle || discharge) {
+                setMetadata({
+                    identification: {
+                        vin: vehicle?.vin,
+                        make: vehicle?.make || undefined,
+                        model: vehicle?.model || undefined,
+                        year: vehicle?.year ? String(vehicle.year) : undefined,
+                        color: vehicle?.color || undefined,
+                    },
+                    specs: {
+                        weight: vehicle?.weight
+                            ? String(vehicle.weight)
+                            : undefined,
+                        // engine / transmission / fuel not present in resource -> left blank
+                    },
+                    arrival: {
+                        port:
+                            (discharge?.port_call as any)?.dock?.name ||
+                            (discharge?.port_call as any)?.port_name ||
+                            undefined,
+                        vessel:
+                            (discharge?.port_call as any)?.vessel
+                                ?.vessel_name || undefined,
+                        arrivalDate: discharge?.discharge_date?.slice(0, 10),
+                        agent: (discharge?.agent as any)?.name || undefined,
+                        origin:
+                            (discharge?.port_call as any)?.origin_port ||
+                            undefined,
+                    },
+                });
+            } else {
+                // fallback placeholder if nothing fetched yet
+                setMetadata({
+                    identification: { make: "—", model: "—" },
+                    specs: {},
+                    arrival: {},
+                });
+            }
         }
         if (!inspection) {
             setInspection({
@@ -89,6 +106,8 @@ export const useVehicleWorkflow = () => {
         setMetadata,
         setInspection,
         addMovement,
+        vehicle,
+        discharge,
     ]);
 
     const saveInspection = () => {
@@ -123,6 +142,8 @@ export const useVehicleWorkflow = () => {
 
     return {
         vin,
+        vehicle,
+        discharge,
         inspection,
         saveInspection,
         movements,

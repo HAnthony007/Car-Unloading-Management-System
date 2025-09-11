@@ -5,6 +5,7 @@ import {
     createDischarge,
     getDischarge,
 } from "../lib/discharge";
+import { useScannerStore } from "../stores/scanner-store";
 import { useCheckVehicleInPortCall } from "./useCheckVehicleInPortCall";
 
 interface UseProcessVinOptions {
@@ -23,6 +24,11 @@ export function useProcessVin({
     setVinCheckResult,
 }: UseProcessVinOptions) {
     const { checkVin } = useCheckVehicleInPortCall({ portCallId });
+    const setVehicle = useScannerStore((s) => (s as any).setVehicle);
+    // setter pour stocker l'objet discharge complet dans le store
+    const setDischarge = useScannerStore(
+        (s) => (s as any).setDischarge as (d: Discharge | null) => void
+    );
 
     const processVin = useCallback(
         async (vin: string): Promise<ProcessResult | null> => {
@@ -35,15 +41,15 @@ export function useProcessVin({
             try {
                 const resp = await checkVin(vin);
                 setVinCheckResult?.(resp);
+                if (resp.vehicle) setVehicle(resp.vehicle);
 
-                let discharge: Discharge | null = null;
+                let discharge = null;
                 let created = false;
 
-                // Patterns logiques en fonction de la réponse
                 if (resp.vehicle_exists && resp.discharge_id) {
                     try {
                         discharge = await getDischarge(resp.discharge_id);
-                        console.log("[DISCHARGE][GET]", discharge);
+                        setDischarge(discharge); // on stocke l'objet complet
                     } catch (err: any) {
                         console.log(
                             "[DISCHARGE][GET][ERROR]",
@@ -58,7 +64,7 @@ export function useProcessVin({
                         );
                         discharge = await createDischarge(payload);
                         created = true;
-                        console.log("[DISCHARGE][CREATE]", discharge);
+                        setDischarge(discharge); // plus de .data, la fonction retourne déjà l'objet
                     } catch (err: any) {
                         console.log(
                             "[DISCHARGE][CREATE][ERROR]",
@@ -66,7 +72,6 @@ export function useProcessVin({
                         );
                     }
                 } else if (!resp.vehicle_exists) {
-                    // fallback: create discharge record anyway using provided vehicle_id surrogate
                     try {
                         const payload = await buildDischargePayload(
                             portCallId,
@@ -74,7 +79,7 @@ export function useProcessVin({
                         );
                         discharge = await createDischarge(payload);
                         created = true;
-                        console.log("[DISCHARGE][CREATE]", discharge);
+                        setDischarge(discharge);
                     } catch (err: any) {
                         console.log(
                             "[DISCHARGE][CREATE][ERROR]",
@@ -92,7 +97,7 @@ export function useProcessVin({
                 throw e;
             }
         },
-        [portCallId, checkVin, setVinCheckResult]
+        [portCallId, checkVin, setVinCheckResult, setVehicle, setDischarge]
     );
 
     return { processVin };
