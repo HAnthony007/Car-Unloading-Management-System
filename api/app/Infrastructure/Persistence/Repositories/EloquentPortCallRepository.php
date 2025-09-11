@@ -69,6 +69,7 @@ final class EloquentPortCallRepository implements PortCallRepositoryInterface
             departureDate: new DateTimeValue($e->departure_date ? Carbon::parse($e->departure_date) : null),
             vesselId: new VesselId($e->vessel_id),
             dockId: $e->dock_id !== null ? new DockId($e->dock_id) : null,
+            status: $e->status ?? null,
             createdAt: $e->created_at,
             updatedAt: $e->updated_at,
         );

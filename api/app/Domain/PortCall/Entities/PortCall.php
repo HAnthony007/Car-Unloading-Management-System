@@ -21,9 +21,10 @@ final class PortCall
         private readonly DateTimeValue $estimatedDeparture,
         private readonly DateTimeValue $departureDate,
         private readonly VesselId $vesselId,
-        private readonly ?DockId $dockId,
-        private readonly ?Carbon $createdAt = null,
-        private readonly ?Carbon $updatedAt = null,
+    private readonly ?DockId $dockId,
+    private readonly ?string $status = null,
+    private readonly ?Carbon $createdAt = null,
+    private readonly ?Carbon $updatedAt = null,
     ) {}
 
     public function getPortCallId(): ?PortCallId
@@ -86,8 +87,7 @@ final class PortCall
      */
     public function getStatus(): ?string
     {
-        // The domain entity currently doesn't store status; return null
-        return null;
+    return $this->status;
     }
 
     public function toArray(): array

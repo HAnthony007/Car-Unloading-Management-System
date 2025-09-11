@@ -7,12 +7,15 @@ use App\Application\PortCall\DTOs\UpdatePortCallDTO;
 use App\Application\PortCall\UseCases\CreatePortCallUseCase;
 use App\Application\PortCall\UseCases\DeletePortCallUseCase;
 use App\Application\PortCall\UseCases\GetPortCallsUseCase;
+use App\Application\PortCall\UseCases\SearchPortCallsUseCase;
+use App\Application\PortCall\DTOs\PortCallSearchCriteriaDTO;
 use App\Application\PortCall\UseCases\GetPortCallUseCase;
 use App\Application\PortCall\UseCases\GetPortCallVehiclesUseCase;
 use App\Application\PortCall\UseCases\UpdatePortCallUseCase;
 use App\Presentation\Http\Requests\StorePortCallRequest;
 use App\Presentation\Http\Requests\UpdatePortCallRequest;
 use App\Presentation\Http\Resources\PortCallResource;
+use App\Presentation\Http\Requests\SearchPortCallsRequest;
 use App\Presentation\Http\Resources\VehicleResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -21,16 +24,38 @@ final class PortCallController
 {
     public function __construct(
         private readonly CreatePortCallUseCase $createUseCase,
-        private readonly GetPortCallsUseCase $listUseCase,
+        private readonly GetPortCallsUseCase $listUseCase, // legacy simple list (maybe kept for internal usage)
+        private readonly SearchPortCallsUseCase $searchUseCase,
         private readonly GetPortCallUseCase $getUseCase,
         private readonly UpdatePortCallUseCase $updateUseCase,
         private readonly DeletePortCallUseCase $deleteUseCase,
         private readonly GetPortCallVehiclesUseCase $getVehiclesUseCase,
     ) {}
 
-    public function index(): AnonymousResourceCollection
+    public function index(SearchPortCallsRequest $request): JsonResponse
     {
-        return PortCallResource::collection($this->listUseCase->execute());
+        try {
+            $criteria = PortCallSearchCriteriaDTO::fromArray($request->validated());
+            $result = $this->searchUseCase->execute($criteria);
+
+            return response()->json([
+                'data' => PortCallResource::collection($result['data']),
+                'meta' => [
+                    'current_page' => $result['current_page'],
+                    'from' => $result['from'],
+                    'last_page' => $result['last_page'],
+                    'path' => $result['path'],
+                    'per_page' => $result['per_page'],
+                    'to' => $result['to'],
+                    'total' => $result['total'],
+                ],
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'message' => 'Failed to fetch port calls.',
+                'error' => $e->getMessage(),
+            ], 400);
+        }
     }
 
     public function store(StorePortCallRequest $request): JsonResponse
