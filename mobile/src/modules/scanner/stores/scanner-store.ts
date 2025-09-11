@@ -73,6 +73,7 @@ interface VehicleWorkflowState {
     documents: DocumentItem[];
     notes: AgentNote[];
     selectedPortCall: string | null;
+    vinCheckResult?: any | null;
     setVin: (vin: string | null) => void;
     setInspection: (data: InspectionData) => void;
     addMovement: (mv: Omit<MovementRecord, "id" | "at">) => void;
@@ -80,6 +81,7 @@ interface VehicleWorkflowState {
     addDocument: (doc: Omit<DocumentItem, "id" | "uploadedAt">) => void;
     addNote: (note: Omit<AgentNote, "id" | "createdAt">) => void;
     setSelectedPortCall: (portCall: string | null) => void;
+    setVinCheckResult: (res: any | null) => void;
     resetWorkflow: () => void;
 }
 export const useScannerStore = create<VehicleWorkflowState>((set, get) => ({
@@ -90,6 +92,7 @@ export const useScannerStore = create<VehicleWorkflowState>((set, get) => ({
     documents: [],
     notes: [],
     selectedPortCall: null,
+    vinCheckResult: null,
     setVin: (vin) =>
         set({
             vin,
@@ -157,5 +160,12 @@ export const useScannerStore = create<VehicleWorkflowState>((set, get) => ({
             ],
         })),
     setSelectedPortCall: (portCall) => set({ selectedPortCall: portCall }),
-    resetWorkflow: () => set({ vin: null, inspection: null, movements: [] }),
+    setVinCheckResult: (res) => set({ vinCheckResult: res }),
+    resetWorkflow: () =>
+        set({
+            vin: null,
+            inspection: null,
+            movements: [],
+            vinCheckResult: null,
+        }),
 }));
