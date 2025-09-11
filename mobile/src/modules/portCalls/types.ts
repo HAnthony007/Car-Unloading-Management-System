@@ -26,29 +26,25 @@ export interface VehicleInPortCall {
     updated_at: string;
 }
 
-export type PortCallStatus =
-    | "pending"
-    | "in_progress"
-    | "completed"
-    | "canceled";
+export type PortCallStatus = "pending" | "in_progress" | "completed"; // backend actuel ("canceled" non utilisé pour l'instant)
 
 export interface PortCall {
     port_call_id: number;
     vessel_agent: string;
     origin_port: string;
-    estimated_arrival: string; // ETA
+    estimated_arrival: string | null; // ETA peut être absent
     arrival_date: string | null;
     estimated_departure: string | null; // ETD
     departure_date: string | null;
     vessel_id: number;
     dock_id: number | null;
-    vehicles_number: number;
+    vehicles_number: number | null; // selon backend
     status: PortCallStatus;
     vessel: Vessel;
-    dock: any; // future detail
+    dock: any; // future détail
     created_at: string;
     updated_at: string;
-    vehicles?: VehicleInPortCall[]; // attached list when viewing details
+    vehicles?: VehicleInPortCall[]; // liste liée
 }
 
 export interface PortCallStats {

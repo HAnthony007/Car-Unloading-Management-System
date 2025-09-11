@@ -1,9 +1,8 @@
 import { Card } from "@/src/components/ui/card";
 import { PortCallDetailsModal } from "@/src/modules/portCalls/components/portcall-detail";
 import { PortCallRow } from "@/src/modules/portCalls/components/portcall-row";
-import { mockPortCalls } from "@/src/modules/portCalls/data/mock-portcalls";
-import { usePortCalls } from "@/src/modules/portCalls/hooks/usePortCalls";
-import { PortCall } from "@/src/modules/portCalls/types";
+import { usePortCallsScreen } from "@/src/modules/portCalls/hooks/usePortCalls";
+import type { PortCall } from "@/src/modules/portCalls/types";
 import { Filter, Plus, Search } from "lucide-react-native";
 import { useState } from "react";
 import {
@@ -26,9 +25,14 @@ export default function PortCallsScreen() {
         setSearchQuery,
         statusFilter,
         setStatusFilter,
-        filteredPortCalls,
+        portCalls,
         stats,
-    } = usePortCalls(mockPortCalls);
+        isLoading,
+        isRefetching,
+        pagination,
+        page,
+        setPage,
+    } = usePortCallsScreen();
 
     return (
         <SafeAreaView className="flex-1 bg-slate-50">
@@ -126,7 +130,7 @@ export default function PortCallsScreen() {
 
             {/* List */}
             <FlatList
-                data={filteredPortCalls}
+                data={portCalls}
                 keyExtractor={(item) => String(item.port_call_id)}
                 renderItem={({ item }) => (
                     <PortCallRow
@@ -142,10 +146,53 @@ export default function PortCallsScreen() {
                     paddingBottom: 40,
                 }}
                 showsVerticalScrollIndicator={false}
+                refreshing={isRefetching}
+                onRefresh={() => {
+                    // refetch already handled by pull to refresh via query key invalidation
+                }}
+                ListFooterComponent={() =>
+                    pagination && pagination.last_page > 1 ? (
+                        <View className="mt-4 mb-10">
+                            <View className="flex-row justify-center space-x-4">
+                                <TouchableOpacity
+                                    disabled={page <= 1}
+                                    onPress={() =>
+                                        setPage(Math.max(1, page - 1))
+                                    }
+                                    className={`px-4 py-2 rounded-lg border ${page <= 1 ? "bg-gray-100 border-gray-200" : "bg-white border-gray-300"}`}
+                                >
+                                    <Text className="text-sm">Précédent</Text>
+                                </TouchableOpacity>
+                                <View className="px-4 py-2 rounded-lg bg-emerald-50 border border-emerald-200">
+                                    <Text className="text-sm font-medium text-emerald-700">
+                                        Page {pagination.current_page} /{" "}
+                                        {pagination.last_page}
+                                    </Text>
+                                </View>
+                                <TouchableOpacity
+                                    disabled={page >= pagination.last_page}
+                                    onPress={() =>
+                                        setPage(
+                                            Math.min(
+                                                pagination.last_page,
+                                                page + 1
+                                            )
+                                        )
+                                    }
+                                    className={`px-4 py-2 rounded-lg border ${page >= pagination.last_page ? "bg-gray-100 border-gray-200" : "bg-white border-gray-300"}`}
+                                >
+                                    <Text className="text-sm">Suivant</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    ) : null
+                }
                 ListEmptyComponent={() => (
                     <View className="px-4 py-16 items-center">
                         <Text className="text-sm text-gray-500 mb-2">
-                            Aucun Port Call trouvé
+                            {isLoading
+                                ? "Chargement..."
+                                : "Aucun Port Call trouvé"}
                         </Text>
                         <Text className="text-xs text-gray-400 text-center">
                             Ajustez votre recherche ou filtre pour afficher des

@@ -4,7 +4,6 @@ import { RecentScans } from "@/src/modules/scanner/components/recent-scan";
 import { ScanHeader } from "@/src/modules/scanner/components/scan-header";
 import { ScannerInterface } from "@/src/modules/scanner/components/scan-interface";
 import { ScanResultModal } from "@/src/modules/scanner/components/scan-result.modal";
-import { mockPortCalls } from "@/src/modules/scanner/data/mock-port-calls";
 import { mockRecentScans } from "@/src/modules/scanner/data/mock-recent-scan";
 import { useVin } from "@/src/modules/scanner/hooks/useVin";
 import { isValidVin } from "@/src/modules/scanner/lib/validation";
@@ -120,7 +119,7 @@ export default function ScannerScreen() {
 
     return (
         <SafeAreaView className="flex-1 bg-gray-50">
-            <ScanHeader portCalls={mockPortCalls} />
+            <ScanHeader />
 
             {/* Scanner Interface */}
             <ScannerInterface

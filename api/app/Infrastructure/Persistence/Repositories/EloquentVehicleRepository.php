@@ -161,4 +161,62 @@ final class EloquentVehicleRepository implements VehicleRepositoryInterface
             'total' => $paginator->total(),
         ];
     }
+
+    public function searchByPortCall(PortCallId $portCallId, ?string $vin, ?string $make, ?string $model, ?string $ownerName, ?string $color, ?string $type, ?string $originCountry, ?string $searchTerm, int $page, int $perPage): array
+    {
+        $query = EloquentVehicle::query()
+            ->whereIn('vehicle_id', function ($q) use ($portCallId) {
+                $q->select('vehicle_id')
+                    ->from('follow_up_files')
+                    ->where('port_call_id', $portCallId->getValue());
+            });
+
+        if ($vin) {
+            $query->where('vin', 'like', '%'.strtoupper($vin).'%');
+        }
+        if ($make) {
+            $query->where('make', 'like', '%'.$make.'%');
+        }
+        if ($model) {
+            $query->where('model', 'like', '%'.$model.'%');
+        }
+        if ($ownerName) {
+            $query->where('owner_name', 'like', '%'.$ownerName.'%');
+        }
+        if ($color) {
+            $query->where('color', 'like', '%'.$color.'%');
+        }
+        if ($type) {
+            $query->where('type', 'like', '%'.$type.'%');
+        }
+        if ($originCountry) {
+            $query->where('origin_country', 'like', '%'.$originCountry.'%');
+        }
+        if ($searchTerm && trim($searchTerm) !== '') {
+            $t = '%'.$searchTerm.'%';
+            $query->where(function ($q) use ($t) {
+                $q->where('vin', 'like', $t)
+                    ->orWhere('make', 'like', $t)
+                    ->orWhere('model', 'like', $t)
+                    ->orWhere('owner_name', 'like', $t)
+                    ->orWhere('color', 'like', $t)
+                    ->orWhere('type', 'like', $t)
+                    ->orWhere('origin_country', 'like', $t);
+            });
+        }
+
+        $paginator = $query->orderByDesc('created_at')->paginate($perPage, ['*'], 'page', $page);
+        $data = collect($paginator->items())->map(fn ($e) => $this->toDomainEntity($e))->toArray();
+
+        return [
+            'data' => $data,
+            'current_page' => $paginator->currentPage(),
+            'from' => $paginator->firstItem() ?? 0,
+            'last_page' => $paginator->lastPage(),
+            'path' => request()->url(),
+            'per_page' => $paginator->perPage(),
+            'to' => $paginator->lastItem() ?? 0,
+            'total' => $paginator->total(),
+        ];
+    }
 }

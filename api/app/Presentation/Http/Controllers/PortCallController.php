@@ -11,12 +11,15 @@ use App\Application\PortCall\UseCases\SearchPortCallsUseCase;
 use App\Application\PortCall\DTOs\PortCallSearchCriteriaDTO;
 use App\Application\PortCall\UseCases\GetPortCallUseCase;
 use App\Application\PortCall\UseCases\GetPortCallVehiclesUseCase;
+use App\Application\PortCall\UseCases\SearchPortCallVehiclesUseCase;
+use App\Application\Vehicle\DTOs\PortCallVehicleSearchCriteriaDTO;
 use App\Application\PortCall\UseCases\UpdatePortCallUseCase;
 use App\Presentation\Http\Requests\StorePortCallRequest;
 use App\Presentation\Http\Requests\UpdatePortCallRequest;
 use App\Presentation\Http\Resources\PortCallResource;
 use App\Presentation\Http\Requests\SearchPortCallsRequest;
 use App\Presentation\Http\Resources\VehicleResource;
+use App\Presentation\Http\Requests\SearchPortCallVehiclesRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
@@ -29,7 +32,8 @@ final class PortCallController
         private readonly GetPortCallUseCase $getUseCase,
         private readonly UpdatePortCallUseCase $updateUseCase,
         private readonly DeletePortCallUseCase $deleteUseCase,
-        private readonly GetPortCallVehiclesUseCase $getVehiclesUseCase,
+    private readonly GetPortCallVehiclesUseCase $getVehiclesUseCase,
+    private readonly SearchPortCallVehiclesUseCase $searchVehiclesUseCase,
     ) {}
 
     public function index(SearchPortCallsRequest $request): JsonResponse
@@ -124,15 +128,24 @@ final class PortCallController
         }
     }
 
-    public function vehicles(int $id): JsonResponse
+    public function vehicles(SearchPortCallVehiclesRequest $request, int $id): JsonResponse
     {
         try {
-            $vehicles = $this->getVehiclesUseCase->execute($id);
+            $criteria = PortCallVehicleSearchCriteriaDTO::fromArray($request->validated(), $id);
+            $result = $this->searchVehiclesUseCase->execute($criteria);
 
             return response()->json([
-                'data' => VehicleResource::collection($vehicles),
+                'data' => VehicleResource::collection($result['data']),
+                'meta' => [
+                    'current_page' => $result['current_page'],
+                    'from' => $result['from'],
+                    'last_page' => $result['last_page'],
+                    'path' => $result['path'],
+                    'per_page' => $result['per_page'],
+                    'to' => $result['to'],
+                    'total' => $result['total'],
+                ],
                 'port_call_id' => $id,
-                'total' => count($vehicles),
             ]);
         } catch (\Throwable $e) {
             return response()->json([

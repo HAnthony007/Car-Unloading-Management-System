@@ -29,4 +29,22 @@ interface VehicleRepositoryInterface
      * @return array<int, Vehicle>
      */
     public function findByPortCallId(PortCallId $portCallId): array;
+
+    /**
+     * Paginated + filtered vehicles for a given port call.
+     * @return array{data: array<int, Vehicle>, current_page: int, from: int, last_page: int, path: string, per_page: int, to: int, total: int}
+     */
+    public function searchByPortCall(
+        PortCallId $portCallId,
+        ?string $vin,
+        ?string $make,
+        ?string $model,
+        ?string $ownerName,
+        ?string $color,
+        ?string $type,
+        ?string $originCountry,
+        ?string $searchTerm,
+        int $page,
+        int $perPage
+    ): array;
 }
