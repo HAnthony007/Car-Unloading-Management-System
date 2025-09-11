@@ -152,6 +152,8 @@ Route::prefix('port-calls')
         Route::get('/{id}/vehicles', [\App\Presentation\Http\Controllers\PortCallController::class, 'vehicles'])->name('portcalls.vehicles');
         // Backward compatibility (French path)
         Route::get('/{id}/vehicules', [\App\Presentation\Http\Controllers\PortCallController::class, 'vehicles'])->name('portcalls.vehicules');
+    // Check vehicle membership (VIN + port call)
+    Route::get('/{id}/vehicles/check', [\App\Presentation\Http\Controllers\PortCallController::class, 'checkVehicleByVin'])->name('portcalls.vehicles.check');
         Route::put('/{id}', [\App\Presentation\Http\Controllers\PortCallController::class, 'update'])->name('portcalls.update');
         Route::delete('/{id}', [\App\Presentation\Http\Controllers\PortCallController::class, 'destroy'])->name('portcalls.destroy');
 

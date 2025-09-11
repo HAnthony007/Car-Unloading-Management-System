@@ -18,6 +18,8 @@ class UpdateDischargeRequest extends FormRequest
         return [
             'discharge_date' => ['nullable', 'date'],
             'port_call_id' => ['nullable', 'integer', 'exists:port_calls,port_call_id'],
+            'vehicle_id' => ['nullable', 'integer', 'exists:vehicles,vehicle_id'],
+            'agent_id' => ['nullable', 'integer', 'exists:users,user_id'],
         ];
     }
 

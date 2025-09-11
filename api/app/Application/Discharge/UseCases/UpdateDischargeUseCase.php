@@ -8,6 +8,8 @@ use App\Domain\Discharge\Repositories\DischargeRepositoryInterface;
 use App\Domain\Discharge\ValueObjects\DateTimeValue;
 use App\Domain\Discharge\ValueObjects\DischargeId;
 use App\Domain\PortCall\ValueObjects\PortCallId;
+use App\Domain\Vehicle\ValueObjects\VehicleId;
+use App\Domain\User\ValueObjects\UserId;
 use Carbon\Carbon;
 
 final class UpdateDischargeUseCase
@@ -25,6 +27,8 @@ final class UpdateDischargeUseCase
             dischargeId: $existing->getDischargeId(),
             dischargeDate: $dto->dischargeDate !== null ? new DateTimeValue($dto->dischargeDate ? Carbon::parse($dto->dischargeDate) : null) : $existing->getDischargeDate(),
             portCallId: $dto->portCallId !== null ? new PortCallId($dto->portCallId) : $existing->getPortCallId(),
+            vehicleId: $dto->vehicleId !== null ? new VehicleId($dto->vehicleId) : $existing->getVehicleId(),
+            agentId: $dto->agentId !== null ? new UserId($dto->agentId) : $existing->getAgentId(),
             createdAt: $existing->getCreatedAt(),
             updatedAt: now(),
         );

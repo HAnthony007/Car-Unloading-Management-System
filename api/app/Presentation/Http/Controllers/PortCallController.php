@@ -22,6 +22,8 @@ use App\Presentation\Http\Resources\VehicleResource;
 use App\Presentation\Http\Requests\SearchPortCallVehiclesRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use App\Application\PortCall\UseCases\CheckVehicleInPortCallUseCase;
+use App\Presentation\Http\Requests\CheckPortCallVehicleVinRequest;
 
 final class PortCallController
 {
@@ -34,6 +36,7 @@ final class PortCallController
         private readonly DeletePortCallUseCase $deleteUseCase,
     private readonly GetPortCallVehiclesUseCase $getVehiclesUseCase,
     private readonly SearchPortCallVehiclesUseCase $searchVehiclesUseCase,
+    private readonly CheckVehicleInPortCallUseCase $checkVehicleInPortCallUseCase,
     ) {}
 
     public function index(SearchPortCallsRequest $request): JsonResponse
@@ -152,6 +155,31 @@ final class PortCallController
                 'message' => 'Failed to fetch vehicles for port call.',
                 'error' => $e->getMessage(),
             ], 404);
+        }
+    }
+
+    /**
+     * Check if a vehicle exists by VIN and whether it has a discharge in the given port call.
+    * Response shape:
+    * {
+    *   "vin": "...",
+    *   "vehicle_exists": bool,
+    *   "vehicle_id": int|null,
+    *   "discharge_id": int|null
+    * }
+     */
+    public function checkVehicleByVin(CheckPortCallVehicleVinRequest $request, int $id): JsonResponse
+    {
+        $vin = $request->validated('vin');
+
+        try {
+            $result = $this->checkVehicleInPortCallUseCase->execute($vin, $id);
+            return response()->json($result->toArray());
+        } catch (\Throwable $e) {
+            return response()->json([
+                'message' => 'Failed to check vehicle VIN.',
+                'error' => $e->getMessage(),
+            ], 400);
         }
     }
 }

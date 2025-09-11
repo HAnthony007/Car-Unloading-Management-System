@@ -10,6 +10,7 @@ use App\Application\PortCall\UseCases\GetPortCallVehiclesUseCase;
 use App\Application\PortCall\UseCases\UpdatePortCallUseCase;
 use App\Application\PortCall\UseCases\SearchPortCallsUseCase;
 use App\Application\PortCall\UseCases\SearchPortCallVehiclesUseCase;
+use App\Application\PortCall\UseCases\CheckVehicleInPortCallUseCase;
 use App\Domain\PortCall\Repositories\PortCallRepositoryInterface;
 use App\Infrastructure\Persistence\Repositories\EloquentPortCallRepository;
 use Illuminate\Support\ServiceProvider;
@@ -29,6 +30,10 @@ class PortCallServiceProvider extends ServiceProvider
         // Vehicles by port call depends on VehicleRepositoryInterface (bound in VehicleServiceProvider)
         $this->app->bind(GetPortCallVehiclesUseCase::class, fn ($app) => new GetPortCallVehiclesUseCase($app->make(\App\Domain\Vehicle\Repositories\VehicleRepositoryInterface::class)));
     $this->app->bind(SearchPortCallVehiclesUseCase::class, fn ($app) => new SearchPortCallVehiclesUseCase($app->make(\App\Domain\Vehicle\Repositories\VehicleRepositoryInterface::class)));
+        $this->app->bind(CheckVehicleInPortCallUseCase::class, fn ($app) => new CheckVehicleInPortCallUseCase(
+            $app->make(\App\Domain\Vehicle\Repositories\VehicleRepositoryInterface::class),
+            $app->make(\App\Domain\Discharge\Repositories\DischargeRepositoryInterface::class),
+        ));
     }
 
     public function boot(): void {}

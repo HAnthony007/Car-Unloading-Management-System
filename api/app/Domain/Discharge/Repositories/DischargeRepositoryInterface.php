@@ -5,6 +5,7 @@ namespace App\Domain\Discharge\Repositories;
 use App\Domain\Discharge\Entities\Discharge;
 use App\Domain\Discharge\ValueObjects\DischargeId;
 use App\Domain\PortCall\ValueObjects\PortCallId;
+use App\Domain\Vehicle\ValueObjects\VehicleId;
 
 interface DischargeRepositoryInterface
 {
@@ -15,6 +16,8 @@ interface DischargeRepositoryInterface
 
     /** @return array<int, Discharge> */
     public function findByPortCallId(PortCallId $portCallId): array;
+
+    public function findLatestByVehicleAndPortCall(VehicleId $vehicleId, PortCallId $portCallId): ?Discharge;
 
     public function save(Discharge $discharge): Discharge;
 
