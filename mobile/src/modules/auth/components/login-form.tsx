@@ -1,5 +1,5 @@
-import { StyledButton } from "@/src/components/ui/styled-button";
-import { StyledTextInput } from "@/src/components/ui/styled-input";
+import { Button } from "@/src/components/ui/button";
+import { Input } from "@/src/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react-native";
 import React, { useEffect, useRef, useState } from "react";
@@ -60,7 +60,7 @@ export const LoginForm = () => {
                     control={control}
                     name="email"
                     render={({ field: { onChange, onBlur, value } }) => (
-                        <StyledTextInput
+                        <Input
                             label="Email professionnel"
                             placeholder="agent@entreprise.com"
                             value={value}
@@ -84,7 +84,7 @@ export const LoginForm = () => {
                     control={control}
                     name="password"
                     render={({ field: { onChange, onBlur, value } }) => (
-                        <StyledTextInput
+                        <Input
                             label="Mot de passe"
                             placeholder="********"
                             value={value}
@@ -119,7 +119,7 @@ export const LoginForm = () => {
             </View> */}
 
             {/* Login button */}
-            <StyledButton
+            <Button
                 title="Connexion..."
                 onPress={handleSubmit(onSubmit)}
                 disabled={!isValid}

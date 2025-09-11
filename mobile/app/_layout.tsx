@@ -1,3 +1,4 @@
+import Providers from "@/src/providers/provider";
 import {
     DarkTheme,
     DefaultTheme,
@@ -20,19 +21,24 @@ export default function RootLayout() {
         <ThemeProvider
             value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
         >
-            <Stack
-                screenOptions={{
-                    headerShown: false,
-                    animation: "slide_from_right",
-                }}
-            >
-                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                <Stack.Screen
-                    name="modal"
-                    options={{ presentation: "modal", title: "Modal" }}
-                />
-            </Stack>
-            <StatusBar style="auto" />
+            <Providers>
+                <Stack
+                    screenOptions={{
+                        headerShown: false,
+                        animation: "slide_from_right",
+                    }}
+                >
+                    <Stack.Screen
+                        name="(main)"
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="modal"
+                        options={{ presentation: "modal", title: "Modal" }}
+                    />
+                </Stack>
+                <StatusBar style="auto" />
+            </Providers>
         </ThemeProvider>
     );
 }

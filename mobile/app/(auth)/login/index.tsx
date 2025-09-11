@@ -11,7 +11,6 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-// Conversion du StyleSheet vers des classes Tailwind (NativeWind)
 export default function LoginScreen() {
     return (
         <KeyboardAvoidingView
