@@ -12,12 +12,12 @@ import {
 import { useState } from "react";
 import {
     RefreshControl,
-    SafeAreaView,
     ScrollView,
     Text,
     TouchableOpacity,
     View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function DashboardScreen() {
     const [refreshing, setRefreshing] = useState(false);

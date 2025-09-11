@@ -1,7 +1,6 @@
 import { Tabs } from "expo-router";
 import React from "react";
 
-import { HapticTab } from "@/src/components/haptic-tab";
 import { Anchor, BarChart3, ScanLine, User } from "lucide-react-native";
 import { useColorScheme } from "react-native";
 
@@ -25,7 +24,7 @@ export default function TabLayout() {
                     fontSize: 12,
                 },
                 headerShown: false,
-                tabBarButton: HapticTab,
+                // tabBarButton: HapticTab,
             }}
         >
             <Tabs.Screen

@@ -9,20 +9,14 @@ import {
     Globe,
     HelpCircle,
     Moon,
+    Settings,
     Shield,
     User,
     Users,
 } from "lucide-react-native";
 import { useState } from "react";
-import {
-    SafeAreaView,
-    ScrollView,
-    Settings,
-    Switch,
-    Text,
-    TouchableOpacity,
-    View,
-} from "react-native";
+import { ScrollView, Switch, Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ProfileScreen() {
     const [notificationsEnabled, setNotificationsEnabled] = useState(true);

@@ -13,7 +13,8 @@ import { ScanFeedback } from "@/src/modules/scanner/type";
 import { CameraType, useCameraPermissions } from "expo-camera";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { SafeAreaView, Text, View } from "react-native";
+import { Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ScannerScreen() {
     const router = useRouter();
@@ -91,7 +92,6 @@ export default function ScannerScreen() {
         setFacing((c) => (c === "back" ? "front" : "back"));
     const toggleFlash = () => setFlashOn((f) => !f);
 
-    // Permission states simplified (could be extracted later)
     if (!permission || !permission.granted) {
         return (
             <SafeAreaView className="flex-1 bg-gray-50 items-center justify-center p-6">

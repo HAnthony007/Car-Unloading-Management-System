@@ -1,5 +1,5 @@
 import { Tabs } from "expo-router";
-import { BarChart3 } from "lucide-react-native";
+import { BarChart3, ClipboardCheck, Move } from "lucide-react-native";
 import React from "react";
 import { useColorScheme } from "react-native";
 
@@ -37,7 +37,7 @@ export default function VehiclesLayout() {
                 }}
             />
 
-            {/* <Tabs.Screen
+            <Tabs.Screen
                 name="survey"
                 options={{
                     title: "Inspection",
@@ -55,7 +55,7 @@ export default function VehiclesLayout() {
                         <Move size={size} color={color} />
                     ),
                 }}
-            /> */}
+            />
         </Tabs>
     );
 }

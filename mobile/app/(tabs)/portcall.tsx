@@ -8,13 +8,13 @@ import { Filter, Plus, Search } from "lucide-react-native";
 import { useState } from "react";
 import {
     FlatList,
-    SafeAreaView,
     ScrollView,
     Text,
     TextInput,
     TouchableOpacity,
     View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function PortCallsScreen() {
     const [showDetails, setShowDetails] = useState(false);
