@@ -10,7 +10,7 @@ import "react-native-reanimated";
 import "./global.css";
 
 export const unstable_settings = {
-    anchor: "(tabs)",
+    initialRouteName: "modal",
 };
 
 export default function RootLayout() {
@@ -20,7 +20,12 @@ export default function RootLayout() {
         <ThemeProvider
             value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
         >
-            <Stack>
+            <Stack
+                screenOptions={{
+                    headerShown: false,
+                    animation: "slide_from_right",
+                }}
+            >
                 <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
                 <Stack.Screen
                     name="modal"
