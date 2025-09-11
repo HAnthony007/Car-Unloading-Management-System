@@ -1,5 +1,5 @@
 import { Button } from "@/src/components/ui/button";
-import { Input } from "@/src/components/ui/input";
+import { StyledTextInput } from "@/src/components/ui/styled-input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react-native";
 import React, { useEffect, useRef, useState } from "react";
@@ -10,12 +10,14 @@ import {
     LoginFormValues,
     loginSchema,
 } from "../data/login-schema";
+import { useAuth } from "../hooks/use-auth";
 
 export const LoginForm = () => {
     const emailRef = useRef<TextInput>(null);
     const passwordRef = useRef<TextInput>(null);
-
     const [showPassword, setShowPassword] = useState(false);
+
+    const { login, isLoggingIn } = useAuth();
 
     const {
         control,
@@ -37,17 +39,18 @@ export const LoginForm = () => {
         }
     }, [errors.email, errors.password, submitCount]);
 
-    const onSubmit = (data: LoginFormValues) => {
+    const onSubmit = async ({ email, password }: LoginFormValues) => {
         clearErrors();
         try {
-            console.log("Login data:", data);
-        } catch (error: any) {
-            if (error?.message.includes("email")) {
-                setError("email", { message: error.message });
-            } else if (error?.message.includes("password")) {
-                setError("password", { message: error.message });
-            } else {
-                console.error("Login error:", error);
+            await login({ email, password });
+        } catch (err: any) {
+            console.log("Login error:", err);
+            if (err?.message.includes("email")) {
+                setError("email", { message: err.message });
+                emailRef.current?.focus();
+            } else if (err?.message.includes("password")) {
+                setError("password", { message: err.message });
+                passwordRef.current?.focus();
             }
         }
     };
@@ -60,7 +63,7 @@ export const LoginForm = () => {
                     control={control}
                     name="email"
                     render={({ field: { onChange, onBlur, value } }) => (
-                        <Input
+                        <StyledTextInput
                             label="Email professionnel"
                             placeholder="agent@entreprise.com"
                             value={value}
@@ -72,9 +75,7 @@ export const LoginForm = () => {
                             autoCapitalize="none"
                             autoComplete="email"
                             returnKeyType="next"
-                            onSubmitEditing={() => {
-                                passwordRef.current?.focus();
-                            }}
+                            onSubmitEditing={() => passwordRef.current?.focus()}
                             errorText={errors.email?.message}
                         />
                     )}
@@ -84,7 +85,7 @@ export const LoginForm = () => {
                     control={control}
                     name="password"
                     render={({ field: { onChange, onBlur, value } }) => (
-                        <Input
+                        <StyledTextInput
                             label="Mot de passe"
                             placeholder="********"
                             value={value}
@@ -120,14 +121,19 @@ export const LoginForm = () => {
 
             {/* Login button */}
             <Button
-                title="Connexion..."
+                variant="primary"
+                className="bg-emerald-600"
+                title={isLoggingIn ? "Connexion..." : "Se connecter"}
                 onPress={handleSubmit(onSubmit)}
                 disabled={!isValid}
                 loading={false}
             />
 
             {/* Forgot password */}
-            <TouchableOpacity className="items-center mt-4" disabled={false}>
+            <TouchableOpacity
+                className="items-center mt-4"
+                disabled={isLoggingIn}
+            >
                 <Text className="text-emerald-600 text-sm font-medium">
                     Mot de passe oublié ?
                 </Text>
