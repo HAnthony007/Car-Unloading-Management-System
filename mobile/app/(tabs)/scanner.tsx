@@ -1,5 +1,3 @@
-import { api } from "@/src/lib/axios-instance";
-import { Storage } from "@/src/lib/storage";
 import { ManualVinModal } from "@/src/modules/scanner/components/manual-vin-modal";
 import { QuickActions } from "@/src/modules/scanner/components/quick-action";
 import { RecentScans } from "@/src/modules/scanner/components/recent-scan";
@@ -7,7 +5,7 @@ import { ScanHeader } from "@/src/modules/scanner/components/scan-header";
 import { ScannerInterface } from "@/src/modules/scanner/components/scan-interface";
 import { ScanResultModal } from "@/src/modules/scanner/components/scan-result.modal";
 import { mockRecentScans } from "@/src/modules/scanner/data/mock-recent-scan";
-import { useCheckVehicleInPortCall } from "@/src/modules/scanner/hooks/useCheckVehicleInPortCall";
+import { useProcessVin } from "@/src/modules/scanner/hooks/useProcessVin";
 import { useVin } from "@/src/modules/scanner/hooks/useVin";
 import { isValidVin } from "@/src/modules/scanner/lib/validation";
 import { useScannerStore } from "@/src/modules/scanner/stores/scanner-store";
@@ -25,8 +23,10 @@ export default function ScannerScreen() {
     const setVinCheckResult = useScannerStore(
         (s) => (s as any).setVinCheckResult
     );
-    const { checkVin } = useCheckVehicleInPortCall({
+    // Hook centralisant la logique de vérification + discharge
+    const { processVin } = useProcessVin({
         portCallId: selectedPortCall,
+        setVinCheckResult: setVinCheckResult as any,
     });
     const [permission, requestPermission] = useCameraPermissions();
 
@@ -58,86 +58,12 @@ export default function ScannerScreen() {
     const handleManualSubmit = async () => {
         if (!validateManual()) return;
         setShowManualEntry(false);
-        setVinGlobal(manualVin);
-        if (selectedPortCall) {
-            try {
-                const resp = await checkVin(manualVin);
-                setVinCheckResult?.(resp);
-                // console.log("[VIN CHECK][MANUAL]", resp);
-                console.log(
-                    "[VIN  VEHICLE ID CHECK][vehicle_id]",
-                    resp.vehicle_id
-                );
-                // If vehicle exists and discharge id present -> fetch discharge
-                if (resp.vehicle_exists && resp.discharge_id) {
-                    try {
-                        const { data } = await api.get(
-                            `/discharges/${resp.discharge_id}`
-                        );
-                        console.log("[DISCHARGE][GET]", data);
-                    } catch (err: any) {
-                        console.log(
-                            "[DISCHARGE][GET][ERROR]",
-                            err?.response?.data || err.message
-                        );
-                    }
-                }
-                // If vehicle exists but no discharge yet -> create discharge for that vehicle
-                else if (resp.vehicle_exists && !resp.discharge_id) {
-                    try {
-                        const user = await Storage.getUser();
-                        const agentId = user?.user_id ?? null;
-                        const payload = {
-                            discharge_date: new Date().toISOString(),
-                            port_call_id: Number(selectedPortCall),
-                            vehicle_id: resp.vehicle_id,
-                            agent_id: agentId,
-                        };
-                        const { data: created } = await api.post(
-                            `/discharges`,
-                            payload
-                        );
-                        console.log("[DISCHARGE][CREATE]", created);
-                    } catch (err: any) {
-                        console.log(
-                            "[DISCHARGE][CREATE][ERROR]",
-                            err?.response?.data || err.message
-                        );
-                    }
-                }
-                // If vehicle does not exist -> create discharge record (fallback)
-                else if (!resp.vehicle_exists) {
-                    try {
-                        const user = await Storage.getUser();
-                        const agentId = user?.user_id ?? null;
-                        const payload = {
-                            discharge_date: new Date().toISOString(),
-                            port_call_id: Number(selectedPortCall),
-                            vehicle_id: resp.vehicle_id,
-                            agent_id: agentId,
-                        };
-                        const { data: created } = await api.post(
-                            `/discharges`,
-                            payload
-                        );
-                        console.log("[DISCHARGE][CREATE]", created);
-                    } catch (err: any) {
-                        console.log(
-                            "[DISCHARGE][CREATE][ERROR]",
-                            err?.response?.data || err.message
-                        );
-                    }
-                }
-            } catch (e: any) {
-                console.log(
-                    "[VIN CHECK][MANUAL][ERROR]",
-                    e?.response?.data || e.message
-                );
-            }
-        } else {
-            console.log(
-                "[VIN CHECK][MANUAL] Aucun port call sélectionné, skip backend check"
-            );
+        const vin = manualVin.trim().toUpperCase();
+        setVinGlobal(vin);
+        try {
+            await processVin(vin);
+        } catch {
+            /* already logged */
         }
         router.push("/(vehicles)" as any);
     };
@@ -154,76 +80,10 @@ export default function ScannerScreen() {
         if (isValidVin(raw)) {
             setFeedback({ type: "valid", code: raw });
             setVinGlobal(raw);
-            if (selectedPortCall) {
-                try {
-                    const resp = await checkVin(raw);
-                    setVinCheckResult?.(resp);
-                    console.log("[VIN CHECK][SCAN]", resp);
-                    if (resp.vehicle_exists && resp.discharge_id) {
-                        try {
-                            const { data } = await api.get(
-                                `/discharges/${resp.discharge_id}`
-                            );
-                            console.log("[DISCHARGE][GET]", data);
-                        } catch (err: any) {
-                            console.log(
-                                "[DISCHARGE][GET][ERROR]",
-                                err?.response?.data || err.message
-                            );
-                        }
-                    } else if (resp.vehicle_exists && !resp.discharge_id) {
-                        try {
-                            const user = await Storage.getUser();
-                            const agentId = user?.user_id ?? null;
-                            const payload = {
-                                discharge_date: new Date().toISOString(),
-                                port_call_id: Number(selectedPortCall),
-                                vehicle_id: resp.vehicle_id,
-                                agent_id: agentId,
-                            };
-                            const { data: created } = await api.post(
-                                `/discharges`,
-                                payload
-                            );
-                            console.log("[DISCHARGE][CREATE]", created);
-                        } catch (err: any) {
-                            console.log(
-                                "[DISCHARGE][CREATE][ERROR]",
-                                err?.response?.data || err.message
-                            );
-                        }
-                    } else if (!resp.vehicle_exists) {
-                        try {
-                            const user = await Storage.getUser();
-                            const agentId = user?.user_id ?? null;
-                            const payload = {
-                                discharge_date: new Date().toISOString(),
-                                port_call_id: Number(selectedPortCall),
-                                vehicle_id: resp.vehicle_id,
-                                agent_id: agentId,
-                            };
-                            const { data: created } = await api.post(
-                                `/discharges`,
-                                payload
-                            );
-                            console.log("[DISCHARGE][CREATE]", created);
-                        } catch (err: any) {
-                            console.log(
-                                "[DISCHARGE][CREATE][ERROR]",
-                                err?.response?.data || err.message
-                            );
-                        }
-                    }
-                } catch (e: any) {
-                    console.log(
-                        "[VIN CHECK][SCAN][ERROR]",
-                        e?.response?.data || e.message
-                    );
-                }
-            } else {
-                console.log(
-                    "[VIN CHECK][SCAN] Aucun port call sélectionné, skip backend check"
-                );
+            try {
+                await processVin(raw);
+            } catch {
+                /* logged */
             }
             setTimeout(() => {
                 setFeedback(null);

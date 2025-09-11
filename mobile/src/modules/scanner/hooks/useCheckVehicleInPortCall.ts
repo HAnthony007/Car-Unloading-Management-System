@@ -1,8 +1,6 @@
+import { VehicleVinCheckResponse } from "@/src/types/domain";
 import { useMutation } from "@tanstack/react-query";
-import {
-    checkVehicleInPortCall,
-    VehicleVinCheckResponse,
-} from "../lib/vehicle-check";
+import { checkVehicleInPortCall } from "../lib/vehicle-check";
 
 interface Options {
     portCallId: string | null;
