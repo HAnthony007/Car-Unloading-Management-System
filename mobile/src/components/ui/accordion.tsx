@@ -35,10 +35,10 @@ export function Accordion({
         outputRange: ["0deg", "180deg"],
     });
 
-    // const contentHeight = progress.interpolate({
-    //     inputRange: [0, 1],
-    //     outputRange: [0, 1], // will multiply by auto height using opacity & pointerEvents
-    // });
+    const contentHeight = progress.interpolate({
+        inputRange: [0, 1],
+        outputRange: [0, 1], // will multiply by auto height using opacity & pointerEvents
+    });
 
     const opacity = progress.interpolate({
         inputRange: [0, 1],

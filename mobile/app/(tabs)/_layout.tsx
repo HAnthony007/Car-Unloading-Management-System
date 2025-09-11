@@ -1,6 +1,7 @@
 import { Tabs } from "expo-router";
 import React from "react";
 
+import { FloatingChatbot } from "@/src/modules/assistant-ai/components/chatbot";
 import { AuthGuard } from "@/src/providers/auth-guard";
 import { Anchor, BarChart3, ScanLine, User } from "lucide-react-native";
 import { useColorScheme } from "react-native";
@@ -68,6 +69,7 @@ export default function TabLayout() {
                     }}
                 />
             </Tabs>
+            <FloatingChatbot />
         </AuthGuard>
     );
 }

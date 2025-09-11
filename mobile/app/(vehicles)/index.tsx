@@ -1,5 +1,6 @@
 import { ArrivalRow } from "@/src/components/arrival-row";
 import { InfoRow } from "@/src/components/info-row";
+import { Section } from "@/src/components/section";
 import { Accordion } from "@/src/components/ui/accordion";
 import { Field } from "@/src/components/ui/field";
 import { DocumentsAccordion } from "@/src/modules/vehicules/components/documents-accordion";
@@ -9,12 +10,12 @@ import { NotesAccordion } from "@/src/modules/vehicules/components/notes-accordi
 import { StatusSection } from "@/src/modules/vehicules/components/status-section";
 import { useVehicleWorkflow } from "@/src/modules/vehicules/hooks/use-vehicle-workflow";
 import { router } from "expo-router";
-import { Calendar, Car, MapPin, Section, Ship, X } from "lucide-react-native";
+import { StatusBar } from "expo-status-bar";
+import { Calendar, Car, MapPin, Ship, X } from "lucide-react-native";
 import { useState } from "react";
 import {
     Platform,
     ScrollView,
-    StatusBar,
     Text,
     TouchableOpacity,
     View,
@@ -259,11 +260,7 @@ export default function VehicleScreen() {
                     }
                 />
             </ScrollView>
-            <StatusBar
-                barStyle={
-                    Platform.OS === "ios" ? "light-content" : "dark-content"
-                }
-            />
+            <StatusBar style={Platform.OS === "ios" ? "dark" : "auto"} />
         </SafeAreaView>
     );
 }
