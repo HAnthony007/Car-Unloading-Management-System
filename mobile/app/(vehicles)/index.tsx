@@ -92,30 +92,34 @@ export default function VehicleScreen() {
                             <View className="w-1/2 px-1">
                                 <InfoRow
                                     label="Marque"
-                                    value={discharge.vehicle?.make ?? undefined}
+                                    value={
+                                        discharge?.vehicle?.make ?? undefined
+                                    }
                                 />
                             </View>
                             <View className="w-1/2 px-1">
                                 <InfoRow
                                     label="Modèle"
                                     value={
-                                        discharge.vehicle?.model ?? undefined
+                                        discharge?.vehicle?.model ?? undefined
                                     }
                                 />
                             </View>
                             <View className="w-1/2 px-1">
                                 <InfoRow
                                     label="Année"
-                                    value={String(
-                                        discharge.vehicle?.year ?? undefined
-                                    )}
+                                    value={
+                                        discharge?.vehicle?.year != null
+                                            ? String(discharge?.vehicle?.year)
+                                            : undefined
+                                    }
                                 />
                             </View>
                             <View className="w-1/2 px-1">
                                 <InfoRow
                                     label="Couleur"
                                     value={
-                                        discharge.vehicle?.color ?? undefined
+                                        discharge?.vehicle?.color ?? undefined
                                     }
                                 />
                             </View>
@@ -164,8 +168,9 @@ export default function VehicleScreen() {
                                 <InfoRow
                                     label="Poids"
                                     value={
-                                        String(discharge.vehicle?.weight) ??
-                                        undefined
+                                        discharge?.vehicle?.weight != null
+                                            ? String(discharge?.vehicle?.weight)
+                                            : undefined
                                     }
                                 />
                             </View>
@@ -185,25 +190,27 @@ export default function VehicleScreen() {
                             icon={Ship}
                             label="Navire"
                             value={
-                                discharge.port_call?.vessel?.vessel_name || "—"
+                                discharge?.port_call?.vessel?.vessel_name || "—"
                             }
                         />
                         <ArrivalRow
                             icon={Calendar}
                             label="Arrivée"
                             value={
-                                String(discharge.port_call?.arrival_date) || "—"
+                                discharge?.port_call?.arrival_date != null
+                                    ? String(discharge?.port_call?.arrival_date)
+                                    : "—"
                             }
                         />
                         <ArrivalRow
                             icon={Car}
                             label="Agent"
-                            value={discharge.agent?.full_name || "—"}
+                            value={discharge?.agent?.full_name || "—"}
                         />
                         <ArrivalRow
                             icon={MapPin}
                             label="Origine"
-                            value={discharge.port_call?.origin_port || "—"}
+                            value={discharge?.port_call?.origin_port || "—"}
                             subtle
                         />
                     </View>
