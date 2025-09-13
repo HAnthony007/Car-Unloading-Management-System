@@ -69,6 +69,7 @@ export default function VehicleScreenBody() {
             completionPercentage: hasInspection ? 100 : 0,
         };
     }, [documents, movements, images, notes, inspection]);
+    console.log("Vehicle stats:", discharge);
 
     return (
         <ScrollView

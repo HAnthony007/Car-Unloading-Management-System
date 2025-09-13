@@ -50,6 +50,10 @@ export function useProcessVin({
                     try {
                         discharge = await getDischarge(resp.discharge_id);
                         setDischarge(discharge); // on stocke l'objet complet
+                        console.log(
+                            "[DISCHARGE][GET] Discharge trouvée et stockée dans le store",
+                            discharge
+                        );
                     } catch (err: any) {
                         console.log(
                             "[DISCHARGE][GET][ERROR]",
@@ -64,6 +68,10 @@ export function useProcessVin({
                         );
                         discharge = await createDischarge(payload);
                         created = true;
+                        console.log(
+                            "[DISCHARGE][CREATE] Discharge créée et stockée dans le store",
+                            discharge
+                        );
                         setDischarge(discharge); // plus de .data, la fonction retourne déjà l'objet
                     } catch (err: any) {
                         console.log(
@@ -80,6 +88,10 @@ export function useProcessVin({
                         discharge = await createDischarge(payload);
                         created = true;
                         setDischarge(discharge);
+                        console.log(
+                            "[DISCHARGE][CREATE] Discharge créée pour véhicule inexistant et stockée dans le store",
+                            discharge
+                        );
                     } catch (err: any) {
                         console.log(
                             "[DISCHARGE][CREATE][ERROR]",
