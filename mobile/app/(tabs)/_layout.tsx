@@ -3,7 +3,7 @@ import React from "react";
 
 import { FloatingChatbot } from "@/src/modules/assistant-ai/components/chatbot";
 import { AuthGuard } from "@/src/providers/auth-guard";
-import { Anchor, BarChart3, ScanLine, User } from "lucide-react-native";
+import { Anchor, BarChart3, MapPin, ScanLine, User } from "lucide-react-native";
 import { useColorScheme } from "react-native";
 
 export default function TabLayout() {
@@ -56,6 +56,15 @@ export default function TabLayout() {
                         title: "Scanner",
                         tabBarIcon: ({ size, color }) => (
                             <ScanLine size={size} color={color} />
+                        ),
+                    }}
+                />
+                <Tabs.Screen
+                    name="map"
+                    options={{
+                        title: "Google Map",
+                        tabBarIcon: ({ size, color }) => (
+                            <MapPin size={size} color={color} />
                         ),
                     }}
                 />
