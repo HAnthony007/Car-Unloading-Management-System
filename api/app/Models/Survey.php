@@ -12,7 +12,7 @@ class Survey extends Model
     protected $primaryKey = 'survey_id';
 
     protected $fillable = [
-        'survey_date', 'overall_status', 'agent_id', 'discharge_id',
+        'survey_date', 'survey_name', 'survey_description', 'overall_status', 'agent_id', 'discharge_id',
     ];
 
     public function agent(): \Illuminate\Database\Eloquent\Relations\BelongsTo

@@ -16,6 +16,8 @@ final class SearchSurveyCheckpointsRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'title_checkpoint' => ['sometimes', 'string', 'max:255'],
+            // Backward compat
             'title' => ['sometimes', 'string', 'max:255'],
             'survey_id' => ['sometimes', 'integer', 'exists:surveys,survey_id'],
             'page' => ['sometimes', 'integer', 'min:1'],

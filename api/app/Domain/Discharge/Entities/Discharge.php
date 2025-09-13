@@ -5,8 +5,8 @@ namespace App\Domain\Discharge\Entities;
 use App\Domain\Discharge\ValueObjects\DateTimeValue;
 use App\Domain\Discharge\ValueObjects\DischargeId;
 use App\Domain\PortCall\ValueObjects\PortCallId;
-use App\Domain\Vehicle\ValueObjects\VehicleId;
 use App\Domain\User\ValueObjects\UserId;
+use App\Domain\Vehicle\ValueObjects\VehicleId;
 use Carbon\Carbon;
 
 final class Discharge
@@ -15,8 +15,8 @@ final class Discharge
         private readonly ?DischargeId $dischargeId,
         private readonly DateTimeValue $dischargeDate,
         private readonly PortCallId $portCallId,
-    private readonly VehicleId $vehicleId,
-    private readonly UserId $agentId,
+        private readonly VehicleId $vehicleId,
+        private readonly UserId $agentId,
         private readonly ?Carbon $createdAt = null,
         private readonly ?Carbon $updatedAt = null,
     ) {}

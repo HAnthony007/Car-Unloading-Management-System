@@ -4,7 +4,9 @@ namespace App\Domain\Survey\Entities;
 
 use App\Domain\Discharge\ValueObjects\DischargeId; // now represents survey_date (datetime)
 use App\Domain\Survey\ValueObjects\SurveyDate;
+use App\Domain\Survey\ValueObjects\SurveyDescription;
 use App\Domain\Survey\ValueObjects\SurveyId; // agent_id
+use App\Domain\Survey\ValueObjects\SurveyName;
 use App\Domain\Survey\ValueObjects\SurveyStatus;
 use App\Domain\User\ValueObjects\UserId;
 use Carbon\Carbon;
@@ -14,6 +16,8 @@ final class Survey
     public function __construct(
         private readonly ?SurveyId $surveyId,
         private readonly SurveyDate $surveyDate,
+        private readonly SurveyName $surveyName,
+        private readonly SurveyDescription $surveyDescription,
         private readonly SurveyStatus $overallStatus,
         private readonly UserId $agentId,
         private readonly DischargeId $dischargeId,
@@ -29,6 +33,16 @@ final class Survey
     public function getSurveyDate(): SurveyDate
     {
         return $this->surveyDate;
+    }
+
+    public function getSurveyName(): SurveyName
+    {
+        return $this->surveyName;
+    }
+
+    public function getSurveyDescription(): SurveyDescription
+    {
+        return $this->surveyDescription;
     }
 
     public function getOverallStatus(): SurveyStatus
@@ -61,6 +75,8 @@ final class Survey
         return [
             'survey_id' => $this->surveyId?->getValue(),
             'survey_date' => $this->surveyDate->getValue()?->toISOString(),
+            'survey_name' => $this->surveyName->getValue(),
+            'survey_description' => $this->surveyDescription->getValue(),
             'overall_status' => $this->overallStatus->getValue(),
             'agent_id' => $this->agentId->getValue(),
             'discharge_id' => $this->dischargeId->getValue(),

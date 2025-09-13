@@ -19,11 +19,15 @@ final class UpdateSurveyUseCase
 
         $surveyDate = $dto->getSurveyDateVOOrNull() ?? $existing->getSurveyDate();
         $status = $dto->getStatusVOOrNull() ?? $existing->getOverallStatus();
+        $name = $dto->getNameVOOrNull() ?? $existing->getSurveyName();
+        $description = $dto->getDescriptionVOOrNull() ?? $existing->getSurveyDescription();
         $agent = $dto->agentId ? new \App\Domain\User\ValueObjects\UserId($dto->agentId) : $existing->getAgentId();
 
         $updated = new \App\Domain\Survey\Entities\Survey(
             surveyId: $existing->getSurveyId(),
             surveyDate: $surveyDate,
+            surveyName: $name,
+            surveyDescription: $description,
             overallStatus: $status,
             agentId: $agent,
             dischargeId: $existing->getDischargeId(),

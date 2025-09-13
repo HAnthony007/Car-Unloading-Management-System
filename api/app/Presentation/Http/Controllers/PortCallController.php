@@ -3,27 +3,26 @@
 namespace App\Presentation\Http\Controllers;
 
 use App\Application\PortCall\DTOs\CreatePortCallDTO;
+use App\Application\PortCall\DTOs\PortCallSearchCriteriaDTO;
 use App\Application\PortCall\DTOs\UpdatePortCallDTO;
+use App\Application\PortCall\UseCases\CheckVehicleInPortCallUseCase;
 use App\Application\PortCall\UseCases\CreatePortCallUseCase;
 use App\Application\PortCall\UseCases\DeletePortCallUseCase;
 use App\Application\PortCall\UseCases\GetPortCallsUseCase;
-use App\Application\PortCall\UseCases\SearchPortCallsUseCase;
-use App\Application\PortCall\DTOs\PortCallSearchCriteriaDTO;
 use App\Application\PortCall\UseCases\GetPortCallUseCase;
 use App\Application\PortCall\UseCases\GetPortCallVehiclesUseCase;
+use App\Application\PortCall\UseCases\SearchPortCallsUseCase;
 use App\Application\PortCall\UseCases\SearchPortCallVehiclesUseCase;
-use App\Application\Vehicle\DTOs\PortCallVehicleSearchCriteriaDTO;
 use App\Application\PortCall\UseCases\UpdatePortCallUseCase;
+use App\Application\Vehicle\DTOs\PortCallVehicleSearchCriteriaDTO;
+use App\Presentation\Http\Requests\CheckPortCallVehicleVinRequest;
+use App\Presentation\Http\Requests\SearchPortCallsRequest;
+use App\Presentation\Http\Requests\SearchPortCallVehiclesRequest;
 use App\Presentation\Http\Requests\StorePortCallRequest;
 use App\Presentation\Http\Requests\UpdatePortCallRequest;
 use App\Presentation\Http\Resources\PortCallResource;
-use App\Presentation\Http\Requests\SearchPortCallsRequest;
 use App\Presentation\Http\Resources\VehicleResource;
-use App\Presentation\Http\Requests\SearchPortCallVehiclesRequest;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use App\Application\PortCall\UseCases\CheckVehicleInPortCallUseCase;
-use App\Presentation\Http\Requests\CheckPortCallVehicleVinRequest;
 
 final class PortCallController
 {
@@ -34,9 +33,9 @@ final class PortCallController
         private readonly GetPortCallUseCase $getUseCase,
         private readonly UpdatePortCallUseCase $updateUseCase,
         private readonly DeletePortCallUseCase $deleteUseCase,
-    private readonly GetPortCallVehiclesUseCase $getVehiclesUseCase,
-    private readonly SearchPortCallVehiclesUseCase $searchVehiclesUseCase,
-    private readonly CheckVehicleInPortCallUseCase $checkVehicleInPortCallUseCase,
+        private readonly GetPortCallVehiclesUseCase $getVehiclesUseCase,
+        private readonly SearchPortCallVehiclesUseCase $searchVehiclesUseCase,
+        private readonly CheckVehicleInPortCallUseCase $checkVehicleInPortCallUseCase,
     ) {}
 
     public function index(SearchPortCallsRequest $request): JsonResponse
@@ -160,13 +159,13 @@ final class PortCallController
 
     /**
      * Check if a vehicle exists by VIN and whether it has a discharge in the given port call.
-    * Response shape:
-    * {
-    *   "vin": "...",
-    *   "vehicle_exists": bool,
-    *   "vehicle_id": int|null,
-    *   "discharge_id": int|null
-    * }
+     * Response shape:
+     * {
+     *   "vin": "...",
+     *   "vehicle_exists": bool,
+     *   "vehicle_id": int|null,
+     *   "discharge_id": int|null
+     * }
      */
     public function checkVehicleByVin(CheckPortCallVehicleVinRequest $request, int $id): JsonResponse
     {
@@ -174,6 +173,7 @@ final class PortCallController
 
         try {
             $result = $this->checkVehicleInPortCallUseCase->execute($vin, $id);
+
             return response()->json($result->toArray());
         } catch (\Throwable $e) {
             return response()->json([

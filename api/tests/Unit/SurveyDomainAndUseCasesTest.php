@@ -10,7 +10,9 @@ use App\Domain\Discharge\ValueObjects\DischargeId;
 use App\Domain\Survey\Entities\Survey;
 use App\Domain\Survey\Repositories\SurveyRepositoryInterface;
 use App\Domain\Survey\ValueObjects\SurveyDate;
+use App\Domain\Survey\ValueObjects\SurveyDescription;
 use App\Domain\Survey\ValueObjects\SurveyId;
+use App\Domain\Survey\ValueObjects\SurveyName;
 use App\Domain\Survey\ValueObjects\SurveyStatus; // agent
 use App\Domain\User\ValueObjects\UserId;
 use Carbon\Carbon;
@@ -22,9 +24,13 @@ class SurveyDomainAndUseCasesTest extends TestCase
     {
         $date = new SurveyDate(Carbon::parse('2025-08-01T09:30:00Z'));
         $status = new SurveyStatus('PASSED');
+        $name = new SurveyName('Initial Survey');
+        $desc = new SurveyDescription('Description');
         $entity = new Survey(
             surveyId: new SurveyId(1),
             surveyDate: $date,
+            surveyName: $name,
+            surveyDescription: $desc,
             overallStatus: $status,
             agentId: new UserId(10),
             dischargeId: new DischargeId(55),
@@ -43,6 +49,8 @@ class SurveyDomainAndUseCasesTest extends TestCase
     {
         $dto = new CreateSurveyDTO(
             surveyDate: '2025-08-01 00:00:00',
+            surveyName: 'New Survey',
+            surveyDescription: 'Desc',
             overallStatus: 'PENDING',
             agentId: 10,
             dischargeId: 55,
@@ -51,6 +59,8 @@ class SurveyDomainAndUseCasesTest extends TestCase
         $expected = new Survey(
             surveyId: new SurveyId(1),
             surveyDate: $dto->getSurveyDateVO(),
+            surveyName: $dto->getNameVO(),
+            surveyDescription: $dto->getDescriptionVO(),
             overallStatus: $dto->getStatusVO(),
             agentId: new UserId(10),
             dischargeId: new DischargeId(55),
@@ -72,6 +82,8 @@ class SurveyDomainAndUseCasesTest extends TestCase
                 return new Survey(
                     surveyId: new SurveyId(1),
                     surveyDate: new SurveyDate(Carbon::parse('2025-08-01')),
+                    surveyName: new SurveyName('S'),
+                    surveyDescription: new SurveyDescription('D'),
                     overallStatus: new SurveyStatus('PENDING'),
                     agentId: new UserId(10),
                     dischargeId: new DischargeId(55),
@@ -94,6 +106,8 @@ class SurveyDomainAndUseCasesTest extends TestCase
         $existing = new Survey(
             surveyId: new SurveyId(1),
             surveyDate: new SurveyDate(Carbon::parse('2025-08-01')),
+            surveyName: new SurveyName('S'),
+            surveyDescription: new SurveyDescription('D'),
             overallStatus: new SurveyStatus('PENDING'),
             agentId: new UserId(10),
             dischargeId: new DischargeId(55),
@@ -102,6 +116,8 @@ class SurveyDomainAndUseCasesTest extends TestCase
         $updated = new Survey(
             surveyId: new SurveyId(1),
             surveyDate: new SurveyDate(Carbon::parse('2025-08-02')),
+            surveyName: new SurveyName('S2'),
+            surveyDescription: new SurveyDescription('D2'),
             overallStatus: new SurveyStatus('PASSED'),
             agentId: new UserId(10),
             dischargeId: new DischargeId(55),
@@ -122,6 +138,8 @@ class SurveyDomainAndUseCasesTest extends TestCase
         $repo->method('findById')->willReturn(new Survey(
             surveyId: new SurveyId(1),
             surveyDate: new SurveyDate(Carbon::parse('2025-08-01')),
+            surveyName: new SurveyName('S'),
+            surveyDescription: new SurveyDescription('D'),
             overallStatus: new SurveyStatus('PENDING'),
             agentId: new UserId(10),
             dischargeId: new DischargeId(55),

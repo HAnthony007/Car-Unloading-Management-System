@@ -3,11 +3,11 @@
 namespace App\Application\PortCall\UseCases;
 
 use App\Application\PortCall\DTOs\VehiclePortCallCheckResultDTO;
-use App\Domain\PortCall\ValueObjects\PortCallId;
-use App\Domain\Vehicle\ValueObjects\Vin;
-use App\Domain\Vehicle\Repositories\VehicleRepositoryInterface;
 use App\Domain\Discharge\Repositories\DischargeRepositoryInterface;
+use App\Domain\PortCall\ValueObjects\PortCallId;
+use App\Domain\Vehicle\Repositories\VehicleRepositoryInterface;
 use App\Domain\Vehicle\ValueObjects\VehicleId;
+use App\Domain\Vehicle\ValueObjects\Vin;
 
 final class CheckVehicleInPortCallUseCase
 {

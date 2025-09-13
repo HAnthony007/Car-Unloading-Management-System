@@ -37,7 +37,15 @@ class FakeSurveyCheckpointRepo implements SurveyCheckpointRepositoryInterface
     {
         if (! $c->getCheckpointId()) {
             $id = $this->nextId++;
-            $c = new DomainSurveyCheckpoint(new SurveyCheckpointId($id), $c->getTitle(), $c->getComment(), $c->getSurveyId());
+            $c = new DomainSurveyCheckpoint(
+                new SurveyCheckpointId($id),
+                $c->getTitle(),
+                $c->getComment(),
+                $c->getDescription(),
+                $c->getResult(),
+                $c->getOrder(),
+                $c->getSurveyId()
+            );
         }
         $this->items[$c->getCheckpointId()->getValue()] = $c;
 
@@ -63,12 +71,12 @@ it('creates, reads, updates and deletes a survey checkpoint', function () {
     $update = new UpdateSurveyCheckpointUseCase($repo);
     $delete = new DeleteSurveyCheckpointUseCase($repo);
 
-    $created = $create->execute(new CreateSurveyCheckpointDTO('Title', 'Comment', 1));
+    $created = $create->execute(new CreateSurveyCheckpointDTO('Title', 'Comment', null, null, null, 1));
     expect($created->getCheckpointId())->not()->toBeNull();
     $found = $get->execute($created->getCheckpointId()->getValue());
     expect($found->getTitle()->getValue())->toBe('Title');
 
-    $updated = $update->execute(new UpdateSurveyCheckpointDTO($created->getCheckpointId()->getValue(), 'New Title', null));
+    $updated = $update->execute(new UpdateSurveyCheckpointDTO($created->getCheckpointId()->getValue(), 'New Title', null, null, null, null));
     expect($updated->getTitle()->getValue())->toBe('New Title');
 
     $delete->execute($created->getCheckpointId()->getValue());

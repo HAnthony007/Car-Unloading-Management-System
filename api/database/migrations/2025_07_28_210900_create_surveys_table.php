@@ -14,9 +14,12 @@ return new class extends Migration
         Schema::create('surveys', function (Blueprint $table) {
             $table->id('survey_id');
             $table->dateTime('survey_date');
+            $table->string('survey_name')->default('Untitled Survey');
+            $table->text('survey_description')->nullable();
             $table->string('overall_status');
             $table->foreignId('agent_id')->constrained('users', 'user_id');
-            $table->foreignId('discharge_id')->unique()->constrained('discharges', 'discharge_id')->cascadeOnDelete();
+            // Allow multiple surveys per discharge (no unique constraint)
+            $table->foreignId('discharge_id')->constrained('discharges', 'discharge_id')->cascadeOnDelete();
             $table->timestamps();
         });
     }

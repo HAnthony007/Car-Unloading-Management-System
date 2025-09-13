@@ -8,8 +8,8 @@ final class UpdateDischargeDTO
         public readonly int $dischargeId,
         public readonly ?string $dischargeDate = null,
         public readonly ?int $portCallId = null,
-    public readonly ?int $vehicleId = null,
-    public readonly ?int $agentId = null,
+        public readonly ?int $vehicleId = null,
+        public readonly ?int $agentId = null,
     ) {}
 
     public static function fromArray(array $data): self

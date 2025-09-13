@@ -13,7 +13,7 @@ class CheckPortCallVehicleVinRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
-        $vin = (string)$this->query('vin', '');
+        $vin = (string) $this->query('vin', '');
         // Normalize: remove spaces, uppercase
         $vin = strtoupper(str_replace([' ', '-'], '', trim($vin)));
         $this->merge(['vin' => $vin]);
@@ -23,7 +23,7 @@ class CheckPortCallVehicleVinRequest extends FormRequest
     {
         return [
             // 17 chars, alphanumeric, excluding I O Q per VIN standard
-            'vin' => ['required','string','size:17','regex:/^[A-HJ-NPR-Z0-9]{17}$/'],
+            'vin' => ['required', 'string', 'size:17', 'regex:/^[A-HJ-NPR-Z0-9]{17}$/'],
         ];
     }
 

@@ -16,8 +16,14 @@ final class CreateSurveyCheckpointRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => ['required', 'string', 'max:255'],
-            'comment' => ['nullable', 'string', 'max:1000'],
+            'title_checkpoint' => ['required_without:title', 'string', 'max:255'],
+            'comment_checkpoint' => ['nullable', 'string', 'max:1000'],
+            'description_checkpoint' => ['nullable', 'string'],
+            'result_checkpoint' => ['nullable', 'string', 'max:255'],
+            'order_checkpoint' => ['nullable', 'integer', 'min:0'],
+            // Backward compat input names
+            'title' => ['sometimes', 'string', 'max:255'],
+            'comment' => ['sometimes', 'nullable', 'string', 'max:1000'],
             'survey_id' => ['required', 'integer', 'exists:surveys,survey_id'],
         ];
     }

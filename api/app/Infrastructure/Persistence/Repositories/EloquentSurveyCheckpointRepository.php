@@ -41,8 +41,11 @@ final class EloquentSurveyCheckpointRepository implements SurveyCheckpointReposi
             $eloquent = new EloquentSurveyCheckpoint;
         }
 
-        $eloquent->title = $checkpoint->getTitle()->getValue();
-        $eloquent->comment = $checkpoint->getComment()?->getValue();
+        $eloquent->title_checkpoint = $checkpoint->getTitle()->getValue();
+        $eloquent->comment_checkpoint = $checkpoint->getComment()?->getValue();
+        $eloquent->description_checkpoint = $checkpoint->getDescription();
+        $eloquent->result_checkpoint = $checkpoint->getResult();
+        $eloquent->order_checkpoint = $checkpoint->getOrder();
         $eloquent->survey_id = $checkpoint->getSurveyId()->getValue();
         $eloquent->save();
 
@@ -58,8 +61,11 @@ final class EloquentSurveyCheckpointRepository implements SurveyCheckpointReposi
     {
         return new DomainSurveyCheckpoint(
             checkpointId: new SurveyCheckpointId($e->checkpoint_id),
-            title: new CheckpointTitle($e->title),
-            comment: $e->comment !== null ? new CheckpointComment($e->comment) : null,
+            title: new CheckpointTitle($e->title_checkpoint),
+            comment: $e->comment_checkpoint !== null ? new CheckpointComment($e->comment_checkpoint) : null,
+            description: $e->description_checkpoint,
+            result: $e->result_checkpoint,
+            order: $e->order_checkpoint,
             surveyId: new SurveyId($e->survey_id),
             createdAt: $e->created_at,
             updatedAt: $e->updated_at,

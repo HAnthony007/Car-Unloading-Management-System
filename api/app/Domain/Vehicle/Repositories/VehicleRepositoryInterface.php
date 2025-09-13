@@ -32,6 +32,7 @@ interface VehicleRepositoryInterface
 
     /**
      * Paginated + filtered vehicles for a given port call.
+     *
      * @return array{data: array<int, Vehicle>, current_page: int, from: int, last_page: int, path: string, per_page: int, to: int, total: int}
      */
     public function searchByPortCall(

@@ -13,8 +13,11 @@ return new class extends Migration
     {
         Schema::create('survey_checkpoints', function (Blueprint $table) {
             $table->id('checkpoint_id');
-            $table->string('title');
-            $table->string('comment')->nullable();
+            $table->string('title_checkpoint');
+            $table->string('comment_checkpoint')->nullable();
+            $table->text('description_checkpoint')->nullable();
+            $table->string('result_checkpoint')->nullable();
+            $table->unsignedInteger('order_checkpoint')->nullable();
             $table->foreignId('survey_id')
                 ->constrained('surveys', 'survey_id')
                 ->cascadeOnDelete();

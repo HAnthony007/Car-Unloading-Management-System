@@ -8,8 +8,8 @@ use App\Domain\Discharge\Repositories\DischargeRepositoryInterface;
 use App\Domain\Discharge\ValueObjects\DateTimeValue;
 use App\Domain\Discharge\ValueObjects\DischargeId;
 use App\Domain\PortCall\ValueObjects\PortCallId;
-use App\Domain\Vehicle\ValueObjects\VehicleId;
 use App\Domain\User\ValueObjects\UserId;
+use App\Domain\Vehicle\ValueObjects\VehicleId;
 use Carbon\Carbon;
 
 final class UpdateDischargeUseCase

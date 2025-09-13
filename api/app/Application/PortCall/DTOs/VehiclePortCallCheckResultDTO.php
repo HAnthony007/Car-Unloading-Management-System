@@ -6,9 +6,9 @@ final class VehiclePortCallCheckResultDTO
 {
     public function __construct(
         public readonly string $vin,
-    public readonly bool $vehicleExists,
-    public readonly ?int $vehicleId,
-    public readonly ?int $dischargeId,
+        public readonly bool $vehicleExists,
+        public readonly ?int $vehicleId,
+        public readonly ?int $dischargeId,
     ) {}
 
     public function toArray(): array

@@ -17,6 +17,9 @@ final class CreateSurveyCheckpointUseCase
             checkpointId: null,
             title: $dto->getTitleVO(),
             comment: $dto->getCommentVOOrNull(),
+            description: $dto->description,
+            result: $dto->result,
+            order: $dto->order,
             surveyId: new SurveyId($dto->surveyId),
         );
 

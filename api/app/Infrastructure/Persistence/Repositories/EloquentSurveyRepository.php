@@ -6,7 +6,9 @@ use App\Domain\Discharge\ValueObjects\DischargeId;
 use App\Domain\Survey\Entities\Survey as DomainSurvey;
 use App\Domain\Survey\Repositories\SurveyRepositoryInterface;
 use App\Domain\Survey\ValueObjects\SurveyDate;
+use App\Domain\Survey\ValueObjects\SurveyDescription;
 use App\Domain\Survey\ValueObjects\SurveyId;
+use App\Domain\Survey\ValueObjects\SurveyName;
 use App\Domain\Survey\ValueObjects\SurveyStatus;
 use App\Domain\User\ValueObjects\UserId;
 use App\Models\Survey as EloquentSurvey;
@@ -53,6 +55,8 @@ final class EloquentSurveyRepository implements SurveyRepositoryInterface
         }
 
         $eloquent->survey_date = $survey->getSurveyDate()->getValue()?->toDateTimeString();
+        $eloquent->survey_name = $survey->getSurveyName()->getValue();
+        $eloquent->survey_description = $survey->getSurveyDescription()->getValue();
         $eloquent->overall_status = $survey->getOverallStatus()->getValue();
         $eloquent->agent_id = $survey->getAgentId()->getValue();
         $eloquent->discharge_id = $survey->getDischargeId()->getValue();
@@ -71,6 +75,8 @@ final class EloquentSurveyRepository implements SurveyRepositoryInterface
         return new DomainSurvey(
             surveyId: new SurveyId($e->survey_id),
             surveyDate: new SurveyDate($e->survey_date ? Carbon::parse($e->survey_date) : null),
+            surveyName: new SurveyName($e->survey_name),
+            surveyDescription: new SurveyDescription($e->survey_description),
             overallStatus: new SurveyStatus($this->normalizeStatus($e->overall_status)),
             agentId: new UserId($e->agent_id),
             dischargeId: new DischargeId($e->discharge_id),

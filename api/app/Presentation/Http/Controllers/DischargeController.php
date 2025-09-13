@@ -10,6 +10,7 @@ use App\Application\Discharge\UseCases\GetDischargesByPortCallUseCase;
 use App\Application\Discharge\UseCases\GetDischargesUseCase;
 use App\Application\Discharge\UseCases\GetDischargeUseCase;
 use App\Application\Discharge\UseCases\UpdateDischargeUseCase;
+use App\Models\Discharge as EloquentDischarge;
 use App\Presentation\Http\Requests\StoreDischargeRequest;
 use App\Presentation\Http\Requests\UpdateDischargeRequest;
 use App\Presentation\Http\Resources\DischargeResource;
@@ -43,9 +44,13 @@ final class DischargeController
             $dto = CreateDischargeDTO::fromArray($request->validated());
             $d = $this->createUseCase->execute($dto);
 
+            // Load Eloquent model with relations so resource can include nested data
+            $eloquent = EloquentDischarge::with(['portCall.vessel', 'portCall.dock', 'vehicle', 'agent'])
+                ->find($d->getDischargeId()->getValue());
+
             return response()->json([
                 'message' => 'Discharge created successfully.',
-                'data' => new DischargeResource($d),
+                'data' => new DischargeResource($eloquent ?? $d),
             ], 201);
         } catch (\Throwable $e) {
             return response()->json([
@@ -58,9 +63,12 @@ final class DischargeController
     public function show(int $id): JsonResponse
     {
         try {
-            $d = $this->getUseCase->execute($id);
+            $eloquent = EloquentDischarge::with(['portCall.vessel', 'portCall.dock', 'vehicle', 'agent'])->find($id);
+            if (! $eloquent) {
+                throw new \RuntimeException('Discharge not found');
+            }
 
-            return response()->json(['data' => new DischargeResource($d)]);
+            return response()->json(['data' => new DischargeResource($eloquent)]);
         } catch (\Throwable $e) {
             return response()->json([
                 'message' => 'Discharge not found.',
@@ -77,9 +85,12 @@ final class DischargeController
             $dto = UpdateDischargeDTO::fromArray($data);
             $d = $this->updateUseCase->execute($dto);
 
+            $eloquent = EloquentDischarge::with(['portCall.vessel', 'portCall.dock', 'vehicle', 'agent'])
+                ->find($d->getDischargeId()?->getValue());
+
             return response()->json([
                 'message' => 'Discharge updated successfully.',
-                'data' => new DischargeResource($d),
+                'data' => new DischargeResource($eloquent ?? $d),
             ]);
         } catch (\Throwable $e) {
             return response()->json([

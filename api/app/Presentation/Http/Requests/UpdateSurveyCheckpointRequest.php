@@ -16,6 +16,12 @@ final class UpdateSurveyCheckpointRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'title_checkpoint' => ['sometimes', 'string', 'max:255'],
+            'comment_checkpoint' => ['sometimes', 'nullable', 'string', 'max:1000'],
+            'description_checkpoint' => ['sometimes', 'nullable', 'string'],
+            'result_checkpoint' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'order_checkpoint' => ['sometimes', 'nullable', 'integer', 'min:0'],
+            // Backward compat input names
             'title' => ['sometimes', 'string', 'max:255'],
             'comment' => ['sometimes', 'nullable', 'string', 'max:1000'],
         ];

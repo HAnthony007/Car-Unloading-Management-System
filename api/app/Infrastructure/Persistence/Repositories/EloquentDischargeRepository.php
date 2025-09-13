@@ -7,8 +7,8 @@ use App\Domain\Discharge\Repositories\DischargeRepositoryInterface;
 use App\Domain\Discharge\ValueObjects\DateTimeValue;
 use App\Domain\Discharge\ValueObjects\DischargeId;
 use App\Domain\PortCall\ValueObjects\PortCallId;
-use App\Domain\Vehicle\ValueObjects\VehicleId;
 use App\Domain\User\ValueObjects\UserId;
+use App\Domain\Vehicle\ValueObjects\VehicleId;
 use App\Models\Discharge as EloquentDischarge;
 use Carbon\Carbon;
 
@@ -47,6 +47,7 @@ final class EloquentDischargeRepository implements DischargeRepositoryInterface
             ->where('port_call_id', $portCallId->getValue())
             ->orderByDesc('discharge_timestamp')
             ->first();
+
         return $eloquent ? $this->toDomainEntity($eloquent) : null;
     }
 
@@ -59,8 +60,8 @@ final class EloquentDischargeRepository implements DischargeRepositoryInterface
 
         $eloquent->discharge_timestamp = $discharge->getDischargeDate()->getValue();
         $eloquent->port_call_id = $discharge->getPortCallId()->getValue();
-    $eloquent->vehicle_id = $discharge->getVehicleId()->getValue();
-    $eloquent->agent_id = $discharge->getAgentId()->getValue();
+        $eloquent->vehicle_id = $discharge->getVehicleId()->getValue();
+        $eloquent->agent_id = $discharge->getAgentId()->getValue();
         $eloquent->save();
 
         return $this->toDomainEntity($eloquent);

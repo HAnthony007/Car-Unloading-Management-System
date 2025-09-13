@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             // DischargeSeeder::class,
             // VehicleSeeder::class,
             ParkingSeeder::class,
+            SurveyTemplateSeeder::class,
             // FollowUpFileSeeder::class,
             // SurveySeeder::class,
             // SurveyCheckpointSeeder::class,

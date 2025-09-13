@@ -16,8 +16,12 @@ class SurveyCheckpointFactory extends Factory
     public function definition(): array
     {
         return [
-            'title' => fake()->sentence(3),
-            'comment' => fake()->optional()->sentence(),
+            'title_checkpoint' => fake()->sentence(3),
+            'comment_checkpoint' => fake()->optional()->sentence(),
+            'description_checkpoint' => fake()->optional()->paragraph(),
+            // Start unset (null). Result will be filled later by inspection process.
+            'result_checkpoint' => null,
+            'order_checkpoint' => fake()->optional()->numberBetween(1, 10),
             'survey_id' => Survey::factory(),
         ];
     }

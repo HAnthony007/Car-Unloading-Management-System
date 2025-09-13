@@ -17,6 +17,8 @@ final class CreateSurveyUseCase
         $entity = new Survey(
             surveyId: null,
             surveyDate: $dto->getSurveyDateVO(),
+            surveyName: $dto->getNameVO(),
+            surveyDescription: $dto->getDescriptionVO(),
             overallStatus: $dto->getStatusVO(),
             agentId: new UserId($dto->agentId),
             dischargeId: new DischargeId($dto->dischargeId),

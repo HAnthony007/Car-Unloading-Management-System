@@ -4,6 +4,7 @@ namespace App\Presentation\Http\Resources;
 
 use App\Domain\Discharge\Entities\Discharge;
 use App\Models\Discharge as EloquentDischarge;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -11,18 +12,16 @@ final class DischargeResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
-        /** @var Discharge $d */
-        $d = $this->resource;
-
-        // If the original resource is an Eloquent model already loaded with relations, reuse it.
+        // Resource may be a Domain Discharge entity OR an Eloquent model. Normalise accessors.
         $eloquent = $this->resource instanceof EloquentDischarge ? $this->resource : null;
-        if (! $eloquent) {
-            try {
-                $id = $d->getDischargeId()?->getValue();
-                $eloquent = $id ? EloquentDischarge::with(['portCall.vessel', 'portCall.dock', 'vehicle', 'agent'])->find($id) : null;
-            } catch (\Throwable $e) {
-                // ignore enrichment errors
-            }
+        $domain   = $this->resource instanceof Discharge ? $this->resource : null;
+
+        // If we only have the domain entity, fetch a hydrated Eloquent model (single small query, cached briefly)
+        if (! $eloquent && $domain && $domain->getDischargeId()) {
+            $id = $domain->getDischargeId()->getValue();
+            $eloquent = Cache::remember("discharge_resource_{$id}", 5, function () use ($id) {
+                return EloquentDischarge::with(['portCall.vessel', 'portCall.dock', 'vehicle', 'agent'])->find($id);
+            });
         }
 
         $portCall = null;
@@ -52,17 +51,47 @@ final class DischargeResource extends JsonResource
             }
         }
 
+        // Extract scalar fields from whichever representation we have.
+    if ($domain) {
+            $dischargeId = $domain->getDischargeId()?->getValue();
+            $dischargeDate = $domain->getDischargeDate()->getValue()?->toIso8601String();
+            $portCallId = $domain->getPortCallId()->getValue();
+            $vehicleId = $domain->getVehicleId()->getValue();
+            $agentId = $domain->getAgentId()->getValue();
+            $createdAt = $domain->getCreatedAt()?->toIso8601String();
+            $updatedAt = $domain->getUpdatedAt()?->toIso8601String();
+    }
+
+    if ($eloquent) {
+            $dischargeId = $eloquent->discharge_id;
+            $dischargeDate = $eloquent->discharge_timestamp?->toIso8601String();
+            $portCallId = $eloquent->port_call_id;
+            $vehicleId = $eloquent->vehicle_id;
+            $agentId = $eloquent->agent_id;
+            $createdAt = $eloquent->created_at?->toIso8601String();
+            $updatedAt = $eloquent->updated_at?->toIso8601String();
+        }
+        
+    // Final fallback if still nothing (should not happen)
+    $dischargeId   = $dischargeId   ?? null;
+    $dischargeDate = $dischargeDate ?? null;
+    $portCallId    = $portCallId    ?? null;
+    $vehicleId     = $vehicleId     ?? null;
+    $agentId       = $agentId       ?? null;
+    $createdAt     = $createdAt     ?? null;
+    $updatedAt     = $updatedAt     ?? null;
+
         return [
-            'discharge_id' => $d->getDischargeId()?->getValue(),
-            'discharge_date' => $d->getDischargeDate()->getValue()?->toIso8601String(),
-            'port_call_id' => $d->getPortCallId()->getValue(),
-            'vehicle_id' => $d->getVehicleId()->getValue(),
-            'agent_id' => $d->getAgentId()->getValue(),
+            'discharge_id' => $dischargeId,
+            'discharge_date' => $dischargeDate,
+            'port_call_id' => $portCallId,
+            'vehicle_id' => $vehicleId,
+            'agent_id' => $agentId,
             'port_call' => $portCall,
             'vehicle' => $vehicle,
             'agent' => $agent,
-            'created_at' => $d->getCreatedAt()?->toIso8601String(),
-            'updated_at' => $d->getUpdatedAt()?->toIso8601String(),
+            'created_at' => $createdAt,
+            'updated_at' => $updatedAt,
         ];
     }
 }

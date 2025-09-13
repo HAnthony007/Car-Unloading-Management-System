@@ -2,10 +2,10 @@
 
 namespace Tests\Feature;
 
+use App\Models\Discharge;
+use App\Models\PortCall;
 use App\Models\User;
 use App\Models\Vehicle;
-use App\Models\PortCall;
-use App\Models\Discharge;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
@@ -18,6 +18,7 @@ class DischargeApiTest extends TestCase
     {
         // Assuming Sanctum; create token
         $token = $user->createToken('test')->plainTextToken;
+
         return [
             'Authorization' => 'Bearer '.$token,
             'Accept' => 'application/json',
@@ -56,7 +57,7 @@ class DischargeApiTest extends TestCase
     {
         $user = User::factory()->create();
         $res = $this->postJson('/api/discharges', [], $this->authHeaders($user));
-        $res->assertStatus(422)->assertJsonValidationErrors(['discharge_date','port_call_id','vehicle_id','agent_id']);
+        $res->assertStatus(422)->assertJsonValidationErrors(['discharge_date', 'port_call_id', 'vehicle_id', 'agent_id']);
     }
 
     public function test_can_update_vehicle_and_agent(): void

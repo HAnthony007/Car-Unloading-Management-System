@@ -7,8 +7,8 @@ final class CreateDischargeDTO
     public function __construct(
         public readonly string $dischargeDate,
         public readonly int $portCallId,
-    public readonly int $vehicleId,
-    public readonly int $agentId,
+        public readonly int $vehicleId,
+        public readonly int $agentId,
     ) {}
 
     public static function fromArray(array $data): self

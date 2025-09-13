@@ -12,5 +12,6 @@ return [
     App\Providers\SurveyServiceProvider::class,
     App\Providers\SurveyCheckpointServiceProvider::class,
     App\Providers\MovementServiceProvider::class,
+    App\Providers\InspectionServiceProvider::class,
     App\Infrastructure\Providers\StorageServiceProvider::class,
 ];

@@ -67,8 +67,8 @@ class PhotoControllerTest extends TestCase
             'discharge_id' => $discharge->discharge_id,
         ]);
         $checkpoint = SurveyCheckpoint::query()->create([
-            'title' => 'Checkpoint',
-            'comment' => 'Ok',
+            'title_checkpoint' => 'Checkpoint',
+            'comment_checkpoint' => 'Ok',
             'survey_id' => $survey->survey_id,
         ]);
 

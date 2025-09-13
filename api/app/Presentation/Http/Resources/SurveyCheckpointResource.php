@@ -13,8 +13,11 @@ final class SurveyCheckpointResource extends JsonResource
 
         return [
             'checkpoint_id' => $c->getCheckpointId()?->getValue(),
-            'title' => $c->getTitle()->getValue(),
-            'comment' => $c->getComment()?->getValue(),
+            'title_checkpoint' => $c->getTitle()->getValue(),
+            'comment_checkpoint' => $c->getComment()?->getValue(),
+            'description_checkpoint' => $c->getDescription(),
+            'result_checkpoint' => $c->getResult(),
+            'order_checkpoint' => $c->getOrder(),
             'survey_id' => $c->getSurveyId()->getValue(),
             'created_at' => $c->getCreatedAt()?->toISOString(),
             'updated_at' => $c->getUpdatedAt()?->toISOString(),

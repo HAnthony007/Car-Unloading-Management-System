@@ -11,14 +11,20 @@ final class UpdateSurveyCheckpointDTO
         public readonly int $checkpointId,
         public readonly ?string $title = null,
         public readonly ?string $comment = null,
+        public readonly ?string $description = null,
+        public readonly ?string $result = null,
+        public readonly ?int $order = null,
     ) {}
 
     public static function fromArray(array $data): self
     {
         return new self(
             checkpointId: (int) $data['checkpoint_id'],
-            title: $data['title'] ?? null,
-            comment: $data['comment'] ?? null,
+            title: $data['title_checkpoint'] ?? $data['title'] ?? null,
+            comment: $data['comment_checkpoint'] ?? $data['comment'] ?? null,
+            description: $data['description_checkpoint'] ?? null,
+            result: $data['result_checkpoint'] ?? null,
+            order: isset($data['order_checkpoint']) ? (int) $data['order_checkpoint'] : null,
         );
     }
 

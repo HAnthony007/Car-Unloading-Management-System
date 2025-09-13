@@ -14,6 +14,9 @@ final class SurveyCheckpoint
         private readonly ?SurveyCheckpointId $checkpointId,
         private readonly CheckpointTitle $title,
         private readonly ?CheckpointComment $comment,
+        private readonly ?string $description,
+        private readonly ?string $result,
+        private readonly ?int $order,
         private readonly SurveyId $surveyId,
         private readonly ?Carbon $createdAt = null,
         private readonly ?Carbon $updatedAt = null,
@@ -32,6 +35,21 @@ final class SurveyCheckpoint
     public function getComment(): ?CheckpointComment
     {
         return $this->comment;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function getResult(): ?string
+    {
+        return $this->result;
+    }
+
+    public function getOrder(): ?int
+    {
+        return $this->order;
     }
 
     public function getSurveyId(): SurveyId
@@ -53,8 +71,11 @@ final class SurveyCheckpoint
     {
         return [
             'checkpoint_id' => $this->checkpointId?->getValue(),
-            'title' => $this->title->getValue(),
-            'comment' => $this->comment?->getValue(),
+            'title_checkpoint' => $this->title->getValue(),
+            'comment_checkpoint' => $this->comment?->getValue(),
+            'description_checkpoint' => $this->description,
+            'result_checkpoint' => $this->result,
+            'order_checkpoint' => $this->order,
             'survey_id' => $this->surveyId->getValue(),
             'created_at' => $this->createdAt?->toISOString(),
             'updated_at' => $this->updatedAt?->toISOString(),

@@ -95,8 +95,8 @@ class SurveyCheckpointFeatureTest extends TestCase
         ]);
 
         $create = $this->postJson('/api/survey-checkpoints', [
-            'title' => 'Entry Gate',
-            'comment' => 'All good',
+            'title_checkpoint' => 'Entry Gate',
+            'comment_checkpoint' => 'All good',
             'survey_id' => $survey->survey_id,
         ]);
         $create->assertCreated();
@@ -108,11 +108,11 @@ class SurveyCheckpointFeatureTest extends TestCase
 
         $show = $this->getJson('/api/survey-checkpoints/'.$id);
         $show->assertOk();
-        $this->assertSame('Entry Gate', $show->json('data.title'));
+        $this->assertSame('Entry Gate', $show->json('data.title_checkpoint'));
 
-        $update = $this->putJson('/api/survey-checkpoints/'.$id, ['title' => 'Exit Gate']);
+        $update = $this->putJson('/api/survey-checkpoints/'.$id, ['title_checkpoint' => 'Exit Gate']);
         $update->assertOk();
-        $this->assertSame('Exit Gate', $update->json('data.title'));
+        $this->assertSame('Exit Gate', $update->json('data.title_checkpoint'));
 
         Photo::query()->create([
             'photo_path' => 'path.jpg',

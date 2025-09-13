@@ -14,6 +14,8 @@ final class SurveyResource extends JsonResource
         return [
             'survey_id' => $s->getSurveyId()?->getValue(),
             'survey_date' => $s->getSurveyDate()->getValue()?->toISOString(),
+            'survey_name' => $s->getSurveyName()->getValue(),
+            'survey_description' => $s->getSurveyDescription()->getValue(),
             'overall_status' => $s->getOverallStatus()->getValue(),
             'agent_id' => $s->getAgentId()->getValue(),
             'discharge_id' => $s->getDischargeId()->getValue(),

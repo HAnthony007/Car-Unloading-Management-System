@@ -12,7 +12,7 @@ class SurveyCheckpoint extends Model
     protected $primaryKey = 'checkpoint_id';
 
     protected $fillable = [
-        'title', 'comment', 'survey_id',
+        'title_checkpoint', 'comment_checkpoint', 'description_checkpoint', 'result_checkpoint', 'order_checkpoint', 'survey_id',
     ];
 
     public function survey(): \Illuminate\Database\Eloquent\Relations\BelongsTo

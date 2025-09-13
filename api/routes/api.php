@@ -15,6 +15,7 @@ Route::prefix('auth')
     ->group(function (): void {
         Route::post('/register', [AuthController::class, 'register'])->name('register');
         Route::post('/login', [AuthController::class, 'login'])->name('login');
+    Route::get('/{id}/inspection', [\App\Presentation\Http\Controllers\InspectionController::class, 'showByDischarge'])->name('discharges.inspection.show');
         // SPA cookie-based session authentication endpoints
         Route::post('/spa/login', [AuthController::class, 'spaLogin'])->name('spa.login');
 
@@ -152,8 +153,8 @@ Route::prefix('port-calls')
         Route::get('/{id}/vehicles', [\App\Presentation\Http\Controllers\PortCallController::class, 'vehicles'])->name('portcalls.vehicles');
         // Backward compatibility (French path)
         Route::get('/{id}/vehicules', [\App\Presentation\Http\Controllers\PortCallController::class, 'vehicles'])->name('portcalls.vehicules');
-    // Check vehicle membership (VIN + port call)
-    Route::get('/{id}/vehicles/check', [\App\Presentation\Http\Controllers\PortCallController::class, 'checkVehicleByVin'])->name('portcalls.vehicles.check');
+        // Check vehicle membership (VIN + port call)
+        Route::get('/{id}/vehicles/check', [\App\Presentation\Http\Controllers\PortCallController::class, 'checkVehicleByVin'])->name('portcalls.vehicles.check');
         Route::put('/{id}', [\App\Presentation\Http\Controllers\PortCallController::class, 'update'])->name('portcalls.update');
         Route::delete('/{id}', [\App\Presentation\Http\Controllers\PortCallController::class, 'destroy'])->name('portcalls.destroy');
 
@@ -168,6 +169,8 @@ Route::prefix('discharges')
         Route::get('/', [\App\Presentation\Http\Controllers\DischargeController::class, 'index'])->name('discharges.index');
         Route::post('/', [\App\Presentation\Http\Controllers\DischargeController::class, 'store'])->name('discharges.store');
         Route::get('/{id}', [\App\Presentation\Http\Controllers\DischargeController::class, 'show'])->name('discharges.show');
+    // Inspection (surveys + checkpoints) for a specific discharge
+    Route::get('/{id}/inspection', [\App\Presentation\Http\Controllers\InspectionController::class, 'showByDischarge'])->name('discharges.inspection.show');
         Route::put('/{id}', [\App\Presentation\Http\Controllers\DischargeController::class, 'update'])->name('discharges.update');
         Route::delete('/{id}', [\App\Presentation\Http\Controllers\DischargeController::class, 'destroy'])->name('discharges.destroy');
     });
@@ -195,6 +198,28 @@ Route::prefix('survey-checkpoints')
         Route::get('/{id}', [\App\Presentation\Http\Controllers\SurveyCheckpointController::class, 'show'])->name('surveycheckpoints.show');
         Route::put('/{id}', [\App\Presentation\Http\Controllers\SurveyCheckpointController::class, 'update'])->name('surveycheckpoints.update');
         Route::delete('/{id}', [\App\Presentation\Http\Controllers\SurveyCheckpointController::class, 'destroy'])->name('surveycheckpoints.destroy');
+    });
+
+// Inspection Initialization Route
+Route::prefix('inspections')
+    ->middleware('auth:sanctum')
+    ->group(function (): void {
+        Route::post('/start', [\App\Presentation\Http\Controllers\InspectionController::class, 'start'])->name('inspections.start');
+    });
+
+// Survey Templates Admin Routes
+Route::prefix('inspection/templates')
+    ->middleware('auth:sanctum')
+    ->group(function (): void {
+        Route::get('/', [\App\Presentation\Http\Controllers\SurveyTemplateController::class, 'index'])->name('surveytemplates.index');
+        Route::post('/', [\App\Presentation\Http\Controllers\SurveyTemplateController::class, 'store'])->name('surveytemplates.store');
+        Route::get('/{id}', [\App\Presentation\Http\Controllers\SurveyTemplateController::class, 'show'])->name('surveytemplates.show');
+        Route::put('/{id}', [\App\Presentation\Http\Controllers\SurveyTemplateController::class, 'update'])->name('surveytemplates.update');
+        Route::delete('/{id}', [\App\Presentation\Http\Controllers\SurveyTemplateController::class, 'destroy'])->name('surveytemplates.destroy');
+        // Checkpoints nested
+        Route::post('/{id}/checkpoints', [\App\Presentation\Http\Controllers\SurveyTemplateController::class, 'storeCheckpoint'])->name('surveytemplates.checkpoints.store');
+        Route::put('/checkpoints/{checkpointId}', [\App\Presentation\Http\Controllers\SurveyTemplateController::class, 'updateCheckpoint'])->name('surveytemplates.checkpoints.update');
+        Route::delete('/checkpoints/{checkpointId}', [\App\Presentation\Http\Controllers\SurveyTemplateController::class, 'destroyCheckpoint'])->name('surveytemplates.checkpoints.destroy');
     });
 
 // Photos Management Routes

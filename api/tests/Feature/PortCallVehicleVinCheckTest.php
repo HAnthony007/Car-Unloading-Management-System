@@ -1,13 +1,13 @@
 <?php
 
+use App\Models\Discharge;
+use App\Models\PortCall;
 use App\Models\Role;
 use App\Models\User;
-use App\Models\PortCall;
 use App\Models\Vehicle;
-use App\Models\Discharge;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\getJson;
@@ -48,7 +48,7 @@ function ensurePortCallVehicleVinCheckTables(): void
             $table->dateTime('departure_date')->nullable();
             $table->foreignId('vessel_id')->constrained('vessels', 'vessel_id');
             $table->foreignId('dock_id')->constrained('docks', 'dock_id');
-            $table->enum('status', ['pending','in_progress','completed'])->default('pending');
+            $table->enum('status', ['pending', 'in_progress', 'completed'])->default('pending');
             $table->timestamps();
         });
     }
@@ -95,13 +95,13 @@ it('validates VIN format', function () {
     // Too short
     getJson("/api/port-calls/{$portCall->getKey()}/vehicles/check?vin=123")
         ->assertStatus(422)
-        ->assertJsonStructure(['message','errors'=>['vin']]);
+        ->assertJsonStructure(['message', 'errors' => ['vin']]);
 
     // Contains forbidden letter I
     $vin = '1HGCM82633I004352'; // 17 chars but includes I
     getJson("/api/port-calls/{$portCall->getKey()}/vehicles/check?vin={$vin}")
         ->assertStatus(422)
-        ->assertJsonStructure(['message','errors'=>['vin']]);
+        ->assertJsonStructure(['message', 'errors' => ['vin']]);
 });
 
 it('returns vehicle_exists=false when VIN not found', function () {

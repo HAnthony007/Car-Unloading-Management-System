@@ -34,6 +34,7 @@ final class SearchPortCallsUseCase
             $portCalls = array_filter($portCalls, function ($pc) use ($needle) {
                 $agent = strtolower($pc->getVesselAgent()->getValue());
                 $origin = strtolower($pc->getOriginPort()->getValue());
+
                 return str_contains($agent, $needle) || str_contains($origin, $needle);
             });
         }
@@ -43,10 +44,17 @@ final class SearchPortCallsUseCase
             $to = $criteria->arrivalTo ? strtotime($criteria->arrivalTo.' 23:59:59') : null;
             $portCalls = array_filter($portCalls, function ($pc) use ($from, $to) {
                 $arrival = $pc->getArrivalDate()->getValue();
-                if ($arrival === null) { return false; }
+                if ($arrival === null) {
+                    return false;
+                }
                 $ts = strtotime($arrival->toDateTimeString());
-                if ($from && $ts < $from) { return false; }
-                if ($to && $ts > $to) { return false; }
+                if ($from && $ts < $from) {
+                    return false;
+                }
+                if ($to && $ts > $to) {
+                    return false;
+                }
+
                 return true;
             });
         }
