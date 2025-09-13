@@ -29,8 +29,8 @@ export function InspectionAccordion({
     const actualOpen =
         controlledOpen !== undefined ? controlledOpen : uncontrolledOpen;
 
-    const [render, setRender] = useState(actualOpen);
-    const anim = useState(new Animated.Value(actualOpen ? 1 : 0))[0];
+    const [render, setRender] = useState(defaultOpen);
+    const anim = useState(new Animated.Value(defaultOpen ? 1 : 0))[0];
 
     useEffect(() => {
         if (actualOpen) setRender(true);
@@ -41,7 +41,7 @@ export function InspectionAccordion({
         }
         Animated.timing(anim, {
             toValue: actualOpen ? 1 : 0,
-            duration: 240,
+            duration: 300,
             easing: Easing.out(Easing.cubic),
             useNativeDriver: false,
         }).start(({ finished }) => {
@@ -67,25 +67,42 @@ export function InspectionAccordion({
     });
 
     return (
-        <View className="mb-6 rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden">
+        <View className="rounded-3xl border border-slate-200 bg-white shadow-lg overflow-hidden">
             <TouchableOpacity
                 onPress={toggle}
-                className="px-5 py-4 flex-row items-center justify-between"
-                activeOpacity={0.85}
+                className="px-6 py-5 flex-row items-center justify-between"
+                activeOpacity={0.7}
+                style={{
+                    shadowColor: "#000",
+                    shadowOffset: { width: 0, height: 1 },
+                    shadowOpacity: 0.05,
+                    shadowRadius: 2,
+                    elevation: 1,
+                }}
             >
                 <View className="flex-1 pr-4">
-                    <Text className="text-sm font-semibold text-slate-900 mb-0.5">
+                    <Text className="text-base font-bold text-slate-900 mb-1">
                         {title}
                     </Text>
                     <Text
-                        className="text-[10px] text-gray-500"
+                        className="text-sm text-slate-600 leading-5"
                         numberOfLines={2}
                     >
                         {description}
                     </Text>
                 </View>
-                <Animated.View style={{ transform: [{ rotate }] }}>
-                    <ChevronDown size={18} color="#374151" />
+                <Animated.View
+                    style={{
+                        transform: [{ rotate }],
+                        backgroundColor: actualOpen ? "#f1f5f9" : "#f8fafc",
+                        borderRadius: 20,
+                        padding: 8,
+                    }}
+                >
+                    <ChevronDown
+                        size={20}
+                        color={actualOpen ? "#475569" : "#94a3b8"}
+                    />
                 </Animated.View>
             </TouchableOpacity>
             {render && (
@@ -93,13 +110,13 @@ export function InspectionAccordion({
                     style={{
                         maxHeight: anim.interpolate({
                             inputRange: [0, 1],
-                            outputRange: [0, 1200],
+                            outputRange: [0, 2000],
                         }),
                         opacity: anim,
                     }}
                 >
-                    <View className="h-px bg-gray-100 mx-5" />
-                    <View className="px-5 py-4">{children}</View>
+                    <View className="h-px bg-slate-100 mx-6" />
+                    <View className="px-6 py-5">{children}</View>
                 </Animated.View>
             )}
         </View>

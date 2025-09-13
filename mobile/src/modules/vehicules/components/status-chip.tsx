@@ -1,4 +1,5 @@
-import { Text, TouchableOpacity } from "react-native";
+import { useEffect, useRef } from "react";
+import { Animated, Text, TouchableOpacity } from "react-native";
 
 interface Props {
     active: boolean;
@@ -15,34 +16,78 @@ export function StatusChip({
     tone,
     icon: Icon,
 }: Props) {
-    const map: Record<string, { bg: string; text: string; border: string }> = {
-        emerald: {
-            bg: active ? "bg-emerald-600" : "bg-emerald-50",
-            text: active ? "text-white" : "text-emerald-700",
-            border: active ? "border-emerald-600" : "border-emerald-200",
-        },
-        amber: {
-            bg: active ? "bg-amber-600" : "bg-amber-50",
-            text: active ? "text-white" : "text-amber-700",
-            border: active ? "border-amber-600" : "border-amber-200",
-        },
-        slate: {
-            bg: active ? "bg-slate-600" : "bg-slate-100",
-            text: active ? "text-white" : "text-slate-700",
-            border: active ? "border-slate-600" : "border-slate-300",
-        },
+    const scaleAnim = useRef(new Animated.Value(1)).current;
+    const opacityAnim = useRef(new Animated.Value(1)).current;
+
+    useEffect(() => {
+        Animated.parallel([
+            Animated.timing(scaleAnim, {
+                toValue: active ? 1.05 : 1,
+                duration: 200,
+                useNativeDriver: true,
+            }),
+            Animated.timing(opacityAnim, {
+                toValue: active ? 1 : 0.7,
+                duration: 200,
+                useNativeDriver: true,
+            }),
+        ]).start();
+    }, [active, scaleAnim, opacityAnim]);
+
+    const getColors = () => {
+        if (tone === "emerald") {
+            return {
+                bg: active ? "bg-emerald-500" : "bg-emerald-50",
+                text: active ? "text-white" : "text-emerald-700",
+                border: active ? "border-emerald-500" : "border-emerald-200",
+                iconColor: active ? "#ffffff" : "#059669",
+                shadowColor: active ? "#10b981" : "transparent",
+            };
+        } else if (tone === "amber") {
+            return {
+                bg: active ? "bg-amber-500" : "bg-amber-50",
+                text: active ? "text-white" : "text-amber-700",
+                border: active ? "border-amber-500" : "border-amber-200",
+                iconColor: active ? "#ffffff" : "#d97706",
+                shadowColor: active ? "#f59e0b" : "transparent",
+            };
+        } else {
+            return {
+                bg: active ? "bg-slate-500" : "bg-slate-50",
+                text: active ? "text-white" : "text-slate-700",
+                border: active ? "border-slate-500" : "border-slate-200",
+                iconColor: active ? "#ffffff" : "#475569",
+                shadowColor: active ? "#64748b" : "transparent",
+            };
+        }
     };
-    const t = map[tone];
+
+    const colors = getColors();
+
     return (
-        <TouchableOpacity
-            onPress={onPress}
-            className={`ml-1 px-2 h-7 rounded-full border flex-row items-center ${t.bg} ${t.border}`}
-            activeOpacity={0.85}
+        <Animated.View
+            style={{
+                transform: [{ scale: scaleAnim }],
+                opacity: opacityAnim,
+            }}
         >
-            <Icon size={12} color={active ? "#fff" : undefined} />
-            <Text className={`ml-1 text-[10px] font-semibold ${t.text}`}>
-                {label}
-            </Text>
-        </TouchableOpacity>
+            <TouchableOpacity
+                onPress={onPress}
+                className={`px-3 py-2 rounded-xl border flex-row items-center ${colors.bg} ${colors.text} ${colors.border}`}
+                activeOpacity={0.8}
+                style={{
+                    shadowColor: colors.shadowColor,
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: active ? 0.3 : 0,
+                    shadowRadius: 4,
+                    elevation: active ? 3 : 0,
+                }}
+            >
+                <Icon size={14} color={colors.iconColor} />
+                <Text className={`ml-2 text-xs font-semibold ${colors.text}`}>
+                    {label}
+                </Text>
+            </TouchableOpacity>
+        </Animated.View>
     );
 }
