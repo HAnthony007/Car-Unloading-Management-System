@@ -8,9 +8,10 @@ import {
 } from "lucide-react-native";
 import React from "react";
 import { Text, View } from "react-native";
+import { useVehicleWorkflow } from "../hooks/use-vehicle-workflow";
 
 export const VehicleInfoCard: React.FC = () => {
-    const metadata = useScannerStore((s) => s.metadata);
+    const { discharge } = useVehicleWorkflow();
     const vin = useScannerStore((s) => s.vin || "VIN-INCONNU");
     return (
         <View className="bg-white rounded-3xl p-6 shadow-lg border border-slate-200">
@@ -19,7 +20,7 @@ export const VehicleInfoCard: React.FC = () => {
                     <Settings size={20} color="#3b82f6" />
                 </View>
                 <Text className="text-slate-900 text-lg font-bold">
-                    Informations Véhicule
+                    Informations
                 </Text>
             </View>
             <View className="bg-slate-50 rounded-2xl p-4 mb-4">
@@ -43,7 +44,7 @@ export const VehicleInfoCard: React.FC = () => {
                             </Text>
                         </View>
                         <Text className="text-slate-900 text-sm font-semibold">
-                            {metadata?.identification.make || "—"}
+                            {discharge?.vehicle?.make || "-"}
                         </Text>
                     </View>
                 </View>
@@ -52,11 +53,11 @@ export const VehicleInfoCard: React.FC = () => {
                         <View className="flex-row items-center mb-1">
                             <Settings size={14} color="#64748b" />
                             <Text className="text-slate-600 text-xs font-medium ml-1">
-                                Modèle
+                                Modèl
                             </Text>
                         </View>
                         <Text className="text-slate-900 text-sm font-semibold">
-                            {metadata?.identification.model || "—"}
+                            {discharge?.vehicle?.model || "-"}
                         </Text>
                     </View>
                 </View>
@@ -69,7 +70,7 @@ export const VehicleInfoCard: React.FC = () => {
                             </Text>
                         </View>
                         <Text className="text-slate-900 text-sm font-semibold">
-                            {metadata?.identification.year || "—"}
+                            {discharge?.vehicle?.year || "—"}
                         </Text>
                     </View>
                 </View>
@@ -82,7 +83,7 @@ export const VehicleInfoCard: React.FC = () => {
                             </Text>
                         </View>
                         <Text className="text-slate-900 text-sm font-semibold">
-                            {metadata?.identification.color || "—"}
+                            {discharge?.vehicle?.color || "—"}
                         </Text>
                     </View>
                 </View>
