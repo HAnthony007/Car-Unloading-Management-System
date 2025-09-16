@@ -2,12 +2,15 @@ import { Tabs } from "expo-router";
 import React from "react";
 
 import { FloatingChatbot } from "@/src/modules/assistant-ai/components/chatbot";
+import { useAuth } from "@/src/modules/auth/hooks/use-auth";
 import { AuthGuard } from "@/src/providers/auth-guard";
 import { Anchor, BarChart3, MapPin, ScanLine, User } from "lucide-react-native";
 import { useColorScheme } from "react-native";
 
 export default function TabLayout() {
     const colorScheme = useColorScheme();
+    const { user } = useAuth();
+    console.log("User in TabLayout:", user); // Debugging line
 
     return (
         <AuthGuard>

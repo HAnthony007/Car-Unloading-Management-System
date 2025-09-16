@@ -1,5 +1,7 @@
 import { LoginForm } from "@/src/modules/auth/components/login-form";
+import { useAuth } from "@/src/modules/auth/hooks/use-auth";
 import { LinearGradient } from "expo-linear-gradient";
+import { Redirect } from "expo-router";
 import { Ship } from "lucide-react-native";
 import React from "react";
 import {
@@ -12,6 +14,12 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function LoginScreen() {
+    const { user } = useAuth();
+    console.log("User in LoginScreen:", user); // Debugging line
+    // If already authenticated, redirect to main tabs
+    if (user) {
+        return <Redirect href="/(tabs)" />;
+    }
     return (
         <KeyboardAvoidingView
             className="flex-1"

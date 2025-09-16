@@ -24,6 +24,21 @@ export default function MapScreen() {
                 //         radius: 100,
                 //     },
                 // ]}
+                markers={[
+                    {
+                        coordinates: {
+                            latitude: -18.159028,
+                            longitude: 49.426028,
+                        },
+                        title: "Position actuelle",
+                    },
+                    {
+                        coordinates: {
+                            latitude: -18.157778,
+                            longitude: 49.425222,
+                        },
+                    },
+                ]}
                 polygons={[
                     {
                         coordinates: [
