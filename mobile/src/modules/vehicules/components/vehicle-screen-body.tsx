@@ -1,9 +1,12 @@
 import { DocumentsAccordion } from "@/src/modules/vehicules/components/documents-accordion";
 import { ImagesSection } from "@/src/modules/vehicules/components/images-section";
+import { InspectionsAccordion } from "@/src/modules/vehicules/components/inspections-accordion";
 import { MovementsAccordion } from "@/src/modules/vehicules/components/movement-accorion";
 import { NotesAccordion } from "@/src/modules/vehicules/components/notes-accordion";
 import { StatusSection } from "@/src/modules/vehicules/components/status-section";
+import { useInspectionsAccordion } from "@/src/modules/vehicules/hooks/use-inspections-accordion";
 import { useVehicleWorkflow } from "@/src/modules/vehicules/hooks/use-vehicle-workflow";
+import { useInspectionSync } from "@/src/modules/vehicules/stores/inspection-sync";
 import { LinearGradient } from "expo-linear-gradient";
 import {
     Activity,
@@ -19,7 +22,7 @@ import {
     Settings,
     User,
 } from "lucide-react-native";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 export default function VehicleScreenBody() {
@@ -43,10 +46,28 @@ export default function VehicleScreenBody() {
         setInspectionNotes,
     } = useVehicleWorkflow();
 
+    // Inspections data from API
+    const {
+        inspections,
+        loading: inspectionsLoading,
+        error: inspectionsError,
+        validateInspection,
+        startInspection,
+        refetch: refetchInspections,
+    } = useInspectionsAccordion();
+
+    // Cross-screen refresh: when survey confirms changes, bump version -> refetch here
+    const version = useInspectionSync((s) => s.version);
+    useEffect(() => {
+        // Avoid firing on mount unnecessarily; refetch on any version bump
+        refetchInspections();
+    }, [version, refetchInspections]);
+
     // UI toggles
     const [showDocs, setShowDocs] = useState(false);
     const [showMovements, setShowMovements] = useState(false);
     const [showInspection, setShowInspection] = useState(false);
+    const [showInspections, setShowInspections] = useState(false);
     const [showNotes, setShowNotes] = useState(false);
 
     // Calculate vehicle statistics
@@ -70,6 +91,23 @@ export default function VehicleScreenBody() {
         };
     }, [documents, movements, images, notes, inspection]);
     console.log("Vehicle stats:", discharge);
+
+    // Inspection handlers
+    const handleValidateInspection = async (inspectionId: string) => {
+        try {
+            await validateInspection(inspectionId);
+        } catch (error) {
+            console.error("Error validating inspection:", error);
+        }
+    };
+
+    const handleStartInspection = async (inspectionId: string) => {
+        try {
+            await startInspection(inspectionId);
+        } catch (error) {
+            console.error("Error starting inspection:", error);
+        }
+    };
 
     return (
         <ScrollView
@@ -485,6 +523,19 @@ export default function VehicleScreenBody() {
                     addMovementRecord={(from, to, reason, reset) =>
                         addMovementRecord(from, to, reason, reset)
                     }
+                />
+            </View>
+
+            {/* Inspections Accordion */}
+            <View className="px-6 mb-6">
+                <InspectionsAccordion
+                    open={showInspections}
+                    toggle={() => setShowInspections((v) => !v)}
+                    inspections={inspections}
+                    onValidateInspection={handleValidateInspection}
+                    onStartInspection={handleStartInspection}
+                    loading={inspectionsLoading}
+                    error={inspectionsError}
                 />
             </View>
 

@@ -1,54 +1,35 @@
-import { InspectionCategories } from "@/src/modules/vehicules/components/inspection-categories";
-import { InspectionHeader } from "@/src/modules/vehicules/components/inspection-header";
-import { StartInspectionCard } from "@/src/modules/vehicules/components/start-inspection-card";
+import { InspectionDetailCard } from "@/src/modules/vehicules/components/inspection-detail-card";
 import { VehicleInfoCard } from "@/src/modules/vehicules/components/vehicle-info-card";
-import { useDischargeInspection } from "@/src/modules/vehicules/hooks/use-discharge-inspection";
-import { useInspection } from "@/src/modules/vehicules/hooks/use-inspection";
-import { useEffect, useMemo } from "react";
-import { ScrollView, View } from "react-native";
+import { useInspectionManagement } from "@/src/modules/vehicules/hooks/use-inspection-management";
+import { Alert, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 export default function SurveyScreen() {
-    const { categories, addPhoto, setStatus, setComment } = useInspection();
-    const { hasInspection, loading, starting, error, start } =
-        useDischargeInspection();
+    const {
+        inspections,
+        loading,
+        error,
+        updating,
+        updateCheckpointStatus,
+        updateCheckpointComment,
+        addCheckpointPhoto,
+        removeCheckpointPhoto,
+        confirmInspection,
+    } = useInspectionManagement();
 
-    // Calculate inspection progress (local categories state)
-    const inspectionStats = useMemo(() => {
-        let totalItems = 0;
-        let completedItems = 0;
-        let okItems = 0;
-        let defectItems = 0;
-        let naItems = 0;
-
-        categories.forEach((category) => {
-            category.items.forEach((item) => {
-                totalItems++;
-                if (item.status) {
-                    completedItems++;
-                    if (item.status === "ok") okItems++;
-                    else if (item.status === "defaut") defectItems++;
-                    else if (item.status === "na") naItems++;
-                }
-            });
-        });
-
-        return {
-            totalItems,
-            completedItems,
-            okItems,
-            defectItems,
-            naItems,
-            progressPercentage:
-                totalItems > 0 ? (completedItems / totalItems) * 100 : 0,
-        };
-    }, [categories]);
-
-    useEffect(() => {
-        // Debug log; remove in production
-        console.log("Inspection categories:", categories.length);
-    }, [categories]);
-
-    // Handlers already provided by hook
+    const handleConfirmInspection = async (inspectionId: string) => {
+        Alert.alert(
+            "Confirmer l'inspection",
+            "Êtes-vous sûr de vouloir confirmer cette inspection ? Cette action est irréversible.",
+            [
+                { text: "Annuler", style: "cancel" },
+                {
+                    text: "Confirmer",
+                    style: "destructive",
+                    onPress: () => confirmInspection(inspectionId),
+                },
+            ]
+        );
+    };
 
     return (
         <SafeAreaView className="flex-1 bg-gradient-to-br from-slate-50 to-slate-100">
@@ -58,47 +39,74 @@ export default function SurveyScreen() {
                 keyboardShouldPersistTaps="handled"
                 showsVerticalScrollIndicator={false}
             >
+                {/* Header */}
                 <View className="px-6 pt-4 pb-6">
-                    {hasInspection ? (
-                        <InspectionHeader
-                            completed={inspectionStats.completedItems}
-                            total={inspectionStats.totalItems}
-                            ok={inspectionStats.okItems}
-                            defect={inspectionStats.defectItems}
-                            na={inspectionStats.naItems}
-                            progress={inspectionStats.progressPercentage}
-                        />
-                    ) : (
-                        <StartInspectionCard
-                            loading={loading}
-                            starting={starting}
-                            error={error}
-                            onStart={(force) => start(force)}
-                            hasDischarge={
-                                true /* discharge selection handled in hook */
-                            }
-                        />
-                    )}
+                    <View className="bg-white rounded-3xl p-6 shadow-lg border border-slate-200">
+                        <Text className="text-slate-900 text-2xl font-bold mb-2">
+                            Inspections Véhicule
+                        </Text>
+                        <Text className="text-slate-600 text-base">
+                            Vérifiez chaque point d&apos;inspection et confirmez
+                            les résultats
+                        </Text>
+                        {updating && (
+                            <View className="mt-4 bg-amber-50 rounded-lg p-3">
+                                <Text className="text-amber-700 text-sm text-center">
+                                    Mise à jour en cours...
+                                </Text>
+                            </View>
+                        )}
+                        {error && (
+                            <View className="mt-4 bg-red-50 rounded-lg p-3">
+                                <Text className="text-red-700 text-sm text-center">
+                                    {error}
+                                </Text>
+                            </View>
+                        )}
+                    </View>
                 </View>
 
                 {/* Vehicle information card */}
-                {hasInspection && (
-                    <View className="px-6 mb-6">
-                        <VehicleInfoCard />
-                    </View>
-                )}
+                <View className="px-6 mb-6">
+                    <VehicleInfoCard />
+                </View>
 
-                {/* Categories accordions */}
-                {hasInspection && (
-                    <View className="px-6">
-                        <InspectionCategories
-                            categories={categories}
-                            addPhoto={addPhoto}
-                            setStatus={setStatus}
-                            setComment={setComment}
-                        />
-                    </View>
-                )}
+                {/* Inspections List */}
+                <View className="px-6">
+                    {loading ? (
+                        <View className="bg-white rounded-3xl p-8 items-center shadow-lg border border-slate-200">
+                            <Text className="text-slate-500 text-base">
+                                Chargement des inspections...
+                            </Text>
+                        </View>
+                    ) : inspections.length === 0 ? (
+                        <View className="bg-white rounded-3xl p-8 items-center shadow-lg border border-slate-200">
+                            <Text className="text-slate-500 text-base mb-2">
+                                Aucune inspection disponible
+                            </Text>
+                            <Text className="text-slate-400 text-sm text-center">
+                                Les inspections seront affichées ici une fois
+                                créées
+                            </Text>
+                        </View>
+                    ) : (
+                        inspections.map((inspection) => (
+                            <InspectionDetailCard
+                                key={inspection.id}
+                                inspection={inspection}
+                                onCheckpointStatusChange={
+                                    updateCheckpointStatus
+                                }
+                                onCheckpointCommentChange={
+                                    updateCheckpointComment
+                                }
+                                onCheckpointPhotoAdd={addCheckpointPhoto}
+                                onCheckpointPhotoRemove={removeCheckpointPhoto}
+                                onConfirmInspection={handleConfirmInspection}
+                            />
+                        ))
+                    )}
+                </View>
             </ScrollView>
         </SafeAreaView>
     );

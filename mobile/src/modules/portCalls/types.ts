@@ -26,7 +26,11 @@ export interface VehicleInPortCall {
     updated_at: string;
 }
 
-export type PortCallStatus = "pending" | "in_progress" | "completed"; // backend actuel ("canceled" non utilisé pour l'instant)
+export type PortCallStatus =
+    | "pending"
+    | "in_progress"
+    | "completed"
+    | "canceled"; // optionnel: support anticipé
 
 export interface PortCall {
     port_call_id: number;
