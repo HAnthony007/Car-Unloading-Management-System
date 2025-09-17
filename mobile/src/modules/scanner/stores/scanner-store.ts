@@ -23,6 +23,9 @@ export interface MovementRecord {
     description?: string;
     coordsFrom?: { lat: number; lng: number };
     coordsTo?: { lat: number; lng: number };
+    // Optional parking slot numbers (e.g., for special zones like Mahasarika)
+    parkingNumberFrom?: string;
+    parkingNumberTo?: string;
 }
 
 export interface VehicleIdentification {
@@ -116,16 +119,16 @@ export const useScannerStore = create<VehicleWorkflowState>((set, get) => ({
             const now = new Date();
             const autoTitle = mv.title || `${mv.from} → ${mv.to}`;
             const autoDesc = mv.description || mv.reason || "";
-            // Generate light random coords near Dakar port if not provided (lat ~14.7167, lng ~-17.4677)
+            // Generate light random coords near Toamasina Port (lat ~-18.157444, lng ~49.425083)
             const rand = (base: number, spread: number) =>
                 base + (Math.random() - 0.5) * spread;
             const coordsFrom = mv.coordsFrom || {
-                lat: rand(14.7167, 0.02),
-                lng: rand(-17.4677, 0.02),
+                lat: rand(-18.157444, 0.006),
+                lng: rand(49.425083, 0.006),
             };
             const coordsTo = mv.coordsTo || {
-                lat: rand(14.7167, 0.02),
-                lng: rand(-17.4677, 0.02),
+                lat: rand(-18.157444, 0.006),
+                lng: rand(49.425083, 0.006),
             };
             return {
                 movements: [

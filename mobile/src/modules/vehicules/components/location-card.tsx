@@ -45,7 +45,7 @@ export const LocationCard = ({
                             Zone actuelle
                         </Text>
                         <Text className="text-slate-900 text-base font-semibold">
-                            {actualLocation}
+                            Zone Mahasarika 007
                         </Text>
                     </View>
                 </View>
@@ -71,8 +71,9 @@ export const LocationCard = ({
                         </Text>
                     </View>
                     <Text className="text-amber-900 text-sm font-semibold mb-1">
-                        {lastMovement.title ||
-                            `${lastMovement.from} → ${lastMovement.to}`}
+                        Zone Tampon → Zone Mahasarika 007
+                        {/* {lastMovement.title ||
+                            `${lastMovement.from}  ${lastMovement.to}`} */}
                     </Text>
                     <Text className="text-amber-700 text-xs">
                         {new Date(lastMovement.at).toLocaleString("fr-FR")}
@@ -80,22 +81,71 @@ export const LocationCard = ({
                 </View>
             )}
 
-            {/* Future Map Placeholder */}
-            <View className="mt-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-4 border border-blue-200">
-                <View className="flex-row items-center">
-                    <View className="w-8 h-8 bg-blue-100 rounded-lg items-center justify-center mr-3">
-                        <MapPin size={16} color="#3b82f6" />
-                    </View>
-                    <View className="flex-1">
-                        <Text className="text-blue-900 text-sm font-semibold">
-                            Carte interactive
-                        </Text>
-                        <Text className="text-blue-700 text-xs">
-                            Visualisation de l'emplacement (à venir)
-                        </Text>
-                    </View>
-                </View>
-            </View>
+            {/* Mini Map */}
+            {/* <View
+                className="mt-4 overflow-hidden rounded-2xl border border-blue-200"
+                style={{ height: 160 }}
+            >
+                {Platform.OS === "ios" ? (
+                    <AppleMaps.View
+                        style={{ flex: 1 }}
+                        cameraPosition={{
+                            coordinates: coords
+                                ? {
+                                      latitude: coords.lat,
+                                      longitude: coords.lng,
+                                  }
+                                : {
+                                      latitude: -18.157444,
+                                      longitude: 49.425083,
+                                  },
+                            zoom: 16.3,
+                        }}
+                        markers={
+                            coords
+                                ? [
+                                      {
+                                          coordinates: {
+                                              latitude: coords.lat,
+                                              longitude: coords.lng,
+                                          },
+                                          title: "Position actuelle",
+                                      },
+                                  ]
+                                : []
+                        }
+                    />
+                ) : Platform.OS === "android" ? (
+                    <GoogleMaps.View
+                        style={{ flex: 1 }}
+                        cameraPosition={{
+                            coordinates: coords
+                                ? {
+                                      latitude: coords.lat,
+                                      longitude: coords.lng,
+                                  }
+                                : {
+                                      latitude: -18.157444,
+                                      longitude: 49.425083,
+                                  },
+                            zoom: 16.3,
+                        }}
+                        markers={
+                            coords
+                                ? [
+                                      {
+                                          coordinates: {
+                                              latitude: coords.lat,
+                                              longitude: coords.lng,
+                                          },
+                                          title: "Position actuelle",
+                                      },
+                                  ]
+                                : []
+                        }
+                    />
+                ) : null}
+            </View> */}
         </View>
     );
 };

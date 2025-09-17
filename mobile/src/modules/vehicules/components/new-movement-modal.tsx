@@ -1,4 +1,5 @@
 import { LinearGradient } from "expo-linear-gradient";
+import { AppleMaps, GoogleMaps } from "expo-maps";
 import {
     Compass,
     FileText,
@@ -12,6 +13,7 @@ import {
 import {
     ActivityIndicator,
     Modal,
+    Platform,
     ScrollView,
     Text,
     TextInput,
@@ -30,6 +32,8 @@ interface Props {
     setToLoc: (v: string) => void;
     note: string;
     setNote: (v: string) => void;
+    parkingNumber?: string;
+    setParkingNumber?: (v: string) => void;
     coords: { lat: number; lng: number } | null;
     loadingLoc: boolean;
     requestLocation: () => void;
@@ -57,6 +61,8 @@ export const NewMovementModal = ({
     disabledConfirm,
     openParkings,
     setFocusedLocationField,
+    parkingNumber,
+    setParkingNumber,
 }: Props) => (
     <Modal
         visible={visible}
@@ -180,6 +186,30 @@ export const NewMovementModal = ({
                                     className="h-10 px-3 rounded-lg border border-slate-200 bg-white text-sm text-slate-900"
                                 />
                             </View>
+                            {/* Parking number if Mahasarika selected */}
+                            {(fromLoc.match(/mahasarika/i) ||
+                                toLoc.match(/mahasarika/i)) && (
+                                <View className="bg-slate-50 rounded-xl p-4 border border-slate-200">
+                                    <View className="flex-row items-center mb-2">
+                                        <View className="w-6 h-6 bg-amber-100 rounded-lg items-center justify-center mr-3">
+                                            <List size={14} color="#f59e0b" />
+                                        </View>
+                                        <Text className="text-slate-600 text-xs font-medium">
+                                            Numéro de parking (Mahasarika)
+                                        </Text>
+                                    </View>
+                                    <TextInput
+                                        value={parkingNumber}
+                                        onChangeText={(v) =>
+                                            setParkingNumber &&
+                                            setParkingNumber(v)
+                                        }
+                                        placeholder="Ex: M-12"
+                                        placeholderTextColor="#94a3b8"
+                                        className="h-10 px-3 rounded-lg border border-slate-200 bg-white text-sm text-slate-900"
+                                    />
+                                </View>
+                            )}
                         </View>
                     </View>
 
@@ -202,7 +232,7 @@ export const NewMovementModal = ({
                         />
                     </View>
 
-                    {/* GPS Section */}
+                    {/* GPS + Mini Map Section */}
                     <View className="mb-6">
                         <View className="bg-gradient-to-r from-slate-50 to-slate-100 rounded-xl p-4 border border-slate-200">
                             <View className="flex-row items-center justify-between mb-3">
@@ -236,6 +266,60 @@ export const NewMovementModal = ({
                                         {coords.lat.toFixed(6)},{" "}
                                         {coords.lng.toFixed(6)}
                                     </Text>
+                                    <View
+                                        style={{
+                                            height: 180,
+                                            borderRadius: 12,
+                                            overflow: "hidden",
+                                            marginTop: 8,
+                                        }}
+                                    >
+                                        {Platform.OS === "ios" ? (
+                                            <AppleMaps.View
+                                                style={{ flex: 1 }}
+                                                cameraPosition={{
+                                                    coordinates: {
+                                                        latitude: coords.lat,
+                                                        longitude: coords.lng,
+                                                    },
+                                                    zoom: 16.3,
+                                                }}
+                                                markers={[
+                                                    {
+                                                        coordinates: {
+                                                            latitude:
+                                                                coords.lat,
+                                                            longitude:
+                                                                coords.lng,
+                                                        },
+                                                        title: "Position actuelle",
+                                                    },
+                                                ]}
+                                            />
+                                        ) : Platform.OS === "android" ? (
+                                            <GoogleMaps.View
+                                                style={{ flex: 1 }}
+                                                cameraPosition={{
+                                                    coordinates: {
+                                                        latitude: coords.lat,
+                                                        longitude: coords.lng,
+                                                    },
+                                                    zoom: 16.3,
+                                                }}
+                                                markers={[
+                                                    {
+                                                        coordinates: {
+                                                            latitude:
+                                                                coords.lat,
+                                                            longitude:
+                                                                coords.lng,
+                                                        },
+                                                        title: "Position actuelle",
+                                                    },
+                                                ]}
+                                            />
+                                        ) : null}
+                                    </View>
                                 </View>
                             ) : (
                                 <View className="bg-slate-200 rounded-lg p-3">

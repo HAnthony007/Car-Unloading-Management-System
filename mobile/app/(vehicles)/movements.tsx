@@ -4,9 +4,17 @@ import { NewMovementModal } from "@/src/modules/vehicules/components/new-movemen
 import { ParkingsModal } from "@/src/modules/vehicules/components/parkings-modal";
 import { useMovements } from "@/src/modules/vehicules/hooks/use-movement";
 import { LinearGradient } from "expo-linear-gradient";
+import { AppleMaps, GoogleMaps } from "expo-maps";
+import { GoogleMapsMapType } from "expo-maps/build/google/GoogleMaps.types";
 import { List, Navigation, Plus, Route } from "lucide-react-native";
 import { useMemo, useState } from "react";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import {
+    Platform,
+    ScrollView,
+    Text,
+    TouchableOpacity,
+    View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 export default function MovementsScreen() {
     const {
@@ -20,6 +28,8 @@ export default function MovementsScreen() {
         setToLoc,
         note,
         setNote,
+        parkingNumber,
+        setParkingNumber,
         coords,
         loadingLoc,
         focusedLocationField,
@@ -32,6 +42,7 @@ export default function MovementsScreen() {
 
     const [showNew, setShowNew] = useState(false);
     const [showParkings, setShowParkings] = useState(false);
+    const [todayOnly, setTodayOnly] = useState(false);
 
     // Calculate movement statistics
     const movementStats = useMemo(() => {
@@ -53,8 +64,250 @@ export default function MovementsScreen() {
             uniqueLocations,
         };
     }, [movements]);
+    const mahasarikaSelected =
+        /mahasarika/i.test(fromLoc) || /mahasarika/i.test(toLoc);
+
+    // Static history polyline path around Toamasina (user-provided)
+    const historyPath = [
+        { latitude: -18.156167, longitude: 49.424611 },
+        { latitude: -18.154972, longitude: 49.426389 },
+        { latitude: -18.158667, longitude: 49.426111 },
+    ];
+
     return (
         <SafeAreaView className="flex-1 bg-gradient-to-br from-slate-50 to-slate-100">
+            {/* Top Map showing current and historical positions */}
+            <View
+                style={{ height: 300 }}
+                className="mx-6 mt-4 mb-2 overflow-hidden rounded-3xl border border-slate-200 shadow"
+            >
+                {Platform.OS === "ios" ? (
+                    <AppleMaps.View
+                        style={{ flex: 1 }}
+                        cameraPosition={{
+                            coordinates: coords
+                                ? {
+                                      latitude: coords.lat,
+                                      longitude: coords.lng,
+                                  }
+                                : {
+                                      latitude: -18.157444,
+                                      longitude: 49.425083,
+                                  },
+                            zoom: 15.5,
+                        }}
+                        markers={[
+                            ...(coords
+                                ? [
+                                      {
+                                          coordinates: {
+                                              latitude: coords.lat,
+                                              longitude: coords.lng,
+                                          },
+                                          title: "Position actuelle",
+                                      },
+                                  ]
+                                : []),
+                            ...(todayOnly
+                                ? movements.filter((m) => {
+                                      const today = new Date();
+                                      const d = new Date(m.at);
+                                      return (
+                                          d.toDateString() ===
+                                          today.toDateString()
+                                      );
+                                  })
+                                : movements
+                            )
+                                .filter((m) => m.coordsTo)
+                                .slice(0, 10)
+                                .map((m) => ({
+                                    coordinates: {
+                                        latitude: m.coordsTo!.lat,
+                                        longitude: m.coordsTo!.lng,
+                                    },
+                                    title: m.title || `${m.from} → ${m.to}`,
+                                })),
+                        ]}
+                        polylines={[
+                            // ...(todayOnly
+                            //     ? movements.filter((m) => {
+                            //           const today = new Date();
+                            //           const d = new Date(m.at);
+                            //           return (
+                            //               d.toDateString() ===
+                            //               today.toDateString()
+                            //           );
+                            //       })
+                            //     : movements
+                            // )
+                            //     .filter((m) => m.coordsFrom && m.coordsTo)
+                            //     .map((m) => ({
+                            //         coordinates: [
+                            //             {
+                            //                 latitude: m.coordsFrom!.lat,
+                            //                 longitude: m.coordsFrom!.lng,
+                            //             },
+                            //             {
+                            //                 latitude: m.coordsTo!.lat,
+                            //                 longitude: m.coordsTo!.lng,
+                            //             },
+                            //         ],
+                            //     })),
+                            { coordinates: historyPath },
+                        ]}
+                        // polygons={[
+                        //     // Approx Mahasarika zone
+                        //     {
+                        //         coordinates: [
+                        //             { latitude: -18.1583, longitude: 49.4244 },
+                        //             { latitude: -18.1588, longitude: 49.4262 },
+                        //             { latitude: -18.1569, longitude: 49.4266 },
+                        //             { latitude: -18.1565, longitude: 49.425 },
+                        //         ],
+                        //     },
+                        //     // Zone A rectangle approx
+                        //     {
+                        //         coordinates: [
+                        //             { latitude: -18.1596, longitude: 49.4246 },
+                        //             { latitude: -18.16, longitude: 49.426 },
+                        //             { latitude: -18.1588, longitude: 49.4263 },
+                        //             { latitude: -18.1584, longitude: 49.4249 },
+                        //         ],
+                        //     },
+                        //     // Zone B rectangle approx
+                        //     {
+                        //         coordinates: [
+                        //             { latitude: -18.1572, longitude: 49.4239 },
+                        //             { latitude: -18.1577, longitude: 49.4256 },
+                        //             { latitude: -18.1564, longitude: 49.4259 },
+                        //             { latitude: -18.1559, longitude: 49.4242 },
+                        //         ],
+                        //     },
+                        // ]}
+                    />
+                ) : Platform.OS === "android" ? (
+                    <GoogleMaps.View
+                        properties={{ mapType: GoogleMapsMapType.SATELLITE }}
+                        style={{ flex: 1 }}
+                        cameraPosition={{
+                            coordinates: coords
+                                ? {
+                                      latitude: coords.lat,
+                                      longitude: coords.lng,
+                                  }
+                                : {
+                                      latitude: -18.157444,
+                                      longitude: 49.425083,
+                                  },
+                            zoom: 15.5,
+                        }}
+                        markers={[
+                            ...(coords
+                                ? [
+                                      {
+                                          coordinates: {
+                                              latitude: coords.lat,
+                                              longitude: coords.lng,
+                                          },
+                                          title: "Position actuelle",
+                                      },
+                                  ]
+                                : []),
+                            // ...movements
+                            //     .filter((m) => m.coordsTo)
+                            //     .slice(0, 10)
+                            //     .map((m) => ({
+                            //         coordinates: {
+                            //             latitude: m.coordsTo!.lat,
+                            //             longitude: m.coordsTo!.lng,
+                            //         },
+                            //         title: m.title || `${m.from} → ${m.to}`,
+                            //     })),
+                            {
+                                coordinates: historyPath[2],
+                                title: "Vehicules actuelle",
+                            },
+                        ]}
+                        polylines={[
+                            // ...movements
+                            //     .filter((m) => m.coordsFrom && m.coordsTo)
+                            //     .map((m) => ({
+                            //         coordinates: [
+                            //             {
+                            //                 latitude: m.coordsFrom!.lat,
+                            //                 longitude: m.coordsFrom!.lng,
+                            //             },
+                            //             {
+                            //                 latitude: m.coordsTo!.lat,
+                            //                 longitude: m.coordsTo!.lng,
+                            //             },
+                            //         ],
+                            //     })),
+                            { coordinates: historyPath },
+                        ]}
+                        // polygons={[
+                        //     // Approx Mahasarika zone
+                        //     {
+                        //         coordinates: [
+                        //             { latitude: -18.1583, longitude: 49.4244 },
+                        //             { latitude: -18.1588, longitude: 49.4262 },
+                        //             { latitude: -18.1569, longitude: 49.4266 },
+                        //             { latitude: -18.1565, longitude: 49.4250 },
+                        //         ],
+                        //     },
+                        //     // Zone A rectangle approx
+                        //     {
+                        //         coordinates: [
+                        //             { latitude: -18.1596, longitude: 49.4246 },
+                        //             { latitude: -18.1600, longitude: 49.4260 },
+                        //             { latitude: -18.1588, longitude: 49.4263 },
+                        //             { latitude: -18.1584, longitude: 49.4249 },
+                        //         ],
+                        //     },
+                        //     // Zone B rectangle approx
+                        //     {
+                        //         coordinates: [
+                        //             { latitude: -18.1572, longitude: 49.4239 },
+                        //             { latitude: -18.1577, longitude: 49.4256 },
+                        //             { latitude: -18.1564, longitude: 49.4259 },
+                        //             { latitude: -18.1559, longitude: 49.4242 },
+                        //         ],
+                        //     },
+                        // ]}
+                    />
+                ) : (
+                    <View className="flex-1 items-center justify-center bg-slate-100">
+                        <Text>Maps not supported</Text>
+                    </View>
+                )}
+            </View>
+            {/* Toggle bar under the map */}
+            <View className="mx-6 mb-2 flex-row items-center justify-between">
+                <Text className="text-slate-600 text-xs">Filtrer la carte</Text>
+                <TouchableOpacity
+                    onPress={() => setTodayOnly((v) => !v)}
+                    className={`px-3 py-2 rounded-xl border ${
+                        todayOnly
+                            ? "bg-emerald-50 border-emerald-300"
+                            : "bg-white border-slate-200"
+                    }`}
+                    activeOpacity={0.8}
+                >
+                    <Text
+                        className={
+                            todayOnly
+                                ? "text-emerald-700 text-xs font-semibold"
+                                : "text-slate-700 text-xs"
+                        }
+                    >
+                        {todayOnly
+                            ? "Aujourd'hui seulement"
+                            : "Tout l'historique"}
+                    </Text>
+                </TouchableOpacity>
+            </View>
+
             <ScrollView
                 className="flex-1"
                 contentContainerStyle={{ paddingBottom: 100 }}
@@ -238,6 +491,8 @@ export default function MovementsScreen() {
                 setToLoc={setToLoc}
                 note={note}
                 setNote={setNote}
+                parkingNumber={parkingNumber}
+                setParkingNumber={setParkingNumber}
                 coords={coords}
                 loadingLoc={loadingLoc}
                 requestLocation={requestLocation}
@@ -245,7 +500,9 @@ export default function MovementsScreen() {
                     confirmMovement();
                     setShowNew(false);
                 }}
-                disabledConfirm={!fromLoc || !toLoc}
+                disabledConfirm={
+                    !fromLoc || !toLoc || (mahasarikaSelected && !parkingNumber)
+                }
                 openParkings={() => setShowParkings(true)}
                 setFocusedLocationField={setFocusedLocationField}
             />
@@ -259,6 +516,9 @@ export default function MovementsScreen() {
                     if (showNew && focusedLocationField) {
                         if (focusedLocationField === "from") setFromLoc(p);
                         else setToLoc(p);
+                        if (!/mahasarika/i.test(p)) {
+                            setParkingNumber("");
+                        }
                     }
                 }}
             />

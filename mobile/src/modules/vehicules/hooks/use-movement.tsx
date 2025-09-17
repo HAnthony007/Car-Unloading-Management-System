@@ -11,6 +11,7 @@ export const useMovements = () => {
     const [fromLoc, setFromLoc] = useState("");
     const [toLoc, setToLoc] = useState("");
     const [note, setNote] = useState("");
+    const [parkingNumber, setParkingNumber] = useState<string>("");
     const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(
         null
     );
@@ -24,12 +25,16 @@ export const useMovements = () => {
         setFromLoc("");
         setToLoc("");
         setNote("");
+        setParkingNumber("");
         setCoords(null);
         setFocusedLocationField(null);
     };
 
     const confirmMovement = () => {
         if (!fromLoc || !toLoc) return;
+        const isMahasarika =
+            /mahasarika/i.test(fromLoc) || /mahasarika/i.test(toLoc);
+
         addMovement({
             from: fromLoc,
             to: toLoc,
@@ -38,6 +43,12 @@ export const useMovements = () => {
             description: note,
             coordsFrom: coords || undefined,
             coordsTo: coords || undefined,
+            parkingNumberFrom: isMahasarika
+                ? parkingNumber || undefined
+                : undefined,
+            parkingNumberTo: isMahasarika
+                ? parkingNumber || undefined
+                : undefined,
         });
         resetForm();
     };
@@ -47,14 +58,15 @@ export const useMovements = () => {
         try {
             let Location: any;
             try {
-                Location = require("expo-location");
+                Location = await import("expo-location");
             } catch {
                 Location = null;
             }
             if (!Location) {
+                // Toamasina Port fallback ~ 18°09'26.8"S 49°25'30.3"E => -18.157444, 49.425083
                 setCoords({
-                    lat: 14.7167 + (Math.random() - 0.5) * 0.01,
-                    lng: -17.4677 + (Math.random() - 0.5) * 0.01,
+                    lat: -18.157444 + (Math.random() - 0.5) * 0.003,
+                    lng: 49.425083 + (Math.random() - 0.5) * 0.003,
                 });
                 return;
             }
@@ -85,6 +97,7 @@ export const useMovements = () => {
         "Parc Export",
         "Inspection Technique",
         "Zone Logistique",
+        "Mahasarika",
     ];
 
     return {
@@ -98,6 +111,8 @@ export const useMovements = () => {
         setToLoc,
         note,
         setNote,
+        parkingNumber,
+        setParkingNumber,
         coords,
         loadingLoc,
         focusedLocationField,

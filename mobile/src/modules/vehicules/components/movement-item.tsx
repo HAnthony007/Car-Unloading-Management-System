@@ -68,6 +68,11 @@ export const MovementItem = ({ item, index, total }: Props) => (
                         >
                             {item.from}
                         </Text>
+                        {item.parkingNumberFrom && (
+                            <Text className="text-[11px] text-slate-500 mt-1">
+                                Place: {item.parkingNumberFrom}
+                            </Text>
+                        )}
                     </View>
                 </View>
 
@@ -89,6 +94,11 @@ export const MovementItem = ({ item, index, total }: Props) => (
                         >
                             {item.to}
                         </Text>
+                        {item.parkingNumberTo && (
+                            <Text className="text-[11px] text-slate-500 mt-1">
+                                Place: {item.parkingNumberTo}
+                            </Text>
+                        )}
                     </View>
                 </View>
             </View>
@@ -107,6 +117,17 @@ export const MovementItem = ({ item, index, total }: Props) => (
                             {item.coordsFrom.lng.toFixed(4)} →{" "}
                             {item.coordsTo.lat.toFixed(4)},{" "}
                             {item.coordsTo.lng.toFixed(4)}
+                        </Text>
+                    </View>
+                )}
+
+                {/* Parking numbers (Mahasarika) */}
+                {(item.parkingNumberFrom || item.parkingNumberTo) && (
+                    <View className="flex-row items-center">
+                        <MapPin size={14} color="#f59e0b" />
+                        <Text className="ml-2 text-xs text-slate-600">
+                            N° parking:{" "}
+                            {item.parkingNumberFrom || item.parkingNumberTo}
                         </Text>
                     </View>
                 )}
