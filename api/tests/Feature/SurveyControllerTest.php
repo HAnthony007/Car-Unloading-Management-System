@@ -172,7 +172,7 @@ class SurveyControllerTest extends TestCase
 
     public function test_update_404(): void
     {
-    $this->putJson('/api/surveys/999999', ['overall_status' => 'COMPLETED'])
+        $this->putJson('/api/surveys/999999', ['overall_status' => 'COMPLETED'])
             ->assertStatus(404);
     }
 

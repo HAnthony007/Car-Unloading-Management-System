@@ -29,9 +29,9 @@ final class ConfirmInspectionUseCase
             throw new \RuntimeException('All checkpoints must be completed before confirming the inspection');
         }
 
-    $inspection->updateStatus(InspectionStatus::COMPLETED);
-    // Persist the completed status on the survey
-    $this->repository->save($inspection);
+        $inspection->updateStatus(InspectionStatus::COMPLETED);
+        // Persist the completed status on the survey
+        $this->repository->save($inspection);
 
         return [
             'inspection_id' => $inspection->getInspectionId()?->getValue(),

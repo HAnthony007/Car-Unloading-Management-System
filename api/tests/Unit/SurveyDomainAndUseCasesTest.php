@@ -38,7 +38,7 @@ class SurveyDomainAndUseCasesTest extends TestCase
             updatedAt: Carbon::now(),
         );
 
-    $this->assertSame('COMPLETED', $entity->getOverallStatus()->getValue());
+        $this->assertSame('COMPLETED', $entity->getOverallStatus()->getValue());
         $this->assertSame('2025-08-01', $entity->getSurveyDate()->getValue()->toDateString());
         $this->assertSame(10, $entity->getAgentId()->getValue());
         $this->assertSame(55, $entity->getDischargeId()->getValue());
@@ -128,7 +128,7 @@ class SurveyDomainAndUseCasesTest extends TestCase
         $repo->method('save')->willReturn($updated);
 
         $uc = new UpdateSurveyUseCase($repo);
-    $out = $uc->execute(new UpdateSurveyDTO(1, '2025-08-02', 'COMPLETED'));
+        $out = $uc->execute(new UpdateSurveyDTO(1, '2025-08-02', 'COMPLETED'));
         $this->assertSame($updated, $out);
     }
 
