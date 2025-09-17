@@ -4,7 +4,16 @@ import React from "react";
 import { FloatingChatbot } from "@/src/modules/assistant-ai/components/chatbot";
 import { useAuth } from "@/src/modules/auth/hooks/use-auth";
 import { AuthGuard } from "@/src/providers/auth-guard";
-import { Anchor, BarChart3, MapPin, ScanLine, User } from "lucide-react-native";
+import {
+    Anchor,
+    BarChart3,
+    CameraIcon,
+    ImageIcon,
+    Map,
+    MapPin,
+    ScanLine,
+    User,
+} from "lucide-react-native";
 import { useColorScheme } from "react-native";
 
 export default function TabLayout() {
@@ -54,6 +63,15 @@ export default function TabLayout() {
                     }}
                 />
                 <Tabs.Screen
+                    name="camera"
+                    options={{
+                        title: "Camera",
+                        tabBarIcon: ({ size, color }) => (
+                            <CameraIcon size={size} color={color} />
+                        ),
+                    }}
+                />
+                <Tabs.Screen
                     name="scanner"
                     options={{
                         title: "Scanner",
@@ -63,11 +81,29 @@ export default function TabLayout() {
                     }}
                 />
                 <Tabs.Screen
+                    name="location"
+                    options={{
+                        title: "Location",
+                        tabBarIcon: ({ size, color }) => (
+                            <Map size={size} color={color} />
+                        ),
+                    }}
+                />
+                <Tabs.Screen
                     name="map"
                     options={{
                         title: "Google Map",
                         tabBarIcon: ({ size, color }) => (
                             <MapPin size={size} color={color} />
+                        ),
+                    }}
+                />
+                <Tabs.Screen
+                    name="image"
+                    options={{
+                        title: "Images Picker",
+                        tabBarIcon: ({ size, color }) => (
+                            <ImageIcon size={size} color={color} />
                         ),
                     }}
                 />
