@@ -20,7 +20,7 @@ class SurveyFactory extends Factory
             'survey_date' => fake()->dateTimeBetween('-5 days', 'now'),
             'survey_name' => fake()->sentence(3),
             'survey_description' => fake()->optional()->paragraph(),
-            'overall_status' => fake()->randomElement(['PASSED', 'FAILED', 'PENDING']),
+            'overall_status' => fake()->randomElement(['PENDING', 'IN_PROGRESS', 'COMPLETED']),
             'agent_id' => fn () => User::query()->inRandomOrder()->value('user_id') ?? User::factory(),
             // ensure uniqueness since surveys table requires unique discharge_id
             'discharge_id' => Discharge::factory(),

@@ -15,7 +15,7 @@ Route::prefix('auth')
     ->group(function (): void {
         Route::post('/register', [AuthController::class, 'register'])->name('register');
         Route::post('/login', [AuthController::class, 'login'])->name('login');
-    Route::get('/{id}/inspection', [\App\Presentation\Http\Controllers\InspectionController::class, 'showByDischarge'])->name('discharges.inspection.show');
+        Route::get('/{id}/inspection', [\App\Presentation\Http\Controllers\InspectionController::class, 'showByDischarge'])->name('discharges.inspection.show');
         // SPA cookie-based session authentication endpoints
         Route::post('/spa/login', [AuthController::class, 'spaLogin'])->name('spa.login');
 
@@ -169,8 +169,8 @@ Route::prefix('discharges')
         Route::get('/', [\App\Presentation\Http\Controllers\DischargeController::class, 'index'])->name('discharges.index');
         Route::post('/', [\App\Presentation\Http\Controllers\DischargeController::class, 'store'])->name('discharges.store');
         Route::get('/{id}', [\App\Presentation\Http\Controllers\DischargeController::class, 'show'])->name('discharges.show');
-    // Inspection (surveys + checkpoints) for a specific discharge
-    Route::get('/{id}/inspection', [\App\Presentation\Http\Controllers\InspectionController::class, 'showByDischarge'])->name('discharges.inspection.show');
+        // Inspection (surveys + checkpoints) for a specific discharge
+        Route::get('/{id}/inspection', [\App\Presentation\Http\Controllers\InspectionController::class, 'showByDischarge'])->name('discharges.inspection.show');
         Route::put('/{id}', [\App\Presentation\Http\Controllers\DischargeController::class, 'update'])->name('discharges.update');
         Route::delete('/{id}', [\App\Presentation\Http\Controllers\DischargeController::class, 'destroy'])->name('discharges.destroy');
     });
@@ -205,6 +205,17 @@ Route::prefix('inspections')
     ->middleware('auth:sanctum')
     ->group(function (): void {
         Route::post('/start', [\App\Presentation\Http\Controllers\InspectionController::class, 'start'])->name('inspections.start');
+    });
+
+// Inspection Checkpoints Management Routes
+Route::prefix('inspection-checkpoints')
+    ->middleware('auth:sanctum')
+    ->group(function (): void {
+        Route::put('/{id}/status', [\App\Presentation\Http\Controllers\InspectionCheckpointController::class, 'updateStatus'])->name('inspectioncheckpoints.status.update');
+        Route::put('/{id}/comment', [\App\Presentation\Http\Controllers\InspectionCheckpointController::class, 'updateComment'])->name('inspectioncheckpoints.comment.update');
+        Route::post('/{id}/photos', [\App\Presentation\Http\Controllers\InspectionCheckpointController::class, 'addPhoto'])->name('inspectioncheckpoints.photos.add');
+        Route::delete('/{id}/photos/{photoIndex}', [\App\Presentation\Http\Controllers\InspectionCheckpointController::class, 'removePhoto'])->name('inspectioncheckpoints.photos.remove');
+        Route::post('/{id}/confirm', [\App\Presentation\Http\Controllers\InspectionCheckpointController::class, 'confirmInspection'])->name('inspectioncheckpoints.confirm');
     });
 
 // Survey Templates Admin Routes

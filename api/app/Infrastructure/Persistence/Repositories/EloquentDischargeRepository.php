@@ -23,8 +23,8 @@ final class EloquentDischargeRepository implements DischargeRepositoryInterface
 
     public function findAll(): array
     {
-        return EloquentDischarge::with(['portCall.vessel', 'portCall.dock', 'vehicle', 'agent'])
-            ->orderByDesc('discharge_timestamp')
+        // Keep this lightweight for listing; resource returns scalar IDs only
+        return EloquentDischarge::orderByDesc('discharge_timestamp')
             ->get()
             ->map(fn ($e) => $this->toDomainEntity($e))
             ->toArray();
@@ -32,8 +32,8 @@ final class EloquentDischargeRepository implements DischargeRepositoryInterface
 
     public function findByPortCallId(PortCallId $portCallId): array
     {
-        return EloquentDischarge::with(['portCall.vessel', 'portCall.dock', 'vehicle', 'agent'])
-            ->where('port_call_id', $portCallId->getValue())
+        // Listing by port call also returns scalar IDs; avoid heavy eager loads
+        return EloquentDischarge::where('port_call_id', $portCallId->getValue())
             ->orderByDesc('discharge_timestamp')
             ->get()
             ->map(fn ($e) => $this->toDomainEntity($e))

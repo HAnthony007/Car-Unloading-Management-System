@@ -86,7 +86,7 @@ final class EloquentSurveyRepository implements SurveyRepositoryInterface
     }
 
     /**
-     * Coerce arbitrary DB values into allowed SurveyResult enum values.
+     * Coerce arbitrary DB values into allowed SurveyStatus values.
      */
     private function normalizeStatus(mixed $value): string
     {
@@ -96,10 +96,10 @@ final class EloquentSurveyRepository implements SurveyRepositoryInterface
 
         // Handle booleans and numeric-like values
         if (is_bool($value)) {
-            return $value ? 'PASSED' : 'FAILED';
+            return $value ? 'COMPLETED' : 'PENDING';
         }
         if (is_int($value)) {
-            return $value === 1 ? 'PASSED' : ($value === 0 ? 'FAILED' : 'PENDING');
+            return $value === 1 ? 'COMPLETED' : ($value === 0 ? 'PENDING' : 'PENDING');
         }
 
         $str = strtoupper(trim((string) $value));
@@ -107,23 +107,27 @@ final class EloquentSurveyRepository implements SurveyRepositoryInterface
             return 'PENDING';
         }
 
-        // Direct allowed values
+        // Direct allowed values (new canonical set)
         if (in_array($str, SurveyStatus::ALLOWED, true)) {
             return $str;
         }
 
-        // Common synonyms mapping
-        // Passed
-        if (str_contains($str, 'PASS') || in_array($str, ['OK', 'VALID', 'APPROVED', 'APPROUVE', 'APPROUVÉ', 'SUCCESS', 'SUCCEEDED'], true)) {
-            return 'PASSED';
+        // Backward compatibility and synonyms mapping
+        // Completed-like (old: PASSED)
+        if ($str === 'PASSED' || str_contains($str, 'PASS') || in_array($str, ['OK', 'VALID', 'APPROVED', 'APPROUVE', 'APPROUVÉ', 'SUCCESS', 'SUCCEEDED'], true)) {
+            return 'COMPLETED';
         }
-        // Failed
-        if (str_contains($str, 'FAIL') || in_array($str, ['REJECT', 'REJECTED', 'KO', 'ERROR'], true)) {
-            return 'FAILED';
+        // Failed-like (map to PENDING conservatively)
+        if ($str === 'FAILED' || str_contains($str, 'FAIL') || in_array($str, ['REJECT', 'REJECTED', 'KO', 'ERROR'], true)) {
+            return 'PENDING';
         }
         // Pending-like
-        if (in_array($str, ['PEND', 'PENDING', 'WAIT', 'WAITING', 'IN_PROGRESS', 'DRAFT'], true)) {
+        if (in_array($str, ['PEND', 'PENDING', 'WAIT', 'WAITING', 'DRAFT'], true)) {
             return 'PENDING';
+        }
+        // In progress-like
+        if (in_array($str, ['IN_PROGRESS', 'IN-PROGRESS', 'EN_COURS', 'EN-COURS', 'EN COURS'], true)) {
+            return 'IN_PROGRESS';
         }
 
         // Fallback to PENDING to keep domain invariant stable

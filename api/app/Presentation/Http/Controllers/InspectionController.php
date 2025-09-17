@@ -2,13 +2,11 @@
 
 namespace App\Presentation\Http\Controllers;
 
-use App\Application\Inspection\UseCases\StartVehicleInspectionUseCase;
 use App\Application\Inspection\UseCases\GetDischargeInspectionUseCase;
+use App\Application\Inspection\UseCases\StartVehicleInspectionUseCase;
 use App\Models\Discharge;
-use App\Models\Survey;
-use Illuminate\Database\Eloquent\Collection;
-use App\Presentation\Http\Resources\SurveyWithCheckpointsResource;
 use App\Presentation\Http\Requests\StartInspectionRequest;
+use App\Presentation\Http\Resources\SurveyWithCheckpointsResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 

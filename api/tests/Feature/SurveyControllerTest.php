@@ -94,7 +94,7 @@ class SurveyControllerTest extends TestCase
         // Need two different discharges because discharge_id is unique per survey
         $discharge2 = $this->buildGraph();
         EloquentSurvey::create([
-            'survey_date' => now(), 'overall_status' => 'PASSED', 'agent_id' => $this->user->user_id, 'discharge_id' => $this->discharge->discharge_id,
+            'survey_date' => now(), 'overall_status' => 'COMPLETED', 'agent_id' => $this->user->user_id, 'discharge_id' => $this->discharge->discharge_id,
         ]);
         EloquentSurvey::create([
             'survey_date' => now(), 'overall_status' => 'PENDING', 'agent_id' => $this->user->user_id, 'discharge_id' => $discharge2->discharge_id,
@@ -132,7 +132,7 @@ class SurveyControllerTest extends TestCase
     {
         $discharge2 = $this->buildGraph();
         $survey = EloquentSurvey::create([
-            'survey_date' => now(), 'overall_status' => 'PASSED', 'agent_id' => $this->user->user_id, 'discharge_id' => $discharge2->discharge_id,
+            'survey_date' => now(), 'overall_status' => 'COMPLETED', 'agent_id' => $this->user->user_id, 'discharge_id' => $discharge2->discharge_id,
         ]);
         $this->getJson('/api/surveys/'.$survey->survey_id)
             ->assertOk()
@@ -150,12 +150,12 @@ class SurveyControllerTest extends TestCase
         $survey = EloquentSurvey::create([
             'survey_date' => now(), 'overall_status' => 'PENDING', 'agent_id' => $this->user->user_id, 'discharge_id' => $discharge2->discharge_id,
         ]);
-        $this->putJson('/api/surveys/'.$survey->survey_id, ['overall_status' => 'PASSED'])
+        $this->putJson('/api/surveys/'.$survey->survey_id, ['overall_status' => 'COMPLETED'])
             ->assertOk()
-            ->assertJsonPath('data.overall_status', 'PASSED');
+            ->assertJsonPath('data.overall_status', 'COMPLETED');
         $this->assertDatabaseHas('surveys', [
             'survey_id' => $survey->survey_id,
-            'overall_status' => 'PASSED',
+            'overall_status' => 'COMPLETED',
         ]);
     }
 
@@ -172,7 +172,7 @@ class SurveyControllerTest extends TestCase
 
     public function test_update_404(): void
     {
-        $this->putJson('/api/surveys/999999', ['overall_status' => 'PASSED'])
+    $this->putJson('/api/surveys/999999', ['overall_status' => 'COMPLETED'])
             ->assertStatus(404);
     }
 

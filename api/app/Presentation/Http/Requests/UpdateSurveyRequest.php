@@ -19,7 +19,7 @@ final class UpdateSurveyRequest extends FormRequest
             'survey_date' => ['sometimes', 'date'],
             'survey_name' => ['sometimes', 'string', 'max:255'],
             'survey_description' => ['sometimes', 'nullable', 'string'],
-            'overall_status' => ['sometimes', 'string', 'in:PASSED,FAILED,PENDING'],
+            'overall_status' => ['sometimes', 'string', 'in:PENDING,IN_PROGRESS,COMPLETED'],
             'agent_id' => ['sometimes', 'integer', 'exists:users,user_id'],
         ];
     }

@@ -19,7 +19,7 @@ final class CreateSurveyRequest extends FormRequest
             'survey_date' => ['required', 'date'],
             'survey_name' => ['sometimes', 'string', 'max:255'],
             'survey_description' => ['nullable', 'string'],
-            'overall_status' => ['required', 'string', 'in:PASSED,FAILED,PENDING'],
+            'overall_status' => ['required', 'string', 'in:PENDING,IN_PROGRESS,COMPLETED'],
             'agent_id' => ['required', 'integer', 'exists:users,user_id'],
             'discharge_id' => ['required', 'integer', 'exists:discharges,discharge_id'],
         ];

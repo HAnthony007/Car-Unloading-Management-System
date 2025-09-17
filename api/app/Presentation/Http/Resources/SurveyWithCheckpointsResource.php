@@ -2,12 +2,11 @@
 
 namespace App\Presentation\Http\Resources;
 
+use App\Application\Inspection\DTOs\SurveyWithCheckpointsViewModel;
+use App\Domain\SurveyCheckpoint\Entities\SurveyCheckpoint as DomainCheckpoint;
+use App\Models\Survey as EloquentSurvey;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use App\Models\Survey as EloquentSurvey;
-use App\Application\Inspection\DTOs\SurveyWithCheckpointsViewModel;
-use App\Domain\Survey\Entities\Survey as DomainSurvey;
-use App\Domain\SurveyCheckpoint\Entities\SurveyCheckpoint as DomainCheckpoint;
 
 /**
  * Standardised representation of a Survey including its checkpoints.
@@ -25,6 +24,7 @@ class SurveyWithCheckpointsResource extends JsonResource
         if ($resource instanceof SurveyWithCheckpointsViewModel) {
             $survey = $resource->survey; // Domain survey entity
             $checkpoints = $resource->checkpoints; // array of domain checkpoints
+
             return [
                 'survey_id' => $survey->getSurveyId()?->getValue(),
                 'survey_name' => $survey->getSurveyName()->getValue(),

@@ -4,13 +4,12 @@ namespace App\Application\Inspection\UseCases;
 
 use App\Application\Inspection\DTOs\SurveyWithCheckpointsViewModel;
 use App\Domain\Discharge\ValueObjects\DischargeId;
-use App\Domain\Survey\Repositories\SurveyRepositoryInterface;
 use App\Domain\Survey\Entities\Survey;
-use App\Domain\Survey\ValueObjects\SurveyId;
-use App\Domain\SurveyCheckpoint\Repositories\SurveyCheckpointRepositoryInterface;
+use App\Domain\Survey\Repositories\SurveyRepositoryInterface;
 use App\Domain\SurveyCheckpoint\Entities\SurveyCheckpoint;
-use App\Domain\SurveyCheckpoint\ValueObjects\SurveyCheckpointId;
-use App\Domain\SurveyCheckpoint\ValueObjects\CheckpointTitle; // just to ensure autoload kept if unused
+use App\Domain\SurveyCheckpoint\Repositories\SurveyCheckpointRepositoryInterface;
+
+// just to ensure autoload kept if unused
 
 final class GetDischargeInspectionUseCase
 {

@@ -2,9 +2,14 @@
 
 namespace Tests\Feature;
 
-use Tests\TestCase;
+use App\Models\Discharge;
+use App\Models\Dock;
+use App\Models\PortCall;
+use App\Models\User;
+use App\Models\Vehicle;
+use App\Models\Vessel;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Models\{User, Vehicle, PortCall, Discharge, Vessel, Dock};
+use Tests\TestCase;
 
 class DischargeShowRelationsTest extends TestCase
 {
@@ -28,7 +33,7 @@ class DischargeShowRelationsTest extends TestCase
             'vehicle_id' => $vehicle->vehicle_id,
         ]);
 
-        $resp = $this->getJson('/api/discharges/' . $discharge->discharge_id);
+        $resp = $this->getJson('/api/discharges/'.$discharge->discharge_id);
         $resp->assertOk()
             ->assertJsonPath('data.discharge_id', $discharge->discharge_id)
             ->assertJsonPath('data.port_call.port_call_id', $portCall->port_call_id)

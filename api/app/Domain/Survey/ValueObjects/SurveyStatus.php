@@ -4,7 +4,7 @@ namespace App\Domain\Survey\ValueObjects;
 
 final class SurveyStatus
 {
-    public const ALLOWED = ['PASSED', 'FAILED', 'PENDING'];
+    public const ALLOWED = ['PENDING', 'IN_PROGRESS', 'COMPLETED'];
 
     private string $value;
 

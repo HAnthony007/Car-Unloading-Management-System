@@ -10,10 +10,12 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-function authenticate(): User {
+function authenticate(): User
+{
     /** @var User $user */
     $user = User::factory()->create();
     test()->actingAs($user);
+
     return $user;
 }
 
@@ -46,10 +48,10 @@ it('returns surveys and checkpoints for a discharge inspection', function () {
                     'survey_id', 'survey_name', 'overall_status', 'survey_description', 'survey_date',
                     'checkpoints' => [
                         [
-                            'checkpoint_id', 'title_checkpoint', 'description_checkpoint', 'comment_checkpoint', 'result_checkpoint', 'order_checkpoint'
-                        ]
-                    ]
-                ]
-            ]
+                            'checkpoint_id', 'title_checkpoint', 'description_checkpoint', 'comment_checkpoint', 'result_checkpoint', 'order_checkpoint',
+                        ],
+                    ],
+                ],
+            ],
         ]);
 });

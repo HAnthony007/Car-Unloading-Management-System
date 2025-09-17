@@ -23,7 +23,7 @@ class SurveyDomainAndUseCasesTest extends TestCase
     public function test_value_objects_and_entity()
     {
         $date = new SurveyDate(Carbon::parse('2025-08-01T09:30:00Z'));
-        $status = new SurveyStatus('PASSED');
+        $status = new SurveyStatus('COMPLETED');
         $name = new SurveyName('Initial Survey');
         $desc = new SurveyDescription('Description');
         $entity = new Survey(
@@ -38,7 +38,7 @@ class SurveyDomainAndUseCasesTest extends TestCase
             updatedAt: Carbon::now(),
         );
 
-        $this->assertSame('PASSED', $entity->getOverallStatus()->getValue());
+    $this->assertSame('COMPLETED', $entity->getOverallStatus()->getValue());
         $this->assertSame('2025-08-01', $entity->getSurveyDate()->getValue()->toDateString());
         $this->assertSame(10, $entity->getAgentId()->getValue());
         $this->assertSame(55, $entity->getDischargeId()->getValue());
@@ -118,7 +118,7 @@ class SurveyDomainAndUseCasesTest extends TestCase
             surveyDate: new SurveyDate(Carbon::parse('2025-08-02')),
             surveyName: new SurveyName('S2'),
             surveyDescription: new SurveyDescription('D2'),
-            overallStatus: new SurveyStatus('PASSED'),
+            overallStatus: new SurveyStatus('COMPLETED'),
             agentId: new UserId(10),
             dischargeId: new DischargeId(55),
         );
@@ -128,7 +128,7 @@ class SurveyDomainAndUseCasesTest extends TestCase
         $repo->method('save')->willReturn($updated);
 
         $uc = new UpdateSurveyUseCase($repo);
-        $out = $uc->execute(new UpdateSurveyDTO(1, '2025-08-02', 'PASSED'));
+    $out = $uc->execute(new UpdateSurveyDTO(1, '2025-08-02', 'COMPLETED'));
         $this->assertSame($updated, $out);
     }
 

@@ -62,7 +62,7 @@ Exemple succès:
     {
       "survey_id": 10,
       "survey_name": "Entrée",
-      "overall_status": "PENDING",
+  "overall_status": "PENDING",
       "survey_description": null,
       "survey_date": "2025-09-13T12:30:00Z",
       "checkpoints": [

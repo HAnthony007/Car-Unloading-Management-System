@@ -54,13 +54,14 @@ final class StartVehicleInspectionUseCase
                 $surveyData = [
                     'survey_name' => $template->name,
                     'survey_description' => $template->description,
-                    'overall_status' => $template->default_overall_status,
+                    // When starting an inspection, mark as IN_PROGRESS
+                    'overall_status' => 'IN_PROGRESS',
                 ];
                 $survey = Survey::query()->create([
                     'survey_date' => now(),
                     'survey_name' => $surveyData['survey_name'] ?? 'Survey',
                     'survey_description' => $surveyData['survey_description'] ?? null,
-                    'overall_status' => $surveyData['overall_status'] ?? 'PENDING',
+                    'overall_status' => $surveyData['overall_status'] ?? 'IN_PROGRESS',
                     'agent_id' => $agentId,
                     'discharge_id' => $dischargeId,
                 ]);
