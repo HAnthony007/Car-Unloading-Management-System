@@ -13,8 +13,8 @@ final class Dock
         private readonly ?DockId $dockId,
         private readonly DockName $dockName,
         private readonly Location $location,
-    private readonly ?float $latitude = null,
-    private readonly ?float $longitude = null,
+        private readonly ?float $latitude = null,
+        private readonly ?float $longitude = null,
         private readonly ?Carbon $createdAt = null,
         private readonly ?Carbon $updatedAt = null
     ) {}

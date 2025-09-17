@@ -10,10 +10,10 @@ final class UpdateMovementDTO
         public readonly ?string $timestamp,
         public readonly ?string $from,
         public readonly ?string $to,
-    public readonly ?float $fromLatitude = null,
-    public readonly ?float $fromLongitude = null,
-    public readonly ?float $toLatitude = null,
-    public readonly ?float $toLongitude = null,
+        public readonly ?float $fromLatitude = null,
+        public readonly ?float $fromLongitude = null,
+        public readonly ?float $toLatitude = null,
+        public readonly ?float $toLongitude = null,
         public readonly ?string $parkingNumber = null,
     ) {}
 

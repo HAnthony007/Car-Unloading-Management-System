@@ -7,8 +7,8 @@ final class CreateDockDTO
     public function __construct(
         public readonly string $dockName,
         public readonly string $location,
-    public readonly ?float $latitude = null,
-    public readonly ?float $longitude = null,
+        public readonly ?float $latitude = null,
+        public readonly ?float $longitude = null,
     ) {}
 
     public static function fromArray(array $data): self
@@ -33,6 +33,7 @@ final class CreateDockDTO
         if ($this->longitude !== null) {
             $data['longitude'] = $this->longitude;
         }
+
         return $data;
     }
 }

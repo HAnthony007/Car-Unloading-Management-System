@@ -8,9 +8,9 @@ final class CreateParkingDTO
         public readonly string $parkingName,
         public readonly string $location,
         public readonly int $capacity,
-    public readonly ?string $parkingNumber = null,
-     public readonly ?float $latitude = null,
-     public readonly ?float $longitude = null,
+        public readonly ?string $parkingNumber = null,
+        public readonly ?float $latitude = null,
+        public readonly ?float $longitude = null,
     ) {}
 
     public static function fromArray(array $data): self
@@ -39,6 +39,7 @@ final class CreateParkingDTO
         if ($this->longitude !== null) {
             $data['longitude'] = $this->longitude;
         }
+
         return $data;
     }
 }

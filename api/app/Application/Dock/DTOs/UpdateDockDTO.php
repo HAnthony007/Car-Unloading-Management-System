@@ -8,8 +8,8 @@ final class UpdateDockDTO
         public readonly int $dockId,
         public readonly ?string $dockName = null,
         public readonly ?string $location = null,
-    public readonly ?float $latitude = null,
-    public readonly ?float $longitude = null,
+        public readonly ?float $latitude = null,
+        public readonly ?float $longitude = null,
     ) {}
 
     public static function fromArray(array $data): self

@@ -9,9 +9,9 @@ final class UpdateParkingDTO
         public readonly ?string $parkingName = null,
         public readonly ?string $location = null,
         public readonly ?int $capacity = null,
-    public readonly ?string $parkingNumber = null,
-    public readonly ?float $latitude = null,
-    public readonly ?float $longitude = null,
+        public readonly ?string $parkingNumber = null,
+        public readonly ?float $latitude = null,
+        public readonly ?float $longitude = null,
     ) {}
 
     public static function fromArray(array $data): self

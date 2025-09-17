@@ -59,6 +59,7 @@ final class MovementResource extends JsonResource
         if ($parking && $parking->latitude !== null && $parking->longitude !== null) {
             return ['lat' => (float) $parking->latitude, 'lng' => (float) $parking->longitude];
         }
+
         return ['lat' => null, 'lng' => null];
     }
 }

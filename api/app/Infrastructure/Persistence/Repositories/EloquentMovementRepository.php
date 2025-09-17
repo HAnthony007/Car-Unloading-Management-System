@@ -60,10 +60,10 @@ final class EloquentMovementRepository implements MovementRepositoryInterface
         $e->discharge_id = $movement->getDischargeId()->getValue();
         $e->user_id = $movement->getUserId()->getValue();
         $e->parking_number = $movement->getParkingNumber();
-    $e->from_latitude = $movement->getFromLatitude();
-    $e->from_longitude = $movement->getFromLongitude();
-    $e->to_latitude = $movement->getToLatitude();
-    $e->to_longitude = $movement->getToLongitude();
+        $e->from_latitude = $movement->getFromLatitude();
+        $e->from_longitude = $movement->getFromLongitude();
+        $e->to_latitude = $movement->getToLatitude();
+        $e->to_longitude = $movement->getToLongitude();
         $e->save();
 
         return $this->toDomain($e);

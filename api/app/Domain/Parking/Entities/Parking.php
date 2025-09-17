@@ -17,8 +17,8 @@ final class Parking
         private readonly Location $location,
         private readonly Capacity $capacity,
         private readonly ?ParkingNumber $parkingNumber = null,
-    private readonly ?float $latitude = null,
-    private readonly ?float $longitude = null,
+        private readonly ?float $latitude = null,
+        private readonly ?float $longitude = null,
         private readonly ?Carbon $createdAt = null,
         private readonly ?Carbon $updatedAt = null
     ) {}
