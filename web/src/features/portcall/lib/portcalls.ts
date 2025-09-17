@@ -66,3 +66,37 @@ export async function getPortCallById(id: number): Promise<PortCall> {
   // Accept either { data: {...} } or direct object
   return (payload?.data ?? payload) as PortCall;
 }
+
+export type UpdatePortCallPayload = {
+  vessel_agent?: string;
+  origin_port?: string;
+  // Dates are nullable in backend rules
+  estimated_arrival?: string | null;
+  arrival_date?: string | null;
+  estimated_departure?: string | null;
+  departure_date?: string | null;
+  vessel_id?: number;
+  dock_id?: number;
+  status?: string;
+};
+
+export async function updatePortCall(id: number, data: UpdatePortCallPayload): Promise<PortCall> {
+  const base = process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL || "";
+  const url = new URL(`${base}/port-calls/${id}`);
+  const res = await fetchWithCsrf(url.toString(), {
+    method: "PUT",
+    headers: { "Content-Type": "application/json", Accept: "application/json" },
+    cache: "no-store",
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    let message = "Failed to update port call";
+    try {
+      const payload = await res.json();
+      message = payload?.message || message;
+    } catch {}
+    throw new Error(message);
+  }
+  const payload = await res.json();
+  return (payload?.data ?? payload) as PortCall;
+}

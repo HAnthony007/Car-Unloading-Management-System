@@ -83,7 +83,7 @@ export default function PortCallDetailClient({ id }: { id: number }) {
                         <Icons.alertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
                         <h3 className="text-lg font-semibold mb-2">Erreur</h3>
                         <p className="text-muted-foreground mb-4">{error.message}</p>
-                        <Button onClick={() => router.push("/dashboard/port/portcall")}>
+                        <Button onClick={() => router.push("/dashboard/operation/port-call")}>
                             Retour à la liste
                         </Button>
                     </CardContent>
@@ -100,7 +100,7 @@ export default function PortCallDetailClient({ id }: { id: number }) {
                         <Icons.alertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
                         <h3 className="text-lg font-semibold mb-2">Port Call non trouvé</h3>
                         <p className="text-muted-foreground mb-4">Le Port Call demandé n'existe pas ou a été supprimé.</p>
-                        <Button onClick={() => router.push("/dashboard/port/portcall")}>Retour à la liste</Button>
+                        <Button onClick={() => router.push("/dashboard/operation/port-call")}>Retour à la liste</Button>
                     </CardContent>
                 </Card>
             </div>
@@ -131,7 +131,7 @@ export default function PortCallDetailClient({ id }: { id: number }) {
                     </div>
                 </div>
                 <div className="flex gap-3">
-                    <Button variant="outline" size="sm" onClick={() => router.push(`/dashboard/port/portcall/${id}/edit`)}>
+                    <Button variant="outline" size="sm" onClick={() => router.push(`/dashboard/operation/port-call/${id}/edit`)}>
                         <Icons.edit className="h-4 w-4 mr-2" />
                         Modifier
                     </Button>

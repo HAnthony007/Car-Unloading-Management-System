@@ -43,7 +43,7 @@ export default function PortCall() {
     const completed = meta?.counts?.completed ?? computedCounts.completed;
 
     const handleView = (id: number) => router.push(`/dashboard/operation/port-call/${id}`);
-    const handleEdit = (id: number) => console.log("edit", id);
+    const handleEdit = (id: number) => router.push(`/dashboard/operation/port-call/${id}/edit`);
     const handleDelete = (id: number) => {
         if (confirm(`Êtes-vous sûr de vouloir supprimer le Port Call #${id} ?`)) {
             console.log("delete", id);
