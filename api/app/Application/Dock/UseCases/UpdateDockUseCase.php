@@ -23,11 +23,15 @@ final class UpdateDockUseCase
 
         $dockName = $dto->dockName !== null ? new DockName($dto->dockName) : $existing->getDockName();
         $location = $dto->location !== null ? new Location($dto->location) : $existing->getLocation();
+    $latitude = $dto->latitude !== null ? $dto->latitude : $existing->getLatitude();
+    $longitude = $dto->longitude !== null ? $dto->longitude : $existing->getLongitude();
 
         $updated = new Dock(
             dockId: $existing->getDockId(),
             dockName: $dockName,
             location: $location,
+            latitude: $latitude,
+            longitude: $longitude,
             createdAt: $existing->getCreatedAt(),
             updatedAt: now(),
         );

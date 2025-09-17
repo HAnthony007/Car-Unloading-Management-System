@@ -26,7 +26,9 @@ final class CreateParkingUseCase
             parkingName: new ParkingName($dto->parkingName),
             location: new Location($dto->location),
             capacity: new Capacity($dto->capacity),
-            parkingNumber: $dto->parkingNumber !== null ? new ParkingNumber($dto->parkingNumber) : null
+                parkingNumber: $dto->parkingNumber !== null ? new ParkingNumber($dto->parkingNumber) : null,
+                latitude: $dto->latitude,
+                longitude: $dto->longitude,
         );
 
         return $this->parkingRepository->save($parking);

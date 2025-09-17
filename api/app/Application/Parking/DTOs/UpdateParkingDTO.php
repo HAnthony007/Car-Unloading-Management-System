@@ -9,7 +9,9 @@ final class UpdateParkingDTO
         public readonly ?string $parkingName = null,
         public readonly ?string $location = null,
         public readonly ?int $capacity = null,
-        public readonly ?string $parkingNumber = null
+    public readonly ?string $parkingNumber = null,
+    public readonly ?float $latitude = null,
+    public readonly ?float $longitude = null,
     ) {}
 
     public static function fromArray(array $data): self
@@ -19,7 +21,9 @@ final class UpdateParkingDTO
             parkingName: $data['parking_name'] ?? null,
             location: $data['location'] ?? null,
             capacity: isset($data['capacity']) ? (int) $data['capacity'] : null,
-            parkingNumber: $data['parking_number'] ?? null
+            parkingNumber: $data['parking_number'] ?? null,
+            latitude: isset($data['latitude']) ? (float) $data['latitude'] : null,
+            longitude: isset($data['longitude']) ? (float) $data['longitude'] : null,
         );
     }
 
@@ -41,6 +45,12 @@ final class UpdateParkingDTO
 
         if ($this->parkingNumber !== null) {
             $data['parking_number'] = $this->parkingNumber;
+        }
+        if ($this->latitude !== null) {
+            $data['latitude'] = $this->latitude;
+        }
+        if ($this->longitude !== null) {
+            $data['longitude'] = $this->longitude;
         }
 
         return $data;

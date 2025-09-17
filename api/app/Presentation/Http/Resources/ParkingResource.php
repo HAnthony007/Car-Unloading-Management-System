@@ -19,6 +19,8 @@ final class ParkingResource extends JsonResource
             'location' => $parking->getLocation()->getValue(),
             'capacity' => $parking->getCapacity()->getValue(),
             'parking_number' => $parking->getParkingNumber()?->getValue(),
+            'latitude' => method_exists($this->resource, 'getAttribute') ? $this->resource->getAttribute('latitude') : null,
+            'longitude' => method_exists($this->resource, 'getAttribute') ? $this->resource->getAttribute('longitude') : null,
             'created_at' => $parking->getCreatedAt()?->toISOString(),
             'updated_at' => $parking->getUpdatedAt()?->toISOString(),
         ];

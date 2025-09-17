@@ -59,6 +59,10 @@ final class CreateMovementUseCase
             dischargeId: new DischargeId($dto->dischargeId),
             userId: new UserId($dto->userId),
             parkingNumber: $parkingNumber,
+            fromLatitude: $dto->fromLatitude,
+            fromLongitude: $dto->fromLongitude,
+            toLatitude: $dto->toLatitude,
+            toLongitude: $dto->toLongitude,
         );
 
         return $this->movementRepository->save($entity);

@@ -13,6 +13,11 @@ class Dock extends Model
 
     protected $guarded = ['dock_id'];
 
+    protected $casts = [
+        'latitude' => 'float',
+        'longitude' => 'float',
+    ];
+
     public function portCalls(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(PortCall::class, 'dock_id');

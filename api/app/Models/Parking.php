@@ -17,4 +17,9 @@ class Parking extends Model
         'capacity',
         'parking_number',
     ];
+
+    protected $casts = [
+        'latitude' => 'float',
+        'longitude' => 'float',
+    ];
 }

@@ -18,6 +18,8 @@ final class UpdateDockRequest extends FormRequest
         return [
             'dock_name' => ['sometimes', 'string', 'max:100'],
             'location' => ['sometimes', 'string', 'max:255'],
+            'latitude' => ['sometimes', 'nullable', 'numeric', 'between:-90,90'],
+            'longitude' => ['sometimes', 'nullable', 'numeric', 'between:-180,180'],
         ];
     }
 

@@ -8,7 +8,9 @@ final class CreateParkingDTO
         public readonly string $parkingName,
         public readonly string $location,
         public readonly int $capacity,
-        public readonly ?string $parkingNumber = null
+    public readonly ?string $parkingNumber = null,
+     public readonly ?float $latitude = null,
+     public readonly ?float $longitude = null,
     ) {}
 
     public static function fromArray(array $data): self
@@ -17,17 +19,26 @@ final class CreateParkingDTO
             parkingName: $data['parking_name'] ?? '',
             location: $data['location'] ?? '',
             capacity: (int) ($data['capacity'] ?? 0),
-            parkingNumber: $data['parking_number'] ?? null
+            parkingNumber: $data['parking_number'] ?? null,
+            latitude: isset($data['latitude']) ? (float) $data['latitude'] : null,
+            longitude: isset($data['longitude']) ? (float) $data['longitude'] : null,
         );
     }
 
     public function toArray(): array
     {
-        return [
+        $data = [
             'parking_name' => $this->parkingName,
             'location' => $this->location,
             'capacity' => $this->capacity,
             'parking_number' => $this->parkingNumber,
         ];
+        if ($this->latitude !== null) {
+            $data['latitude'] = $this->latitude;
+        }
+        if ($this->longitude !== null) {
+            $data['longitude'] = $this->longitude;
+        }
+        return $data;
     }
 }

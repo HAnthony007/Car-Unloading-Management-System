@@ -51,6 +51,13 @@ final class EloquentParkingRepository implements ParkingRepositoryInterface
         $eloquentParking->capacity = $parking->getCapacity()->getValue();
         $eloquentParking->parking_number = $parking->getParkingNumber()?->getValue();
 
+        // Persist coordinates if provided on the domain entity
+        if (method_exists($parking, 'getLatitude')) {
+            $eloquentParking->latitude = $parking->getLatitude();
+        }
+        if (method_exists($parking, 'getLongitude')) {
+            $eloquentParking->longitude = $parking->getLongitude();
+        }
         $eloquentParking->save();
 
         return $this->toDomainEntity($eloquentParking);
@@ -75,6 +82,8 @@ final class EloquentParkingRepository implements ParkingRepositoryInterface
             location: new Location($eloquentParking->location),
             capacity: new Capacity($eloquentParking->capacity),
             parkingNumber: $eloquentParking->parking_number !== null ? new ParkingNumber($eloquentParking->parking_number) : null,
+            latitude: $eloquentParking->latitude,
+            longitude: $eloquentParking->longitude,
             createdAt: $eloquentParking->created_at,
             updatedAt: $eloquentParking->updated_at
         );

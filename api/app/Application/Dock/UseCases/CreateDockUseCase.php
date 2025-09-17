@@ -18,6 +18,8 @@ final class CreateDockUseCase
             dockId: null,
             dockName: new DockName($dto->dockName),
             location: new Location($dto->location),
+            latitude: $dto->latitude,
+            longitude: $dto->longitude,
         );
 
         return $this->dockRepository->save($dock);

@@ -53,6 +53,9 @@ final class UpdateParkingUseCase
             ? new ParkingNumber($dto->parkingNumber)
             : $existingParking->getParkingNumber();
 
+    $latitude = $dto->latitude !== null ? $dto->latitude : $existingParking->getLatitude();
+    $longitude = $dto->longitude !== null ? $dto->longitude : $existingParking->getLongitude();
+
         // Créer une nouvelle entité avec les valeurs mises à jour
         $updatedParking = new Parking(
             parkingId: $existingParking->getParkingId(),
@@ -60,6 +63,8 @@ final class UpdateParkingUseCase
             location: $location,
             capacity: $capacity,
             parkingNumber: $parkingNumber,
+            latitude: $latitude,
+            longitude: $longitude,
             createdAt: $existingParking->getCreatedAt(),
             updatedAt: now()
         );

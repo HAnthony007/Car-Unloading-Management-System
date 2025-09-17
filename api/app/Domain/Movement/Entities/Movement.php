@@ -19,6 +19,10 @@ final class Movement
         private readonly DischargeId $dischargeId,
         private readonly UserId $userId,
         private readonly ?string $parkingNumber = null,
+    private readonly ?float $fromLatitude = null,
+    private readonly ?float $fromLongitude = null,
+    private readonly ?float $toLatitude = null,
+    private readonly ?float $toLongitude = null,
         private readonly ?Carbon $createdAt = null,
         private readonly ?Carbon $updatedAt = null,
     ) {}
@@ -63,6 +67,11 @@ final class Movement
         return $this->parkingNumber;
     }
 
+    public function getFromLatitude(): ?float { return $this->fromLatitude; }
+    public function getFromLongitude(): ?float { return $this->fromLongitude; }
+    public function getToLatitude(): ?float { return $this->toLatitude; }
+    public function getToLongitude(): ?float { return $this->toLongitude; }
+
     public function getCreatedAt(): ?Carbon
     {
         return $this->createdAt;
@@ -81,6 +90,10 @@ final class Movement
             'timestamp' => $this->timestamp->toISOString(),
             'from' => $this->from->getValue(),
             'to' => $this->to->getValue(),
+            'from_latitude' => $this->fromLatitude,
+            'from_longitude' => $this->fromLongitude,
+            'to_latitude' => $this->toLatitude,
+            'to_longitude' => $this->toLongitude,
             'discharge_id' => $this->dischargeId->getValue(),
             'user_id' => $this->userId->getValue(),
             'parking_number' => $this->parkingNumber,

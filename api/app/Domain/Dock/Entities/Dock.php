@@ -13,6 +13,8 @@ final class Dock
         private readonly ?DockId $dockId,
         private readonly DockName $dockName,
         private readonly Location $location,
+    private readonly ?float $latitude = null,
+    private readonly ?float $longitude = null,
         private readonly ?Carbon $createdAt = null,
         private readonly ?Carbon $updatedAt = null
     ) {}
@@ -32,6 +34,16 @@ final class Dock
         return $this->location;
     }
 
+    public function getLatitude(): ?float
+    {
+        return $this->latitude;
+    }
+
+    public function getLongitude(): ?float
+    {
+        return $this->longitude;
+    }
+
     public function getCreatedAt(): ?Carbon
     {
         return $this->createdAt;
@@ -48,6 +60,8 @@ final class Dock
             'dock_id' => $this->dockId?->getValue(),
             'dock_name' => $this->dockName->getValue(),
             'location' => $this->location->getValue(),
+            'latitude' => $this->latitude,
+            'longitude' => $this->longitude,
             'created_at' => $this->createdAt?->toISOString(),
             'updated_at' => $this->updatedAt?->toISOString(),
         ];

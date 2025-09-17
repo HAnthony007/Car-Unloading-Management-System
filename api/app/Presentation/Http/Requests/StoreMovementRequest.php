@@ -20,6 +20,10 @@ final class StoreMovementRequest extends FormRequest
             'timestamp' => ['required', 'date'],
             'from' => ['nullable', 'string', 'max:255'],
             'to' => ['nullable', 'string', 'max:255'],
+            'from_latitude' => ['nullable', 'numeric', 'between:-90,90'],
+            'from_longitude' => ['nullable', 'numeric', 'between:-180,180'],
+            'to_latitude' => ['nullable', 'numeric', 'between:-90,90'],
+            'to_longitude' => ['nullable', 'numeric', 'between:-180,180'],
             // parking_number is per-discharge slot; required when destination is Mahasarika
             'parking_number' => ['nullable', 'string', 'max:50', 'required_if:to,Mahasarika'],
             'discharge_id' => ['required', 'integer'],

@@ -32,6 +32,13 @@ final class EloquentDockRepository implements DockRepositoryInterface
 
         $eloquent->dock_name = $dock->getDockName()->getValue();
         $eloquent->location = $dock->getLocation()->getValue();
+        // Persist coordinates if provided on the domain entity
+        if (property_exists($dock, 'latitude')) {
+            $eloquent->latitude = $dock->getLatitude();
+        }
+        if (property_exists($dock, 'longitude')) {
+            $eloquent->longitude = $dock->getLongitude();
+        }
         $eloquent->save();
 
         return $this->toDomainEntity($eloquent);
@@ -53,6 +60,8 @@ final class EloquentDockRepository implements DockRepositoryInterface
             dockId: new DockId($eloquent->dock_id),
             dockName: new DockName($eloquent->dock_name),
             location: new Location($eloquent->location),
+            latitude: $eloquent->latitude,
+            longitude: $eloquent->longitude,
             createdAt: $eloquent->created_at,
             updatedAt: $eloquent->updated_at,
         );

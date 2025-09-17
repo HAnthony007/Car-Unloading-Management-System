@@ -17,6 +17,8 @@ final class DockResource extends JsonResource
             'dock_id' => $dock->getDockId()?->getValue(),
             'dock_name' => $dock->getDockName()->getValue(),
             'location' => $dock->getLocation()->getValue(),
+            'latitude' => $dock->getLatitude(),
+            'longitude' => $dock->getLongitude(),
             'created_at' => $dock->getCreatedAt()?->toISOString(),
             'updated_at' => $dock->getUpdatedAt()?->toISOString(),
         ];

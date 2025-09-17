@@ -43,6 +43,11 @@ final class UpdateMovementUseCase
             ? ($dto->parkingNumber ?? $existing->getParkingNumber())
             : null;
 
+    $fromLat = $dto->fromLatitude !== null ? $dto->fromLatitude : $existing->getFromLatitude();
+    $fromLng = $dto->fromLongitude !== null ? $dto->fromLongitude : $existing->getFromLongitude();
+    $toLat = $dto->toLatitude !== null ? $dto->toLatitude : $existing->getToLatitude();
+    $toLng = $dto->toLongitude !== null ? $dto->toLongitude : $existing->getToLongitude();
+
         $updated = new DomainMovement(
             movementId: $existing->getMovementId(),
             note: $dto->note ?? $existing->getNote(),
@@ -52,6 +57,10 @@ final class UpdateMovementUseCase
             dischargeId: $existing->getDischargeId(),
             userId: $existing->getUserId(),
             parkingNumber: $newParkingNumber,
+            fromLatitude: $fromLat,
+            fromLongitude: $fromLng,
+            toLatitude: $toLat,
+            toLongitude: $toLng,
             createdAt: $existing->getCreatedAt(),
             updatedAt: $existing->getUpdatedAt(),
         );
