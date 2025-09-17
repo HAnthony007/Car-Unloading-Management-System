@@ -18,12 +18,24 @@ export default function PortCall() {
     const [perPage, setPerPage] = useState(15);
     const [q, setQ] = useState("");
     const [status, setStatus] = useState<string>("all");
-    const { data: queryData, isLoading } = usePortCalls({ page, perPage, q, status });
-    const portCalls = useMemo<PortCall[]>(() => queryData?.data ?? [], [queryData]);
+    const { data: queryData, isLoading } = usePortCalls({
+        page,
+        perPage,
+        q,
+        status,
+    });
+    const portCalls = useMemo<PortCall[]>(
+        () => queryData?.data ?? [],
+        [queryData]
+    );
     const meta = queryData?.meta;
 
     // Try to extract totals from meta if provided by the API (prefer server-side counts)
-    const totalFromMeta = meta?.total ?? meta?.pagination?.total ?? meta?.total_items ?? meta?.count;
+    const totalFromMeta =
+        meta?.total ??
+        meta?.pagination?.total ??
+        meta?.total_items ??
+        meta?.count;
 
     // Compute counts per status from returned data as fallback (or when meta has only page data)
     const computedCounts = (queryData?.data ?? []).reduce(
@@ -34,18 +46,29 @@ export default function PortCall() {
             else if (s === "completed") acc.completed += 1;
             return acc;
         },
-        { pending: 0, in_progress: 0, completed: 0 },
+        { pending: 0, in_progress: 0, completed: 0 }
     );
 
-    const total = totalFromMeta ?? (queryData?.meta && typeof queryData.meta.total === "number" ? queryData.meta.total : portCalls.length);
-    const inProgress = meta?.counts?.in_progress ?? meta?.counts?.running ?? computedCounts.in_progress;
+    const total =
+        totalFromMeta ??
+        (queryData?.meta && typeof queryData.meta.total === "number"
+            ? queryData.meta.total
+            : portCalls.length);
+    const inProgress =
+        meta?.counts?.in_progress ??
+        meta?.counts?.running ??
+        computedCounts.in_progress;
     const pendingCount = meta?.counts?.pending ?? computedCounts.pending;
     const completed = meta?.counts?.completed ?? computedCounts.completed;
 
-    const handleView = (id: number) => router.push(`/dashboard/operation/port-call/${id}`);
-    const handleEdit = (id: number) => router.push(`/dashboard/operation/port-call/${id}/edit`);
+    const handleView = (id: number) =>
+        router.push(`/dashboard/operation/port-call/${id}`);
+    const handleEdit = (id: number) =>
+        router.push(`/dashboard/operation/port-call/${id}/edit`);
     const handleDelete = (id: number) => {
-        if (confirm(`Êtes-vous sûr de vouloir supprimer le Port Call #${id} ?`)) {
+        if (
+            confirm(`Êtes-vous sûr de vouloir supprimer le Port Call #${id} ?`)
+        ) {
             console.log("delete", id);
         }
     };
@@ -54,12 +77,20 @@ export default function PortCall() {
         <Main>
             <div className="mb-2 flex flex-wrap items-center justify-between space-y-2">
                 <div>
-                    <h2 className="text-2xl font-bold tracking-tight">Gestion des Port Calls</h2>
-                    <p className="text-muted-foreground">Suivi et gestion de tous les escales portuaires</p>
+                    <h2 className="text-2xl font-bold tracking-tight">
+                        Gestion des Port Calls
+                    </h2>
+                    <p className="text-muted-foreground">
+                        Suivi et gestion de tous les escales portuaires
+                    </p>
                 </div>
                 <div>
-                    <Button className="flex items-center gap-2" onClick={() => console.log("Créer nouveau")}>
-                        <Icons.plusCircled className="h-5 w-5" />Nouveau Port Call
+                    <Button
+                        className="flex items-center gap-2"
+                        onClick={() => console.log("Créer nouveau")}
+                    >
+                        <Icons.plusCircled className="h-5 w-5" />
+                        Nouveau Port Call
                     </Button>
                 </div>
             </div>
@@ -70,8 +101,12 @@ export default function PortCall() {
                         <div className="flex items-center gap-2">
                             <Icons.area className="h-6 w-6 text-blue-600" />
                             <div>
-                                <p className="text-2xl font-bold">{total ?? 0}</p>
-                                <p className="text-sm text-muted-foreground">Total Port Calls</p>
+                                <p className="text-2xl font-bold">
+                                    {total ?? 0}
+                                </p>
+                                <p className="text-sm text-muted-foreground">
+                                    Total Port Calls
+                                </p>
                             </div>
                         </div>
                     </CardContent>
@@ -82,8 +117,12 @@ export default function PortCall() {
                         <div className="flex items-center gap-2">
                             <Icons.calendar className="h-6 w-6 text-green-600" />
                             <div>
-                                <p className="text-2xl font-bold">{inProgress ?? 0}</p>
-                                <p className="text-sm text-muted-foreground">En cours</p>
+                                <p className="text-2xl font-bold">
+                                    {inProgress ?? 0}
+                                </p>
+                                <p className="text-sm text-muted-foreground">
+                                    En cours
+                                </p>
                             </div>
                         </div>
                     </CardContent>
@@ -94,8 +133,12 @@ export default function PortCall() {
                         <div className="flex items-center gap-2">
                             <Icons.clock className="h-6 w-6 text-blue-600" />
                             <div>
-                                <p className="text-2xl font-bold">{pendingCount ?? 0}</p>
-                                <p className="text-sm text-muted-foreground">En attente</p>
+                                <p className="text-2xl font-bold">
+                                    {pendingCount ?? 0}
+                                </p>
+                                <p className="text-sm text-muted-foreground">
+                                    En attente
+                                </p>
                             </div>
                         </div>
                     </CardContent>
@@ -106,8 +149,12 @@ export default function PortCall() {
                         <div className="flex items-center gap-2">
                             <Icons.check className="h-6 w-6 text-gray-600" />
                             <div>
-                                <p className="text-2xl font-bold">{completed ?? 0}</p>
-                                <p className="text-sm text-muted-foreground">Terminés</p>
+                                <p className="text-2xl font-bold">
+                                    {completed ?? 0}
+                                </p>
+                                <p className="text-sm text-muted-foreground">
+                                    Terminés
+                                </p>
                             </div>
                         </div>
                     </CardContent>
@@ -135,9 +182,12 @@ export default function PortCall() {
 
             <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                    <h2 className="text-xl font-semibold">Port Calls ({portCalls.length})</h2>
+                    <h2 className="text-xl font-semibold">
+                        Port Calls ({portCalls.length})
+                    </h2>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Icons.info className="h-4 w-4" />Cliquez sur une ligne pour plus de détails
+                        <Icons.info className="h-4 w-4" />
+                        Cliquez sur une ligne pour plus de détails
                     </div>
                 </div>
 
@@ -146,7 +196,12 @@ export default function PortCall() {
                         <Icons.spinner className="h-6 w-6 animate-spin" />
                     </div>
                 ) : (
-                    <PortCallList portCalls={portCalls} onView={handleView} onEdit={handleEdit} onDelete={handleDelete} />
+                    <PortCallList
+                        portCalls={portCalls}
+                        onView={handleView}
+                        onEdit={handleEdit}
+                        onDelete={handleDelete}
+                    />
                 )}
             </div>
         </Main>
