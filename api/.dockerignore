@@ -1,0 +1,14 @@
+.git
+.gitignore
+node_modules
+vendor/.cache
+storage/logs
+storage/framework/sessions
+storage/framework/cache
+storage/framework/views
+bootstrap/cache/*.php
+.env
+tests
+docker-compose.yml
+Dockerfile
+.DS_Store

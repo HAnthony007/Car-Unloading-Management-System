@@ -171,6 +171,12 @@ Route::prefix('discharges')
         Route::get('/{id}', [\App\Presentation\Http\Controllers\DischargeController::class, 'show'])->name('discharges.show');
         // Inspection (surveys + checkpoints) for a specific discharge
         Route::get('/{id}/inspection', [\App\Presentation\Http\Controllers\InspectionController::class, 'showByDischarge'])->name('discharges.inspection.show');
+    // Discharge photos upload (Cloudflare R2)
+    Route::get('/{id}/photos', [\App\Presentation\Http\Controllers\DischargePhotoController::class, 'index'])->name('discharges.photos.index');
+    Route::post('/{id}/photos', [\App\Presentation\Http\Controllers\DischargePhotoController::class, 'store'])->name('discharges.photos.store');
+    Route::post('/{id}/photos/batch', [\App\Presentation\Http\Controllers\DischargePhotoController::class, 'storeBatch'])->name('discharges.photos.store-batch');
+    Route::get('/{id}/photos/{photoId}/temporary-url', [\App\Presentation\Http\Controllers\DischargePhotoController::class, 'temporaryUrl'])->name('discharges.photos.temporary-url');
+    Route::delete('/{id}/photos/{photoId}', [\App\Presentation\Http\Controllers\DischargePhotoController::class, 'destroy'])->name('discharges.photos.destroy');
         Route::put('/{id}', [\App\Presentation\Http\Controllers\DischargeController::class, 'update'])->name('discharges.update');
         Route::delete('/{id}', [\App\Presentation\Http\Controllers\DischargeController::class, 'destroy'])->name('discharges.destroy');
     });
