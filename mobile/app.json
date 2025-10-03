@@ -22,7 +22,7 @@
             "edgeToEdgeEnabled": true,
             "config": {
                 "googleMaps": {
-                    "apiKey": "AIzaSyCfNN-MHYxVh5FA6BzCurNbGNowDGSUYYs"
+                    "apiKey": ""
                 }
             },
             "permissions": [
